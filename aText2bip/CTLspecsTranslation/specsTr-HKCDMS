@@ -1,0 +1,18 @@
+-- Packet Store Mode Manager:
+-- MD1: AG (  HKCDMS_mem_write_req -> hkcdms_psmodmng.Nuplace = NuSMEMORY  )
+CTLSPEC  AG (  (NuInteraction) = (NuI5) -> hkcdms_psmodmng.Nuplace = NuSMEMORY  )
+-- Packet Store Mode Manager:
+-- MD1: AG (  HKCDMS_mem_write_req -> hkcdms_psmodmng.Nuplace = NuSMEMORY  )
+CTLSPEC  AG (  (NuInteraction) = (NuI5) -> hkcdms_psmodmng.Nuplace = NuSMEMORY  )
+-- MD1: AG (  HKCDMS_ask_sat -> hkcdms_psmodmng.Nuplace = NuSSAT  )
+CTLSPEC  AG (  (NuInteraction) = (NuI4) -> hkcdms_psmodmng.Nuplace = NuSSAT  )
+
+-- HKCDMS Mode Manager:
+-- MD1: AG (  HKCDMS_read_HK -> hkcdms_modmng.Nuplace = NuSENABLED  )
+CTLSPEC  AG (  (NuInteraction) = (NuI1) -> hkcdms_modmng.Nuplace = NuSENABLED  )
+
+-- HKCDMS MUTEX:
+-- MX1: AG ( HKCDMS_read_HK -> AX A [! (HKCDMS_read_HK) U ( HKCDMS_I2C_res |  HKCDMS_mem_res ) ])
+CTLSPEC  AG ( (NuInteraction) = (NuI1) -> AX A [! ((NuInteraction) = (NuI1)) U ( (NuInteraction) = (NuI3) |  (NuInteraction) = (NuI2) ) ])
+
+FAIRNESS ( ( (NuInteraction) = (NuI3) |  (NuInteraction) = (NuI2) ) );

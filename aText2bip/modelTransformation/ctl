@@ -1,0 +1,65 @@
+TCF1
+---------
+
+/-- Action flow with abort --/
+/-- 1.-- AG (  TCmngt.ask -> AX A[ !( TCmngt.ask  ) U ( TCmngt.acqSg_e | TCmngt.noSg ) ] )  --/
+FAIRNESS 	(NuInteraction) = (NuI5)  | (NuInteraction) = (NuI8);	
+CTLSPEC AG ( (NuInteraction) = (NuI1) -> AX A[ !( (NuInteraction) = (NuI1) ) U ( (NuInteraction) = (NuI6)  | (NuInteraction) = (NuI8) ) ] )
+
+/-- 2.-- AG (  ( TCmngt.acqSg_e | TCmngt.noSg ) -> AX A[ !( TCmngt.acqSg_e | TCmngt.noSg  ) U ( TCmngt.ask )] )  --/
+
+/-- 3.-- AG (  TCmngt.put -> AX A[ !( TCmngt.put  ) U ( TCmngt.success | TCmngt.acqFail_e) ] ) ] ) --/
+
+/-- 4.-- AG (  ( TCmngt.acqSg_e | TCmngt.noSg ) -> AX A[ !( TCmngt.acqSg_e | TCmngt.noSg  ) U ( TCmngt.ask )] )  --/
+
+
+
+/-- Mode management --/
+/-- 5.--trivial: AG (  TCmngt.acqSg_e -> AX A[ !( TCmngt.acqSg_b  ) U ( TCmngt.acqSg_b ) ] )  --/
+/-- 6.--trivial: AG (  TCmngt.acqFail_e -> AX A[ !( TCmngt.acqFail_b  ) U ( TCmngt.acqFail_b ) ] )  --/
+
+TCF2
+---------
+
+/-- Action flow with abort --/
+/-- 1.-- AG (  SndrPrior.getTC -> AX A[ !(  SndrPrior.getTC  ) U ( SndrPrior.retTC | SndrPrior.noTCs ) ] )  --/
+/-- 2.-- AG ( ( SndrPrior.retTC | SndrPrior.noTCs ) -> AX A[ !( SndrPrior.retTC | SndrPrior.noTCs )U ( SndrPrior.getTC )] )  --/
+/-- 3.-- AG (  LockCtrl.askMod -> AX A[ !(  LockCtrl.askMod  ) U ( LockCtrl.lckAcc | LockCtrl.lckAccX | LockCtrl.lckRej) ] ) ] ) --/
+/-- 4.-- AG (  (LockCtrl.lckAcc | LockCtrl.lckAccX | LockCtrl.lckRej ) -> AX A[ !( LockCtrl.lckAcc | LockCtrl.lckAccX | LockCtrl.lckRej  ) U ( LockCtrl.askMod )] )  --/
+/-- 5.-- AG (  ModeCtrl.askMod -> AX A[ !(  ModeCtrl.askMod  ) U ( ModeCtrl.modAcc | ModeCtrl.modAccX | ModeCtrl.modRej) ] ) ] ) --/
+/-- 6.-- AG (  (ModeCtrl.modAcc | ModeCtrl.modAccX | ModeCtrl.modRej ) -> AX A[ !( ModeCtrl.modAcc | ModeCtrl.modAccX | ModeCtrl.modRej  ) U ( ModeCtrl.askMod )] )  --/
+/-- 7.--trivial: AG (  (SndrPriorMng.get3 | SndrPriorMng.get4 | SndrPriorMng.empty3 | SndrPriorMng.empty4) -> AX A[ !(  SndrPriorMng.get3 | SndrPriorMng.get4 | SndrPriorMng.empty3 | SndrPriorMng.empty4 ) U ( SndrPriorMng.get3 | SndrPriorMng.get4 | SndrPriorMng.empty3 | SndrPriorMng.empty4)  ] ) ] ) --/
+
+/-- Mode management --/
+/-- 8.--trivial: AG (  ModeCtrl.modAcc -> AX A[ !( ModeCtrl.modAcc ) U ( ModeCtrl.modAcc ) ] )  --/
+/-- 9.--trivial: AG (  (ModeCtrl.modRej | ModeCtrl.modAccX) -> AX A[ !( ModeCtrl.modRej | ModeCtrl.modAccX ) U ( ModeCtrl.modRej | ModeCtrl.modAccX ) ] )  --/
+/-- 10.--trivial: AG (  LockCtrl.lckAcc -> AX A[ !( LockCtrl.lckAcc ) U ( LockCtrl.lckAcc ) ] )  --/
+/-- 11.--trivial: AG (  (LockCtrl.lckRej | LockCtrl.lckAccX) -> AX A[ !( LockCtrl.lckRej | LockCtrl.lckAccX ) U ( LockCtrl.lckRej | LockCtrl.lckAccX ) ] )  --/
+/-- 12.--trivial: AG (  Prior0ActFlAb.ask0 -> AX A[ !( Prior0ActFlAb.ask0 ) U ( Prior0ActFlAb.getOPS |  Prior0ActFlAb.emptyOPS | Prior0ActFlAb.getMTL ) ] )  --/
+/-- 13.--trivial: AG (  (Prior0ActFlAb.getOPS |  Prior0ActFlAb.emptyOPS | Prior0ActFlAb.getMTL) -> AX A[ !( Prior0ActFlAb.getOPS |  Prior0ActFlAb.emptyOPS | Prior0ActFlAb.getMTL ) U ( Prior0ActFlAb.ask0) ] )  --/
+/-- 14.--trivial: AG (  Prior1ActFlAb.ask1 -> AX A[ !( Prior1ActFlAb.ask1 ) U ( Prior1ActFlAb.getOPS |  Prior1ActFlAb.emptyMTL | Prior1ActFlAb.getMTL ) ] )  --/
+/-- 15.--trivial: AG (  (Prior1ActFlAb.getOPS |  Prior1ActFlAb.emptyMTL | Prior1ActFlAb.getMTL) -> AX A[ !( Prior1ActFlAb.getOPS |  Prior1ActFlAb.emptyMTL | Prior1ActFlAb.getMTL ) U ( Prior1ActFlAb.ask1) ] )  --/
+
+/-- Priority management --/
+/-- 17.-- AG (  TCFifo.get | TCFifo.empty ) ] )  --/
+/-- 18.-- AG (  MTLFifo.get | MTLFifo.empty ) ] )  --/
+/-- 19.-- AG (  OPSFifo.get | OPSFifo.empty ) ] )  --/
+/-- 20.-- AG (  OBCPFifo.get | OBCPFifo.empty ) ] )  --/
+/-- 21.-- AG (  EASFifo.get | EASFifo.empty ) ] )  --/
+/-- 22.-- AG (  ASFifo.get | ASFifo.empty ) ] )  --/
+
+TCF3
+---------
+/-- Action flow with abort --/
+/-- 1.-- AG (  PUS1.PUSver -> AX A[ !(  PUS1.PUSver  ) U ( PUS1.PUSaccept | PUS1.PUSreject ) ] )  --/
+
+/-- 2.-- AG ( ( PUS1.retTC | PUS1.PUSreject ) -> AX A[ !( PUS1.retTC | PUS1.PUSreject )U ( PUS1.PUSver )] )  --/
+
+/-- 3.-- AG (  TcVerif.ask -> AX A[ !(  TcVerif.ask  ) U ( TcVerif.accept | TcVerif.reject ) ] )  --/
+
+/-- 4.-- AG ( ( TcVerif.retTC | TcVerif.reject ) -> AX A[ !( TcVerif.retTC | TcVerif.reject )U ( TcVerif.ask )] )  --/
+
+
+
+TCF4
+---------

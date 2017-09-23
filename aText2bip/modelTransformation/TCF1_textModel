@@ -1,0 +1,136 @@
+
+$!----------------------------TCFifoManager------------------------------------!$
+atom: TC_FifoManager
+data: occup,sid,ssid,ackReq, TC_CAP
+init: S0
+initAct:  occup=0; sid=-1; ssid=-1; ackReq=-1; TC_CAP=2;
+ports: 
+S0,S0,empty
+S0,S0,put(sid,ssid,ackReq),,occup=occup+1;
+S0,S1,*internal3,(occup==1)
+
+S1,S1,put(sid,ssid,ackReq), !(occup==0) && !(occup==TC_CAP),occup=occup+1;
+S1,S1,get(sid,ssid,ackReq),!(occup==0) && !(occup==TC_CAP),occup=occup-1;
+S1,S0,*internal1,(occup==0)
+S1,S2,*internal2,(occup==TC_CAP)
+
+S2,S2,full, !(occup<TC_CAP)
+S2,S2,get(sid,ssid,ackReq),!(occup<TC_CAP),occup=occup-1;
+S2,S1,*internal3,(occup<TC_CAP)
+end
+
+$!----------------------------SmuTC------------------------------------!$
+atom: SmuTC
+data: sid,ssid,ackReq
+init: S0
+initAct: sid=-1; ssid=-1; ackReq=-1;
+ports: 
+S0,S1,ask
+S1,S0,empty
+S1,S2,get_b(sid,ssid,ackReq)
+S2,S0,get_e
+end
+
+$!----------------------------SegmRcpt_ActFlAb------------------------------------!$
+
+atom: SegmRcpt_ActFlAb
+init: S0
+ports: 
+S0,S1,start
+S1,S2,ask
+S2,S3,acqSg_e
+S2,S0,noSg
+S3,S4,put
+S4,S5,success
+S4,S0,acqFail_e
+S5,S0,finish
+end
+
+$!----------------------------TCmngt------------------------------------!$
+atom: TCmngt
+data: sid,ssid,ackReq
+init: S0
+initAct: sid=-1; ssid=-1; ackReq=-1; 
+ports:
+S0,S1,acqSg_b
+S1,S0,acqSg_e(sid,ssid,ackReq)
+
+S0,S0,noSg
+
+S0,S3,put(sid,ssid,ackReq)
+S3,S2,acqFail_b
+S2,S0,acqFail_e
+S3,S0,success
+
+S0,S0,getGround
+
+end
+
+$!----------------------------TCmngt_ModeManager------------------------------------!$
+atom: TCmngt_ModeManager
+init: nFull
+ports: 
+nFull,nFull,acqSg
+nFull,full,toFull
+full,nFull,toNFull
+full,full,acqFail
+end
+
+$!----------------------------AcqFail_Monitor------------------------------------!$
+atom: AcqFail_Monitor
+init: S0
+ports: 
+S0,S1,acqFail
+S1,S0,tm5_3
+end
+
+$!----------------------------PUSsvc5------------------------------------!$
+atom: PUSsvc5
+init: S0
+ports: 
+S0,S0,tm5_3
+end
+
+$!-------------------------------mainModel---------------------------------!$
+
+
+compound: TCFunction
+component: TC_FifoManager,TCFIFO
+component: SegmRcpt_ActFlAb,SEGMRCPT
+component: TCmngt,TCMNG
+component: SmuTC,SMUTC
+component: TCmngt_ModeManager, TCMNGTMOD
+component: AcqFail_Monitor, ACQFAILMON
+component: PUSsvc5, PUS5
+
+
+connectors: 
+$! TCM-F1 segment acquisition function !$
+
+CPTC3obs,storeTC,,TCMNG.put,SEGMRCPT.put,TCFIFO.put
+
+/* fullFifo1 < fullFifo2 */
+CPTC4full,fullFifo2,,TCMNG.put,SEGMRCPT.put,TCFIFO.full, TCMNGTMOD.toFull
+CPTC3full,fullFifo1,,TCMNG.put,SEGMRCPT.put,TCFIFO.full
+
+RDV3,acqSg_b,,TCMNG.acqSg_b, SMUTC.get_b,TCMNGTMOD.acqSg
+CPTC3obs,acqSg_e, , SMUTC.get_e, SEGMRCPT.acqSg_e,TCMNG.acqSg_e 
+RDV3,acqFail_e, , TCMNG.acqFail_e, SEGMRCPT.acqFail_e, ACQFAILMON.acqFail
+RDV3,emptySg,,SMUTC.empty,TCMNG.noSg, SEGMRCPT.noSg
+RDV2, acqFail_b, , TCMNG.acqFail_b, TCMNGTMOD.acqFail
+RDV2,success, , TCMNG.success, SEGMRCPT.success
+RDV2,askSg,,SEGMRCPT.ask,SMUTC.ask
+RDV2,ACQFAILMON_tm5_3,,ACQFAILMON.tm5_3,PUS5.tm5_3
+
+
+/* nfullFifo1 < nfullFifo2 */
+CPTC3obs,nfullFifo2,,TCFIFO.get,TCMNG.getGround, TCMNGTMOD.toNFull
+CPTC2,nfullFifo1,,TCFIFO.get,TCMNG.getGround
+RDV2, emptyGround,,TCFIFO.empty,TCMNG.getGround
+
+end
+
+
+
+
+

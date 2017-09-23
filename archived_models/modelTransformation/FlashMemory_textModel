@@ -1,0 +1,105 @@
+
+ $!-------------------------sMutex---------------------------------------!$
+atom: sMutex
+init: IDLE
+ports: 
+IDLE,BUSY,take
+BUSY,IDLE,release
+end
+
+
+$!-------------------------flash_memory_readModeManager---------------------------------------!$
+atom: flash_memory_readModeManager
+init: IDLE
+ports: 
+IDLE, READ, read
+READ, IDLE, done
+READ, READ, contin
+end
+
+
+$!-------------------------flash_memory_writeModeManager---------------------------------------!$
+atom: flash_memory_writeModeManager
+init: IDLE
+ports: 
+IDLE, READ, write
+READ, IDLE, done
+READ, READ, contin
+end
+
+$!-------------------------flash_memory_readActionFlowWithAbort---------------------------------------!$
+atom: flash_memory_readActionFlowWithAbort
+init: READ_BUFFER
+ports: 
+READ_BUFFER, CRC, read
+CRC, STATUS_READ, check_CRC
+STATUS_READ, READ_BUFFER, bad_CRC
+STATUS_READ, READ_BUFFER, fail
+STATUS_READ, DONE, ok_read
+DONE, READ_BUFFER, finish
+end
+
+$!-------------------------flash_memory_writeActionFlowWithAbort---------------------------------------!$
+atom: flash_memory_writeActionFlowWithAbort
+init: WRITE_BUFFER
+ports: 
+WRITE_BUFFER, WAIT, write
+WAIT, STATUS_WRITE, wait
+STATUS_WRITE, WRITE_BUFFER, contin
+STATUS_WRITE, WRITE_BUFFER, fail
+STATUS_WRITE, DONE, ok_write
+DONE, WRITE_BUFFER, finish
+end
+
+$!-------------------------memory_library---------------------------------------!$
+atom: memory_library
+init: S0
+ports: 
+S0, S0, setWrite
+S0, S0, setRead
+S0, S0, checkCRC
+end
+
+
+$!-------------------------------mainModel---------------------------------!$
+compound: CubETH
+component: sMutex, MEM_MUX
+component: flash_memory_readActionFlowWithAbort, MEMRD_ACTFLAB
+component: flash_memory_writeActionFlowWithAbort, MEMWR_ACTFLAB
+component: memory_library, MEMLIB
+component: flash_memory_readModeManager, MEMRD_MODMNG
+component: flash_memory_writeModeManager, MEMWR_MODMNG
+connectors: 
+
+/******** flash memory ***********/
+/* TODO: add in .smv file : flash_memory_read2 > 1 */
+RDV3, flash_memory_setRead2, , MEM_MUX.take, MEMLIB.setRead, MEMRD_MODMNG.read
+RDV2, flash_memory_setRead1, , MEM_MUX.take, MEMLIB.setRead
+RDV2, flash_memory_read, , MEMRD_MODMNG.contin, MEMRD_ACTFLAB.read
+
+/* TODO: add in .smv file : flash_memory_read_fail2 > flash_memory_read_fail1 */
+RDV3, flash_memory_read_fail2, , MEMRD_ACTFLAB.fail, MEM_MUX.release, MEMRD_MODMNG.done 
+RDV2, flash_memory_read_fail1, , MEMRD_ACTFLAB.fail, MEM_MUX.release 
+/* TODO: add in .smv file : flash_memory_ok_read2 > flash_memory_ok_read1 */
+RDV3, flash_memory_ok_read2, , MEMRD_ACTFLAB.ok_read, MEM_MUX.release, MEMRD_MODMNG.done 
+RDV2, flash_memory_ok_read1, , MEMRD_ACTFLAB.ok_read,  MEM_MUX.release 
+
+RDV2, flash_memory_checkCRC, , MEMRD_ACTFLAB.check_CRC, MEMLIB.checkCRC
+SINGLE, flash_memory_bad_CRC , , MEMRD_ACTFLAB.bad_CRC
+
+RDV2, flash_memory_write, , MEMWR_MODMNG.contin, MEMWR_ACTFLAB.write
+
+/* TODO: add in .smv file : flash_memory_read2 > 1 */ 
+RDV3, flash_memory_setWrite2, , MEM_MUX.take, MEMLIB.setWrite, MEMWR_MODMNG.write
+RDV2, flash_memory_setWrite1, , MEM_MUX.take, MEMLIB.setWrite
+/* TODO: add in .smv file : flash_memory_write_fail2 > flash_memory_write_fail1 */
+RDV3, flash_memory_write_fail2, , MEMWR_ACTFLAB.fail,  MEM_MUX.release, MEMWR_MODMNG.done 
+RDV2, flash_memory_write_fail1, , MEMWR_ACTFLAB.fail,  MEM_MUX.release 
+/* TODO: add in .smv file : flash_memory_ok_write2 > flash_memory_ok_write1 */ 
+RDV3, flash_memory_ok_write2, , MEMWR_ACTFLAB.ok_write, MEM_MUX.release, MEMWR_MODMNG.done 
+RDV2, flash_memory_ok_write1, , MEMWR_ACTFLAB.ok_write, MEM_MUX.release 
+
+
+
+end
+

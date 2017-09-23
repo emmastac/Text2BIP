@@ -1,0 +1,94 @@
+
+$!----------------------------PUSsvc1------------------------------------!$
+atom: PUSsvc1
+init: S0
+ports: 
+S0,S0,tm1_4
+S0,S0,tm1_2
+S0,S0,tm1_8
+S0,S0,tm1_7
+S0,S0,tm1_1
+end
+
+$!----------------------------TcVerif_ActFlowAbort------------------------------------!$
+atom: TcVerif_ActFlowAbort
+data: LEGAL_APID, sid, ssid, ackReq, src
+init: S0
+initAct: LEGAL_APID=-1; sid=-1; ssid=-1; ackReq=-1; src=-1;
+ports: 
+S0,S1, start(sid, ssid, ackReq, src)
+S1,S2, ask, , LEGAL_APID=-1; 
+S2,S3, accept, (LEGAL_APID==-1 || LEGAL_APID==1), LEGAL_APID=1;
+S2,S0, reject, (LEGAL_APID==-1 || LEGAL_APID==0), LEGAL_APID=0;
+S3,S4, PUSver(sid, ssid, ackReq, src)
+S4,S5, PUSaccept
+S4,S0, PUSreject
+S5,S6, disptch(sid, ssid, ackReq, src)
+S6,S7, dispRet
+S7,S0, finish
+end
+
+$!----------------------------PUSsvc1Verif------------------------------------!$
+atom: PUSsvc1Verif
+data: sid,ssid,ackReq,src
+init: S0
+initAct: sid=-1; ssid=-1; ackReq=-1; src=-1;
+ports: 
+S0,S1, PUSver(sid,ssid,ackReq,src)
+S1,S0, PUSreject
+S1,S0, PUSaccept
+end
+
+$!----------------------------TCverif------------------------------------!$
+atom: TCverif
+data: sid,ssid,ackReq,src
+init: S0
+initAct: sid=-1; ssid=-1; ackReq=-1; src=-1;
+ports: 
+S0,S1, ask(sid,ssid,ackReq,src)
+S1,S0, reject
+S1,S0, accept
+end
+
+$!----------------------------VerifAcceptFailure_Monitor------------------------------------!$
+atom: VerifAcceptFailure_Monitor
+init: S0
+ports: 
+S0,S1,fail
+S1,S0,tm1_2
+end
+
+
+$!-------------------------------mainModel---------------------------------!$
+
+
+compound: TCFunction
+component: PUSsvc1, PUS1
+
+component: TcVerif_ActFlowAbort,VERIFACTFLAB
+component: PUSsvc1Verif,PUS1_VERIF
+component: TCverif,TCVERIF
+component: VerifAcceptFailure_Monitor, VERACCFAILMON
+
+
+connectors: 
+
+$! TCM-F3 TC verification function !$
+
+CPTCXT2, PUSver , ,VERIFACTFLAB.PUSver, PUS1_VERIF.PUSver
+RDV2, PUSaccept , ,VERIFACTFLAB.PUSaccept, PUS1_VERIF.PUSaccept
+RDV3, PUSreject , ,VERIFACTFLAB.PUSreject, PUS1_VERIF.PUSreject, VERACCFAILMON.fail
+
+CPTCXT2, verif_ask , ,VERIFACTFLAB.ask, TCVERIF.ask
+RDV2, verif_accept , ,VERIFACTFLAB.accept, TCVERIF.accept
+RDV3, verif_reject , ,VERIFACTFLAB.reject, TCVERIF.reject, VERACCFAILMON.fail
+
+RDV2, VERACCFAILMON_tm1_2, , VERACCFAILMON.tm1_2, PUS1.tm1_2
+
+
+end
+
+
+
+
+

@@ -1,0 +1,7 @@
+1 ask
+Loop starts here: 2
+2 ((tcmng.NuPput)&(tcfifo.NuPput))
+3 tcfifo.NuPinternal3
+4 nfullFifo where Nfull
+5 tcfifo.NuPinternal1
+6 ((tcmng.NuPput)&(tcfifo.NuPput))

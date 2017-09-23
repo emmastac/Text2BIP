@@ -1,0 +1,98 @@
+
+$!----------------------------TCFifoManager------------------------------------!$
+atom: TC_FifoManager
+data: occup,sid,ssid,ackReq, TC_CAP
+init: S0
+initAct:  occup=0; sid=-1; ssid=-1; ackReq=-1; TC_CAP=2;
+ports: 
+S0,S0,empty
+S0,S0,put(sid,ssid,ackReq),,occup=occup+1;
+S0,S1,*internal3,(occup==1)
+
+S1,S1,put(sid,ssid,ackReq), !(occup==0) && !(occup==TC_CAP),occup=occup+1;
+S1,S1,get(sid,ssid,ackReq),!(occup==0) && !(occup==TC_CAP),occup=occup-1;
+S1,S0,*internal1,(occup==0)
+S1,S2,*internal2,(occup==TC_CAP)
+
+S2,S2,full, !(occup<TC_CAP)
+S2,S2,get(sid,ssid,ackReq),!(occup<TC_CAP),occup=occup-1;
+S2,S1,*internal3,(occup<TC_CAP)
+end
+
+$!----------------------------TCmngt------------------------------------!$
+atom: TCmngt
+data: sid,ssid,ackReq
+init: S0
+initAct: sid=-1; ssid=-1; ackReq=-1;
+ports:
+S0,S1,acqSg_b(sid,ssid,ackReq)
+S1,S0,acqSg_e
+
+S0,S0,noSg
+
+S0,S3,put(sid,ssid,ackReq)
+S3,S2,acqFail_b
+S2,S0,acqFail_e
+S3,S0,success
+
+S0,S0,getGround
+
+end
+
+$!----------------------------SmuTC------------------------------------!$
+atom: SmuTC
+data: sid,ssid,ackReq
+init: S0
+initAct: sid=-1; ssid=-1; ackReq=-1;
+ports: 
+S0,S1,ask
+S1,S0,empty
+S1,S2,get_b(sid,ssid,ackReq)
+S2,S0,get_e
+end
+
+$!----------------------------TCmngt_ModeManager------------------------------------!$
+atom: TCmngt_ModeManager
+init: nFull
+ports: 
+nFull,nFull,acqSg
+nFull,full,toFull
+full,nFull,toNFull
+full,full,acqFail
+end
+
+$!-------------------------------mainModel---------------------------------!$
+
+
+compound: TCFunction
+component: TC_FifoManager,TCFIFO
+component: TCmngt,TCMNG
+component: SmuTC,SMUTC
+component: TCmngt_ModeManager,TCMOD
+
+connectors: 
+$! TCM-F1 segment acquisition function !$
+SINGLE,ask, , SMUTC.ask 
+CPTC2,storeTC,,TCMNG.put,TCFIFO.put
+CPTC3full,fullFifo2,,TCMNG.put,TCFIFO.full, TCMOD.toFull
+CPTC2full,fullFifo1,,TCMNG.put,TCFIFO.full
+
+CPTC2obs,acqSg_b,,SMUTC.get_b,TCMNG.acqSg_b, TCMOD.acqSg
+RDV2,acqSg_e, , SMUTC.get_e, TCMNG.acqSg_e 
+SINGLE,acqFail_e, , TCMNG.acqFail_e
+RDV2,emptySg,,SMUTC.empty,TCMNG.noSg
+
+RDV2, acqFail_b, , TCMNG.acqFail_b, TCMOD.acqFail
+SINGLE,success, , TCMNG.success 
+
+CPTC3obs,nfullFifo2,,TCFIFO.get,TCMNG.getGround, TCMOD.toNFull
+CPTC2,nfullFifo1,,TCFIFO.get,TCMNG.getGround
+RDV2, emptyGround,,TCFIFO.empty,TCMNG.getGround
+
+
+end
+
+
+
+
+

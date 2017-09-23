@@ -1,0 +1,289 @@
+
+$!-------------------------svc228---------------------------------------!$
+
+atom: svc228
+data: SID,SSID,accReq
+init: S0
+initAct: SID=228; SSID=-1; accReq=-1;
+ports: 
+S0,S1,tcComm(SID,SSID,accReq)
+S1,S2,set_nom,(SSID==-1 || SSID==1), SSID=1;
+S1,S2,set_restr,(SSID==-1 || SSID==2), SSID=2;
+S1,S2,set_on,(SSID==-1 || SSID==3), SSID=3;
+S1,S2,set_off,(SSID==-1 || SSID==4), SSID=4;
+S2,S0,fin
+end
+
+$!----------------------------Sband------------------------------------!$
+
+atom: Sband
+data: occup,sid,ssid,accReq,complete
+init: S0
+initAct:  occup=0; sid=-1; ssid=-1; accReq=-1; complete=-1;
+ports: 
+S0,S0,empty
+S0,S0,nFull
+S0,S0,put(sid,ssid,accReq),,occup=occup+1;
+S0,S1,,(occup==1)
+
+S1,S1,put(sid,ssid,accReq,complete),,occup=occup+1;
+S1,S1,get(sid,ssid,accReq,complete),,occup=occup-1;
+S1,S0,,(occup==0)
+S1,S2,,(occup==SBAND_CAP)
+S1,S1,nFull
+S1,S1,nEmpty
+
+S2,S2,full
+S2,S2,nEmpty
+S2,S2,get(sid,ssid,accReq),,occup=occup-1;
+S2,S1,,(occup<SBAND_CAP)
+end
+
+
+$!----------------------------TCFifo------------------------------------!$
+
+atom: TCFifo
+data: occup,sid,ssid,accReq
+init: S0
+initAct:  occup=0; sid=-1; ssid=-1; accReq=-1;
+ports: 
+S0,S0,empty
+S0,S0,nFull
+S0,S0,put(sid,ssid,accReq),,occup=occup+1;
+S0,S1,,(occup==1)
+
+S1,S1,put(sid,ssid,accReq),,occup=occup+1;
+S1,S1,get(sid,ssid,accReq),,occup=occup-1;
+S1,S0,,(occup==0)
+S1,S2,,(occup==TC_CAP)
+S1,S1,nFull
+S1,S1,nEmpty
+
+S2,S2,full
+S2,S2,nEmpty
+S2,S2,get(sid,ssid,accReq),,occup=occup-1;
+S2,S1,,(occup<TC_CAP)
+end
+
+
+$!-----------------------------SegmRcpt_main-----------------------------------!$
+
+atom: SegmRcpt_main
+data: complete,sid,ssid,accReq
+init: S0
+initAct:  sid=-1; ssid=-1; accReq=-1; complete=-1; 
+ports: 
+S0,S1,rcvSgBg
+S1,S7,emptySg
+S1,S2,nEmptySg
+S2,S6,fullFifo
+S2,S3,nFullFifo
+S3,S4,acqSg(sid,ssid,accReq,complete),,complete=-1;
+S6,S7,acqFail
+S4,S1,storeTC(sid,ssid,accReq),(complete==-1 || complete==1),complete=1;
+S4,S3,,(complete==-1 || complete==0), complete=0;
+S7,S0,rcvSgNd
+end
+
+$!-----------------------------AcqFailMonit-----------------------------------!$
+
+atom: AcqFailMonit
+data: sid,ssid,errorMsg
+init: S0
+initAct: sid=-1; ssid=-1; errorMsg=-1;
+ports: 
+S0,S1,acqFail,, sid=EVENT_REPORTING_SID; ssid=MEDIUM_ANOMALY_REPORT_SSID;
+S1,S0,genTM(sid,ssid,errorMsg), , sid=-1; ssid=-1; errorMsg=-1;
+end
+
+
+$!---------------------------SndrMng-------------------------------------!$
+
+
+atom: SndrMng
+data: acc,sid,ssid,accReq
+init: S0
+initAct: acc=-1; sid=-1; ssid=-1; accReq=-1;
+ports: 
+S0,S1,sndrTC
+S1,S2,getTC
+S2,S3,retTC(sid,ssid,accReq)
+S2,S9,noTCs
+S3,S4,chkMode
+S4,S9,modRej
+S4,S5,modAcc
+S5,S6,chkLock
+S6,S7,lckAcc
+S6,S9,lckRej
+S7,S8,verifTC(sid,ssid,accReq)
+S8,S9,retVerif
+S9,S0,fin
+end
+
+$!---------------------------TcProcMode-------------------------------------!$
+
+atom: TcProcMode
+init: RESTR
+ports: 
+RESTR,NOM, set_nom
+NOM,RESTR, set_restr
+NOM,NOM, nom
+RESTR,RESTR, restr
+end
+
+$!---------------------------TcProcModeMng-------------------------------------!$
+
+atom: TcProcModeMng
+init: S0
+ports: 
+S0,S1, modChk
+S1,S0, set_nom
+S0,S1, set_restr_prep
+S1,S0, set_restr
+end
+
+
+
+$!-------------------------------SndrPrior---------------------------------!$
+
+atom: SndrPrior
+data: MTLvsOPS,sid,ssid,accReq
+init: S0
+initAct: MTLvsOPS=-1; sid=-1; ssid=-1; accReq=-1;
+ports: 
+S0,S1,getTC
+S1,S6,getACSEQ(sid,ssid,accReq)
+S2,S6,getEcAc(sid,ssid,accReq)
+S3,S6,getMTL(sid,ssid,accReq),(MTLvsOPS==-1 || MTLvsOPS==1 ),MTLvsOPS=1;
+S3,S6,getOPS(sid,ssid,accReq),(MTLvsOPS==-1 || MTLvsOPS==0 ),MTLvsOPS=0;
+S4,S6,getGr(sid,ssid,accReq)
+S5,S6,getOBCP(sid,ssid,accReq)
+S6,S0,retTC(sid,ssid,accReq)
+S1,S2,emptyACSEQ
+S2,S3,emptyEcAc
+S3,S4,emptyMTL,(MTLvsOPS==-1 || MTLvsOPS==1 ),MTLvsOPS=1;
+S3,S4,emptyOPS,(MTLvsOPS==-1 || MTLvsOPS==0 ),MTLvsOPS=0;
+S4,S5,emptyGr
+S5,S7,emptyOBCP
+S7,S0,noTCs
+end
+
+
+$!----------------------------PUS_1------------------------------------!$
+
+atom: PUS_1
+data: acc,sid,ssid,accReq
+init: S0
+initAct: accReq=-1; acc=-1; sid=-1; ssid=-1;
+ports: 
+S0,S1,PUSver(sid,ssid,accReq),,accReq=-1; /* accReq=get(tc,1,4); */ acc=-1; /* acc=PUSverifTC(tc); */
+S1,S2,*accFail,( acc==-1 || acc==0 ),  acc=0;
+S1,S2,*accSucc, ( acc==-1 || acc==1 ),  acc=1;
+S2,S3,*skipReqAcc,( accReq==-1 || accReq==0), accReq=0; 
+S2,S3,genTM, ( accReq==-1 || accReq==1), accReq=1;
+S3,S0,verRet(acc)
+S0,S4,PUSdisp(sid,ssid,accReq)
+S4,S5,dispTC(sid,ssid,accReq)
+S5,S6,tcEnd
+S6,S0,dispRet
+end
+
+
+$!-------------------------------TcDisptch---------------------------------!$
+
+atom: TcDisptch
+data: sid,ssid,accReq
+init: S0
+initAct:  sid=-1; ssid=-1; accReq=-1;
+ports: 
+S0,S1,dispTC(sid,ssid,accReq)
+S1,S2,PUSdisp(sid,ssid,accReq)
+S2,S3,dispRet
+S3,S0,return
+end
+
+
+$!---------------------------------TcVerif-------------------------------!$
+
+atom: TcVerif
+data: acc,sid,ssid,accReq
+init: S0
+initAct:  sid=-1; ssid=-1; accReq=-1; acc=-1;
+ports: 
+S0,S1,verifTC(sid,ssid,accReq)
+S1,S2,,,acc=-1; /* acc=verifTC(tc) */
+S2,S7,*accepted,(acc==-1 || acc==0),acc=0;
+S2,S3,PUSver(sid,ssid,accReq),( acc==-1 || acc==1),acc=1;
+S3,S4,verRet(acc)
+S4,S5,disp(sid,ssid,accReq),acc==1
+S4,S8,,acc==0
+S5,S6,dispRet
+S6,S0,return
+S7,S8,genTM
+S8,S0,return
+end
+
+
+$!-------------------------------TcCtrl---------------------------------!$
+
+atom: TcCtrl
+documentation: TcCtrl is invoking segment acquisition (once) and TC processing (i.e. sndrMng, verif and dispatch) (once) in a loop
+init: S0
+ports: 
+S0,S1,startAcq
+S1,S2,acqEnd
+S2,S3,processTCs
+S3,S0,processTCsEnd
+end
+
+
+$!-------------------------------mainModel---------------------------------!$
+
+
+compound: TCFunction
+component: SndrMng,SNDRMNG
+component: TcVerif,TCVERIF
+component: TcDisptch,TCDISP
+component: PUS_1,PUS1
+component: svc228,SVC228
+component: SndrPrior,SNDRPRIOR
+component: SegmRcpt_main,SEGMRCPT
+component: TcCtrl,TCCTRL
+component: Sband,SBAND
+component: TCFifo,TCFIFO
+component: AcqFailMonit,ACKFAIL_MONIT
+connectors: 
+CPTC2,dispTC,, TCDISP.dispTC,TCVERIF.disp
+RDV2,dispRet,, TCDISP.return,TCVERIF.dispRet
+CPTC2,PUSver,,TCVERIF.PUSver,PUS1.PUSver
+RETS2,verRet,,PUS1.verRet,TCVERIF.verRet
+CPTC2,PUSdisp,,TCDISP.PUSdisp,PUS1.PUSdisp
+RDV2,pusDispRet,,PUS1.dispRet,TCDISP.dispRet
+CPTC2,verifTC,,SNDRMNG.verifTC,TCVERIF.verifTC
+RDV2,return,,TCVERIF.return,SNDRMNG.retVerif
+RDV2,SNDRMNGgetTC,,SNDRMNG.getTC,SNDRPRIOR.getTC
+CPTC2,SNDRMNGretTC,,SNDRPRIOR.retTC,SNDRMNG.retTC
+RDV2,SNDRMNGnoTCs,,SNDRPRIOR.noTCs,SNDRMNG.noTCs
+
+$! dispatching of TCs !$
+CPTCIF2,SVC228tcComm,,PUS1.dispTC,SVC228.tcComm
+RDV2,SVC228tcEnd,,SVC228.fin,PUS1.tcEnd
+
+RDV2,startAcq,,TCCTRL.startAcq,SEGMRCPT.rcvSgBg
+RDV2,acqEnd,,TCCTRL.acqEnd,SEGMRCPT.rcvSgNd
+RDV2,processTCs,,TCCTRL.processTCs,SNDRMNG.sndrTC
+RDV2,processTCsEnd,,TCCTRL.processTCsEnd,SNDRMNG.fin
+
+CPSG2,acqSg,,SBAND.get,SEGMRCPT.acqSg
+RDV2,emptySg,,SBAND.empty,SEGMRCPT.emptySg
+RDV2,nEmptySg,,SBAND.nEmpty,SEGMRCPT.nEmptySg
+
+CPTC2,storeTC,,SEGMRCPT.storeTC,TCFIFO.put
+RDV2,fullFifo,,TCFIFO.full,SEGMRCPT.fullFifo
+RDV2,nFullFifo,,TCFIFO.nFull,SEGMRCPT.nFullFifo
+
+BRD2,ackFailMonit,,SEGMRCPT.acqFail,ACKFAIL_MONIT.acqFail
+
+
+end
+

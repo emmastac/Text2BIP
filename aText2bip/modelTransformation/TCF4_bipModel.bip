@@ -1,0 +1,264 @@
+model TCF4_bipModel
+
+	port type syncPort
+	
+
+
+connector type SINGLE(syncPort p1)
+define p1
+end
+
+
+connector type RDV2(syncPort p1, syncPort p2)
+define p1 p2
+end	
+
+connector type RDV3(syncPort p1, syncPort p2, syncPort p3)
+define p1 p2 p3
+end	
+
+connector type RDV4(syncPort p1, syncPort p2, syncPort p3, syncPort p4)
+define p1 p2 p3 p4
+end	
+
+connector type RDV5(syncPort p1, syncPort p2, syncPort p3, syncPort p4, syncPort p5)
+define p1 p2 p3 p4 p5
+end	
+
+connector type RDV6(syncPort p1, syncPort p2, syncPort p3, syncPort p4, syncPort p5, syncPort p6)
+define p1 p2 p3 p4 p5 p6
+end	
+
+connector type RDV7(syncPort p1, syncPort p2, syncPort p3, syncPort p4, syncPort p5, syncPort p6, syncPort p7)
+define p1 p2 p3 p4 p5 p6 p7
+end	
+
+connector type RDV8(syncPort p1, syncPort p2, syncPort p3, syncPort p4, syncPort p5, syncPort p6, syncPort p7, syncPort p8)
+define p1 p2 p3 p4 p5 p6 p7 p8
+end	
+
+ 
+atomic type PUSsvc1
+
+   
+	export port  syncPort  tm1_7     
+	export port  syncPort  tm1_8     
+	export port  syncPort  tm1_4     
+	export port  syncPort  tm1_1     
+	export port  syncPort  tm1_2   
+ 
+	place S0 
+
+initial to  S0 do{  }
+
+ on tm1_4 from S0 to S0   
+ on tm1_2 from S0 to S0   
+ on tm1_8 from S0 to S0   
+ on tm1_7 from S0 to S0   
+ on tm1_1 from S0 to S0   
+
+
+end
+
+ 
+atomic type PUSsvc228
+
+   
+	export port  syncPort  exec228_2     
+	export port  syncPort  exec228_3     
+	export port  syncPort  exec228_1     
+	export port  syncPort  exec228_4   
+ 
+	place S0 
+
+initial to  S0 do{  }
+
+ on exec228_1 from S0 to S0   
+ on exec228_2 from S0 to S0   
+ on exec228_3 from S0 to S0   
+ on exec228_4 from S0 to S0   
+
+
+end
+
+ 
+atomic type TcDisptch_ActFlowAbort
+
+ 
+data int  sid ,ssid ,ackReq ,src  
+   
+	export port  syncPort  accOK_ack     
+	export port  syncPort  start     
+	export port  syncPort  accOK     
+	export port  syncPort  execOK     
+	export port  syncPort  execOK_ack     
+	export port  syncPort  PUSdisp     
+	export port  syncPort  accFail     
+	export port  syncPort  execFail   
+ 
+	place S3 ,S0 ,S1 ,S2 
+
+initial to  S0 do{  
+	sid=-1; ssid=-1; ackReq=-1; src=-1;  }
+
+ on start from S0 to S1   
+ on PUSdisp from S1 to S2   
+ on accOK_ack from S2 to S3  provided( (ackReq==-1 || ackReq==1) )   do{
+  ackReq=1;  }  
+ on accOK from S2 to S3  provided( (ackReq==-1 || ackReq==0) )   do{
+  ackReq=0;  }  
+ on accFail from S2 to S0   
+ on execFail from S3 to S0   
+ on execOK from S3 to S0  provided( (ackReq==-1 || ackReq==1) )   do{
+  ackReq=1;  }  
+ on execOK_ack from S3 to S0  provided( (ackReq==-1 || ackReq==1) )   do{
+  ackReq=1;  }  
+
+
+end
+
+ 
+atomic type AppExecAck_Monitor
+
+   
+	export port  syncPort  tm1_7     
+	export port  syncPort  ack   
+ 
+	place S0 ,S1 
+
+initial to  S0 do{  }
+
+ on ack from S0 to S1   
+ on tm1_7 from S1 to S0   
+
+
+end
+
+ 
+atomic type ExecFailure_Monitor
+
+   
+	export port  syncPort  fail     
+	export port  syncPort  tm1_8   
+ 
+	place S0 ,S1 
+
+initial to  S0 do{  }
+
+ on fail from S0 to S1   
+ on tm1_8 from S1 to S0   
+
+
+end
+
+ 
+atomic type AppAccFailure_Monitor
+
+   
+	export port  syncPort  fail     
+	export port  syncPort  tm1_2   
+ 
+	place S0 ,S1 
+
+initial to  S0 do{  }
+
+ on fail from S0 to S1   
+ on tm1_2 from S1 to S0   
+
+
+end
+
+ 
+atomic type AppAccAck_Monitor
+
+   
+	export port  syncPort  ack     
+	export port  syncPort  tm1_1   
+ 
+	place S0 ,S1 
+
+initial to  S0 do{  }
+
+ on ack from S0 to S1   
+ on tm1_1 from S1 to S0   
+
+
+end
+
+ 
+atomic type PUSsvc1Disptch
+
+ 
+data int  sid ,ssid ,ackReq ,src  
+   
+	export port  syncPort  accOK_ack     
+	export port  syncPort  accOK     
+	export port  syncPort  execOK     
+	export port  syncPort  execOK_ack     
+	export port  syncPort  PUSdisp     
+	export port  syncPort  accFail     
+	export port  syncPort  execFail   
+ 
+	place S0 
+
+initial to  S0 do{  
+	sid=-1; ssid=-1; ackReq=-1; src=-1;  }
+
+ on PUSdisp from S0 to S0   
+ on accOK_ack from S0 to S0   
+ on accOK from S0 to S0   
+ on accFail from S0 to S0   
+ on execFail from S0 to S0   
+ on execOK from S0 to S0   
+ on execOK_ack from S0 to S0   
+
+
+end
+
+
+
+compound type TCFunction
+
+
+	component PUSsvc1 PUS1 
+	component PUSsvc228 PUS228 
+	component TcDisptch_ActFlowAbort DISPACTFLAB 
+	component AppExecAck_Monitor EXECACKMON 
+	component ExecFailure_Monitor EXECFAILMON 
+	component AppAccFailure_Monitor APPACCFAILMON 
+	component AppAccAck_Monitor APPACCACKMON 
+	component PUSsvc1Disptch PUS1_DISP 
+
+ 
+	connector RDV3 execFail ( DISPACTFLAB.execFail ,EXECFAILMON.fail ,PUS1_DISP.execFail   )  
+	/* distinct application commands w/ ack*/
+	connector RDV4 execOK_ack_228_1 ( DISPACTFLAB.execOK_ack ,EXECACKMON.ack ,PUS1_DISP.execOK_ack ,PUS228.exec228_1   )  
+	connector RDV4 execOK_ack_228_2 ( DISPACTFLAB.execOK_ack ,EXECACKMON.ack ,PUS1_DISP.execOK_ack ,PUS228.exec228_2   )  
+	connector RDV4 execOK_ack_228_3 ( DISPACTFLAB.execOK_ack ,EXECACKMON.ack ,PUS1_DISP.execOK_ack ,PUS228.exec228_3   )  
+	connector RDV4 execOK_ack_228_4 ( DISPACTFLAB.execOK_ack ,EXECACKMON.ack ,PUS1_DISP.execOK_ack ,PUS228.exec228_4   )  
+	connector RDV3 execOK_ack_Any ( DISPACTFLAB.execOK_ack ,EXECACKMON.ack ,PUS1_DISP.execOK_ack   )  
+	/* distinct application commands no ack */
+	connector RDV3 execOK_228_1 ( DISPACTFLAB.execOK ,PUS1_DISP.execOK ,PUS228.exec228_1   )  
+	connector RDV3 execOK_228_2 ( DISPACTFLAB.execOK ,PUS1_DISP.execOK ,PUS228.exec228_2   )  
+	connector RDV3 execOK_228_3 ( DISPACTFLAB.execOK ,PUS1_DISP.execOK ,PUS228.exec228_3   )  
+	connector RDV3 execOK_228_4 ( DISPACTFLAB.execOK ,PUS1_DISP.execOK ,PUS228.exec228_4   )  
+	connector RDV2 execOK_Any ( DISPACTFLAB.execOK ,PUS1_DISP.execOK   )  
+	connector RDV3 accOK_ack ( DISPACTFLAB.accOK_ack ,APPACCACKMON.ack ,PUS1_DISP.accOK_ack   )  
+	connector RDV3 accFail ( DISPACTFLAB.accFail ,APPACCFAILMON.fail ,PUS1_DISP.accFail   )  
+	connector RDV2 EXECACKMON_tm1_7 ( EXECACKMON.tm1_7 ,PUS1.tm1_7   )  
+	connector RDV2 EXECFAILMON_tm1_8 ( EXECFAILMON.tm1_8 ,PUS1.tm1_8   )  
+	connector RDV2 APPACCACKMON_tm1_1 ( APPACCACKMON.tm1_1 ,PUS1.tm1_1   )  
+	connector RDV2 APPACCFAILMON_tm1_2 ( APPACCFAILMON.tm1_2 ,PUS1.tm1_2   )  
+	connector RDV2 PUSdisp ( DISPACTFLAB.PUSdisp ,PUS1_DISP.PUSdisp   )  
+	connector RDV2 execOK ( DISPACTFLAB.execOK ,PUS1_DISP.execOK   )  
+	connector RDV2 accOK ( DISPACTFLAB.accOK ,PUS1_DISP.accOK   )  
+	connector SINGLE PUS1_tm1_4 ( PUS1.tm1_4   )  
+	connector SINGLE DISPACTFLAB_start ( DISPACTFLAB.start   ) 
+
+	
+
+end
+
+component TCFunction Root
+
+end

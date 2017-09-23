@@ -1,0 +1,394 @@
+MODULE HKCDMS_ACTFLAB(active_interaction)
+
+	VAR
+		NuPask		:		boolean;
+		NuPread_HK		:		boolean;
+		NuPmem_res		:		boolean;
+		NuPI2C_res		:		boolean;
+		Nuplace		:		{NuSSEND_HK_REPORT, NuSASK, NuSWAIT};
+
+
+	INIT
+		( (Nuplace) = (NuSWAIT) );
+
+	INVAR
+		( (NuPask) <-> (( (Nuplace) = (NuSSEND_HK_REPORT) )) ) &
+		( (NuPI2C_res) <-> (( (Nuplace) = (NuSASK) )) ) &
+		( (NuPmem_res) <-> (( (Nuplace) = (NuSASK) )) ) &
+		( (NuPread_HK) <-> (( (Nuplace) = (NuSWAIT) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSWAIT) )) & (( (next(Nuplace)) = (NuSSEND_HK_REPORT) )) )) & (( (active_interaction) = (NuI1) )) ) |
+		( (( (( (Nuplace) = (NuSSEND_HK_REPORT) )) & (( (next(Nuplace)) = (NuSASK) )) )) & (( (active_interaction) = (NuI4) )) ) |
+		( (( (( (Nuplace) = (NuSSEND_HK_REPORT) )) & (( (next(Nuplace)) = (NuSASK) )) )) & (( (active_interaction) = (NuI5) )) ) |
+		( (( (( (Nuplace) = (NuSASK) )) & (( (next(Nuplace)) = (NuSWAIT) )) )) & (( (active_interaction) = (NuI2) )) ) |
+		( (( (( (Nuplace) = (NuSASK) )) & (( (next(Nuplace)) = (NuSWAIT) )) )) & (( (active_interaction) = (NuI3) )) ) |
+		( (( (active_interaction) != (NuI3) )) & (( (( (active_interaction) != (NuI2) )) & (( (( (active_interaction) != (NuI5) )) & (( (( (active_interaction) != (NuI4) )) & (( (( (active_interaction) != (NuI1) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) );
+
+
+MODULE MSGLIB(active_interaction)
+
+	VAR
+		NuPcomposeMessage		:		boolean;
+		NuPdecodeMessage		:		boolean;
+		Nuplace		:		{NuSS0};
+
+
+	INIT
+		( (Nuplace) = (NuSS0) );
+
+	INVAR
+		( (NuPdecodeMessage) <-> (( (Nuplace) = (NuSS0) )) ) &
+		( (NuPcomposeMessage) <-> (( (Nuplace) = (NuSS0) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI3) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI4) )) ) |
+		( (( (active_interaction) != (NuI4) )) & (( (( (active_interaction) != (NuI3) )) & (( (next(Nuplace)) = (Nuplace) )) )) );
+
+
+MODULE S3_6(active_interaction)
+
+	VAR
+		NuPcom		:		boolean;
+		NuPinternal		:		boolean;
+		NuPcdms		:		boolean;
+		NuPeps		:		boolean;
+		NuPfinish		:		boolean;
+		NuPdisable_HK		:		boolean;
+		NuPpl		:		boolean;
+		Nuplace		:		{NuSIDLE, NuSSTART, NuSEND};
+
+
+	INIT
+		( (Nuplace) = (NuSIDLE) );
+
+	INVAR
+		( (NuPfinish) <-> (( (Nuplace) = (NuSSTART) )) ) &
+		( (NuPinternal) <-> (( (Nuplace) = (NuSEND) )) ) &
+		( (NuPdisable_HK) <-> (( (Nuplace) = (NuSIDLE) )) ) &
+		( (NuPcom) <-> (( (Nuplace) = (NuSSTART) )) ) &
+		( (NuPcdms) <-> (( (Nuplace) = (NuSSTART) )) ) &
+		( (NuPeps) <-> (( (Nuplace) = (NuSSTART) )) ) &
+		( (NuPpl) <-> (( (Nuplace) = (NuSSTART) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSSTART) )) )) & (( (active_interaction) = (NuI26) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI8) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI9) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI27) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI24) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI22) )) ) |
+		( (( (( (Nuplace) = (NuSEND) )) & (( (next(Nuplace)) = (NuSSTART) )) )) & (( (active_interaction) = (NuI23) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI25) )) ) |
+		( (( (active_interaction) != (NuI25) )) & (( (( (active_interaction) != (NuI23) )) & (( (( (active_interaction) != (NuI22) )) & (( (( (active_interaction) != (NuI24) )) & (( (( (active_interaction) != (NuI27) )) & (( (( (active_interaction) != (NuI9) )) & (( (( (active_interaction) != (NuI8) )) & (( (( (active_interaction) != (NuI26) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) )) )) )) );
+
+
+MODULE HKCDMS_MUX(active_interaction)
+
+	VAR
+		NuPtake		:		boolean;
+		NuPrelease		:		boolean;
+		Nuplace		:		{NuSIDLE, NuSBUSY};
+
+
+	INIT
+		( (Nuplace) = (NuSIDLE) );
+
+	INVAR
+		( (NuPtake) <-> (( (Nuplace) = (NuSIDLE) )) ) &
+		( (NuPrelease) <-> (( (Nuplace) = (NuSBUSY) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI1) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI2) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI3) )) ) |
+		( (( (active_interaction) != (NuI3) )) & (( (( (active_interaction) != (NuI2) )) & (( (( (active_interaction) != (NuI1) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) );
+
+
+MODULE S3_5(active_interaction)
+
+	VAR
+		NuPcom		:		boolean;
+		NuPinternal		:		boolean;
+		NuPenable_HK		:		boolean;
+		NuPcdms		:		boolean;
+		NuPeps		:		boolean;
+		NuPfinish		:		boolean;
+		NuPpl		:		boolean;
+		Nuplace		:		{NuSIDLE, NuSSTART, NuSEND};
+
+
+	INIT
+		( (Nuplace) = (NuSIDLE) );
+
+	INVAR
+		( (NuPcom) <-> (( (Nuplace) = (NuSSTART) )) ) &
+		( (NuPinternal) <-> (( (Nuplace) = (NuSEND) )) ) &
+		( (NuPcdms) <-> (( (Nuplace) = (NuSSTART) )) ) &
+		( (NuPenable_HK) <-> (( (Nuplace) = (NuSIDLE) )) ) &
+		( (NuPeps) <-> (( (Nuplace) = (NuSSTART) )) ) &
+		( (NuPfinish) <-> (( (Nuplace) = (NuSSTART) )) ) &
+		( (NuPpl) <-> (( (Nuplace) = (NuSSTART) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSSTART) )) )) & (( (active_interaction) = (NuI18) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI6) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI7) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI21) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI19) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI16) )) ) |
+		( (( (( (Nuplace) = (NuSEND) )) & (( (next(Nuplace)) = (NuSSTART) )) )) & (( (active_interaction) = (NuI17) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI20) )) ) |
+		( (( (active_interaction) != (NuI20) )) & (( (( (active_interaction) != (NuI17) )) & (( (( (active_interaction) != (NuI16) )) & (( (( (active_interaction) != (NuI19) )) & (( (( (active_interaction) != (NuI21) )) & (( (( (active_interaction) != (NuI7) )) & (( (( (active_interaction) != (NuI6) )) & (( (( (active_interaction) != (NuI18) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) )) )) )) );
+
+
+MODULE S15_1(active_interaction)
+
+	VAR
+		NuPcom		:		boolean;
+		NuPinternal		:		boolean;
+		NuPenable_PS		:		boolean;
+		NuPcdms		:		boolean;
+		NuPeps		:		boolean;
+		NuPfinish		:		boolean;
+		NuPpl		:		boolean;
+		Nuplace		:		{NuSIDLE, NuSSTART, NuSEND};
+
+
+	INIT
+		( (Nuplace) = (NuSIDLE) );
+
+	INVAR
+		( (NuPcdms) <-> (( (Nuplace) = (NuSSTART) )) ) &
+		( (NuPenable_PS) <-> (( (Nuplace) = (NuSIDLE) )) ) &
+		( (NuPcom) <-> (( (Nuplace) = (NuSSTART) )) ) &
+		( (NuPeps) <-> (( (Nuplace) = (NuSSTART) )) ) &
+		( (NuPinternal) <-> (( (Nuplace) = (NuSEND) )) ) &
+		( (NuPpl) <-> (( (Nuplace) = (NuSSTART) )) ) &
+		( (NuPfinish) <-> (( (Nuplace) = (NuSSTART) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSSTART) )) )) & (( (active_interaction) = (NuI30) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI10) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI11) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI33) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI31) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI28) )) ) |
+		( (( (( (Nuplace) = (NuSEND) )) & (( (next(Nuplace)) = (NuSSTART) )) )) & (( (active_interaction) = (NuI29) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI32) )) ) |
+		( (( (active_interaction) != (NuI32) )) & (( (( (active_interaction) != (NuI29) )) & (( (( (active_interaction) != (NuI28) )) & (( (( (active_interaction) != (NuI31) )) & (( (( (active_interaction) != (NuI33) )) & (( (( (active_interaction) != (NuI11) )) & (( (( (active_interaction) != (NuI10) )) & (( (( (active_interaction) != (NuI30) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) )) )) )) );
+
+
+MODULE MEMLIB(active_interaction)
+
+	VAR
+		NuPsetWrite		:		boolean;
+		NuPcheckCRC		:		boolean;
+		NuPsetRead		:		boolean;
+		Nuplace		:		{NuSS0};
+
+
+	INIT
+		( (Nuplace) = (NuSS0) );
+
+	INVAR
+		( (NuPcheckCRC) <-> (( (Nuplace) = (NuSS0) )) ) &
+		( (NuPsetRead) <-> (( (Nuplace) = (NuSS0) )) ) &
+		( (NuPsetWrite) <-> (( (Nuplace) = (NuSS0) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI5) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI15) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI14) )) ) |
+		( (( (active_interaction) != (NuI14) )) & (( (( (active_interaction) != (NuI15) )) & (( (( (active_interaction) != (NuI5) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) );
+
+
+MODULE HKCDMS_MODMNG(active_interaction)
+
+	VAR
+		NuPdisable		:		boolean;
+		NuPenable		:		boolean;
+		NuPread_HK		:		boolean;
+		Nuplace		:		{NuSDISABLED, NuSENABLED};
+
+
+	INIT
+		( (Nuplace) = (NuSENABLED) );
+
+	INVAR
+		( (NuPread_HK) <-> (( (Nuplace) = (NuSENABLED) )) ) &
+		( (NuPenable) <-> (( (Nuplace) = (NuSDISABLED) )) ) &
+		( (NuPdisable) <-> (( (Nuplace) = (NuSENABLED) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSENABLED) )) & (( (next(Nuplace)) = (NuSDISABLED) )) )) & (( (active_interaction) = (NuI9) )) ) |
+		( (( (( (Nuplace) = (NuSENABLED) )) & (( (next(Nuplace)) = (NuSENABLED) )) )) & (( (active_interaction) = (NuI1) )) ) |
+		( (( (( (Nuplace) = (NuSDISABLED) )) & (( (next(Nuplace)) = (NuSENABLED) )) )) & (( (active_interaction) = (NuI7) )) ) |
+		( (( (active_interaction) != (NuI7) )) & (( (( (active_interaction) != (NuI1) )) & (( (( (active_interaction) != (NuI9) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) );
+
+
+MODULE S15_2(active_interaction)
+
+	VAR
+		NuPcom		:		boolean;
+		NuPinternal		:		boolean;
+		NuPcdms		:		boolean;
+		NuPeps		:		boolean;
+		NuPfinish		:		boolean;
+		NuPdisable_PS		:		boolean;
+		NuPpl		:		boolean;
+		Nuplace		:		{NuSIDLE, NuSSTART, NuSEND};
+
+
+	INIT
+		( (Nuplace) = (NuSIDLE) );
+
+	INVAR
+		( (NuPcdms) <-> (( (Nuplace) = (NuSSTART) )) ) &
+		( (NuPcom) <-> (( (Nuplace) = (NuSSTART) )) ) &
+		( (NuPdisable_PS) <-> (( (Nuplace) = (NuSIDLE) )) ) &
+		( (NuPeps) <-> (( (Nuplace) = (NuSSTART) )) ) &
+		( (NuPfinish) <-> (( (Nuplace) = (NuSSTART) )) ) &
+		( (NuPpl) <-> (( (Nuplace) = (NuSSTART) )) ) &
+		( (NuPinternal) <-> (( (Nuplace) = (NuSEND) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSSTART) )) )) & (( (active_interaction) = (NuI38) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI12) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI13) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI39) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI36) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI34) )) ) |
+		( (( (( (Nuplace) = (NuSEND) )) & (( (next(Nuplace)) = (NuSSTART) )) )) & (( (active_interaction) = (NuI35) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI37) )) ) |
+		( (( (active_interaction) != (NuI37) )) & (( (( (active_interaction) != (NuI35) )) & (( (( (active_interaction) != (NuI34) )) & (( (( (active_interaction) != (NuI36) )) & (( (( (active_interaction) != (NuI39) )) & (( (( (active_interaction) != (NuI13) )) & (( (( (active_interaction) != (NuI12) )) & (( (( (active_interaction) != (NuI38) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) )) )) )) );
+
+
+MODULE HKCDMS_PSMODMNG(active_interaction)
+
+	VAR
+		NuPdisable		:		boolean;
+		NuPenable		:		boolean;
+		NuPmem_write_req		:		boolean;
+		NuPI2C_ask_sat		:		boolean;
+		Nuplace		:		{NuSMEMORY, NuSSAT};
+
+
+	INIT
+		( (Nuplace) = (NuSMEMORY) );
+
+	INVAR
+		( (NuPdisable) <-> (( (Nuplace) = (NuSMEMORY) )) ) &
+		( (NuPmem_write_req) <-> (( (Nuplace) = (NuSMEMORY) )) ) &
+		( (NuPenable) <-> (( (Nuplace) = (NuSSAT) )) ) &
+		( (NuPI2C_ask_sat) <-> (( (Nuplace) = (NuSSAT) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSMEMORY) )) & (( (next(Nuplace)) = (NuSSAT) )) )) & (( (active_interaction) = (NuI13) )) ) |
+		( (( (( (Nuplace) = (NuSMEMORY) )) & (( (next(Nuplace)) = (NuSMEMORY) )) )) & (( (active_interaction) = (NuI5) )) ) |
+		( (( (( (Nuplace) = (NuSSAT) )) & (( (next(Nuplace)) = (NuSSAT) )) )) & (( (active_interaction) = (NuI4) )) ) |
+		( (( (( (Nuplace) = (NuSSAT) )) & (( (next(Nuplace)) = (NuSMEMORY) )) )) & (( (active_interaction) = (NuI11) )) ) |
+		( (( (active_interaction) != (NuI11) )) & (( (( (active_interaction) != (NuI4) )) & (( (( (active_interaction) != (NuI5) )) & (( (( (active_interaction) != (NuI13) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) );
+
+
+MODULE main
+
+	VAR
+		NuInteraction		:		{NuI1, NuI2, NuI3, NuI4, NuI5, NuI6, NuI7, NuI8, NuI9, NuI10, NuI11, NuI12, NuI13, NuI14, NuI15, NuI16, NuI17, NuI18, NuI19, NuI20, NuI21, NuI22, NuI23, NuI24, NuI25, NuI26, NuI27, NuI28, NuI29, NuI30, NuI31, NuI32, NuI33, NuI34, NuI35, NuI36, NuI37, NuI38, NuI39};
+		hkcdms_actflab	:	HKCDMS_ACTFLAB(NuInteraction);
+		msglib	:	MSGLIB(NuInteraction);
+		s3_6	:	S3_6(NuInteraction);
+		hkcdms_mux	:	HKCDMS_MUX(NuInteraction);
+		s3_5	:	S3_5(NuInteraction);
+		s15_1	:	S15_1(NuInteraction);
+		memlib	:	MEMLIB(NuInteraction);
+		hkcdms_modmng	:	HKCDMS_MODMNG(NuInteraction);
+		s15_2	:	S15_2(NuInteraction);
+		hkcdms_psmodmng	:	HKCDMS_PSMODMNG(NuInteraction);
+
+	DEFINE
+		S3_6_eps		:=		s3_6.NuPeps;
+		s3_5_cdms2		:=		( (s3_5.NuPcdms) & (hkcdms_modmng.NuPenable) );
+		S3_6_pl		:=		s3_6.NuPpl;
+		S3_6_finish		:=		s3_6.NuPfinish;
+		MEMLIB_checkCRC		:=		memlib.NuPcheckCRC;
+		S15_2_pl		:=		s15_2.NuPpl;
+		S3_5_pl		:=		s3_5.NuPpl;
+		S15_2_com		:=		s15_2.NuPcom;
+		S3_6_com		:=		s3_6.NuPcom;
+		S15_2_internal		:=		s15_2.NuPinternal;
+		HKCDMS_read_HK		:=		( (( (hkcdms_mux.NuPtake) & (hkcdms_actflab.NuPread_HK) )) & (hkcdms_modmng.NuPread_HK) );
+		S15_2_disable_PS		:=		s15_2.NuPdisable_PS;
+		S15_1_internal		:=		s15_1.NuPinternal;
+		MEMLIB_setRead		:=		memlib.NuPsetRead;
+		s3_5_cdms1		:=		s3_5.NuPcdms;
+		S3_6_disable_HK		:=		s3_6.NuPdisable_HK;
+		S3_6_internal		:=		s3_6.NuPinternal;
+		S3_5_internal		:=		s3_5.NuPinternal;
+		s15_1_cdms2		:=		( (s15_1.NuPcdms) & (hkcdms_psmodmng.NuPenable) );
+		S15_1_finish		:=		s15_1.NuPfinish;
+		S15_1_enable_PS		:=		s15_1.NuPenable_PS;
+		HKCDMS_ask_sat		:=		( (( (hkcdms_actflab.NuPask) & (hkcdms_psmodmng.NuPI2C_ask_sat) )) & (msglib.NuPcomposeMessage) );
+		s15_2_cdms2		:=		( (s15_2.NuPcdms) & (hkcdms_psmodmng.NuPdisable) );
+		S3_5_finish		:=		s3_5.NuPfinish;
+		S15_2_finish		:=		s15_2.NuPfinish;
+		S15_1_com		:=		s15_1.NuPcom;
+		HKCDMS_I2C_res		:=		( (( (hkcdms_mux.NuPrelease) & (hkcdms_actflab.NuPI2C_res) )) & (msglib.NuPdecodeMessage) );
+		S15_1_pl		:=		s15_1.NuPpl;
+		HKCDMS_mem_write_req		:=		( (( (hkcdms_actflab.NuPask) & (hkcdms_psmodmng.NuPmem_write_req) )) & (memlib.NuPsetWrite) );
+		s3_6_cdms1		:=		s3_6.NuPcdms;
+		S15_1_eps		:=		s15_1.NuPeps;
+		s15_1_cdms1		:=		s15_1.NuPcdms;
+		s3_6_cdms2		:=		( (s3_6.NuPcdms) & (hkcdms_modmng.NuPdisable) );
+		s15_2_cdms1		:=		s15_2.NuPcdms;
+		S15_2_eps		:=		s15_2.NuPeps;
+		S3_5_eps		:=		s3_5.NuPeps;
+		S3_5_com		:=		s3_5.NuPcom;
+		S3_5_enable_HK		:=		s3_5.NuPenable_HK;
+		HKCDMS_mem_res		:=		( (hkcdms_mux.NuPrelease) & (hkcdms_actflab.NuPmem_res) );
+
+
+	INVAR
+		( (( (NuInteraction) = (NuI24) )) -> (S3_6_eps) ) &
+		( (( (NuInteraction) = (NuI7) )) -> (s3_5_cdms2) ) &
+		( (( (NuInteraction) = (NuI27) )) -> (S3_6_pl) ) &
+		( (( (NuInteraction) = (NuI25) )) -> (S3_6_finish) ) &
+		( (( (NuInteraction) = (NuI14) )) -> (MEMLIB_checkCRC) ) &
+		( (( (NuInteraction) = (NuI39) )) -> (S15_2_pl) ) &
+		( (( (NuInteraction) = (NuI21) )) -> (S3_5_pl) ) &
+		( (( (NuInteraction) = (NuI34) )) -> (S15_2_com) ) &
+		( (( (NuInteraction) = (NuI22) )) -> (S3_6_com) ) &
+		( (( (NuInteraction) = (NuI35) )) -> (S15_2_internal) ) &
+		( (( (NuInteraction) = (NuI1) )) -> (HKCDMS_read_HK) ) &
+		( (( (NuInteraction) = (NuI38) )) -> (S15_2_disable_PS) ) &
+		( (( (NuInteraction) = (NuI29) )) -> (S15_1_internal) ) &
+		( (( (NuInteraction) = (NuI15) )) -> (MEMLIB_setRead) ) &
+		( (( (NuInteraction) = (NuI6) )) -> (s3_5_cdms1) ) &
+		( (( (NuInteraction) = (NuI26) )) -> (S3_6_disable_HK) ) &
+		( (( (NuInteraction) = (NuI23) )) -> (S3_6_internal) ) &
+		( (( (NuInteraction) = (NuI17) )) -> (S3_5_internal) ) &
+		( (( (NuInteraction) = (NuI11) )) -> (s15_1_cdms2) ) &
+		( (( (NuInteraction) = (NuI32) )) -> (S15_1_finish) ) &
+		( (( (NuInteraction) = (NuI30) )) -> (S15_1_enable_PS) ) &
+		( (( (NuInteraction) = (NuI4) )) -> (HKCDMS_ask_sat) ) &
+		( (( (NuInteraction) = (NuI13) )) -> (s15_2_cdms2) ) &
+		( (( (NuInteraction) = (NuI20) )) -> (S3_5_finish) ) &
+		( (( (NuInteraction) = (NuI37) )) -> (S15_2_finish) ) &
+		( (( (NuInteraction) = (NuI28) )) -> (S15_1_com) ) &
+		( (( (NuInteraction) = (NuI3) )) -> (HKCDMS_I2C_res) ) &
+		( (( (NuInteraction) = (NuI33) )) -> (S15_1_pl) ) &
+		( (( (NuInteraction) = (NuI5) )) -> (HKCDMS_mem_write_req) ) &
+		( (( (NuInteraction) = (NuI8) )) -> (s3_6_cdms1) ) &
+		( (( (NuInteraction) = (NuI31) )) -> (S15_1_eps) ) &
+		( (( (NuInteraction) = (NuI10) )) -> (s15_1_cdms1) ) &
+		( (( (NuInteraction) = (NuI9) )) -> (s3_6_cdms2) ) &
+		( (( (NuInteraction) = (NuI12) )) -> (s15_2_cdms1) ) &
+		( (( (NuInteraction) = (NuI36) )) -> (S15_2_eps) ) &
+		( (( (NuInteraction) = (NuI19) )) -> (S3_5_eps) ) &
+		( (( (NuInteraction) = (NuI16) )) -> (S3_5_com) ) &
+		( (( (NuInteraction) = (NuI18) )) -> (S3_5_enable_HK) ) &
+		( (( (NuInteraction) = (NuI2) )) -> (HKCDMS_mem_res) );
+
+
+

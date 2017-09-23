@@ -1,0 +1,374 @@
+model HKEPS_bipModel
+
+	port type syncPort
+	
+
+
+connector type SINGLE(syncPort p1)
+define p1
+end
+
+
+connector type RDV2(syncPort p1, syncPort p2)
+define p1 p2
+end	
+
+connector type RDV3(syncPort p1, syncPort p2, syncPort p3)
+define p1 p2 p3
+end	
+
+connector type RDV4(syncPort p1, syncPort p2, syncPort p3, syncPort p4)
+define p1 p2 p3 p4
+end	
+
+connector type RDV5(syncPort p1, syncPort p2, syncPort p3, syncPort p4, syncPort p5)
+define p1 p2 p3 p4 p5
+end	
+
+connector type RDV6(syncPort p1, syncPort p2, syncPort p3, syncPort p4, syncPort p5, syncPort p6)
+define p1 p2 p3 p4 p5 p6
+end	
+
+connector type RDV7(syncPort p1, syncPort p2, syncPort p3, syncPort p4, syncPort p5, syncPort p6, syncPort p7)
+define p1 p2 p3 p4 p5 p6 p7
+end	
+
+connector type RDV8(syncPort p1, syncPort p2, syncPort p3, syncPort p4, syncPort p5, syncPort p6, syncPort p7, syncPort p8)
+define p1 p2 p3 p4 p5 p6 p7 p8
+end	
+
+ 
+atomic type MessageLibrary
+
+   
+	export port  syncPort  composeMessage     
+	export port  syncPort  decodeMessage   
+ 
+	place S0 
+
+initial to  S0 do{  }
+
+ on decodeMessage from S0 to S0   
+ on composeMessage from S0 to S0   
+
+
+end
+
+ 
+atomic type sMutex
+
+   
+	export port  syncPort  take     
+	export port  syncPort  release   
+ 
+	place IDLE ,BUSY 
+
+initial to  IDLE do{  }
+
+ on take from IDLE to BUSY   
+ on release from BUSY to IDLE   
+
+
+end
+
+ 
+atomic type memory_library
+
+   
+	export port  syncPort  setWrite     
+	export port  syncPort  checkCRC     
+	export port  syncPort  setRead   
+ 
+	place S0 
+
+initial to  S0 do{  }
+
+ on setWrite from S0 to S0   
+ on setRead from S0 to S0   
+ on checkCRC from S0 to S0   
+
+
+end
+
+ 
+atomic type HK_EPS_processActionFlowWithAbort
+
+ 
+data int  timer ,period  
+   
+	export port  syncPort  I2C_res_TTC     
+	export port  syncPort  ask     
+	export port  syncPort  read_HK     
+	export port  syncPort  mem_res     
+	export port  syncPort  I2C_ask_EPS     
+	export port  syncPort  I2C_res_EPS     
+	export port  syncPort  I2C_fail_EPS   
+ 
+	place SEND_HK_REPORT ,ASK ,START ,I2C ,WAIT 
+
+initial to  WAIT do{  
+	timer=0; period = -1;  }
+
+ on read_HK from WAIT to START  provided( (period==-1 || timer == period ) /* to increase the timer we need timer ports */ )   
+ on I2C_ask_EPS from START to I2C   
+ on I2C_res_EPS from I2C to SEND_HK_REPORT   
+ on I2C_fail_EPS from I2C to WAIT   
+ on ask from SEND_HK_REPORT to ASK   
+ on mem_res from ASK to WAIT   
+ on I2C_res_TTC from ASK to WAIT   
+
+
+end
+
+ 
+atomic type HK_EPS_FailureMonitoring
+
+ 
+data int  timer ,max_timer  
+   
+	export port  syncPort  failure     
+	export port  syncPort  success     
+	export port  syncPort  I2C_ask_EPS     
+	export port  syncPort  I2C_res_EPS   
+ 
+	place NOMINAL ,CRITICAL_FAILURE ,ANOMALY 
+
+initial to  NOMINAL do{  
+	timer=0; max_timer = -1;  }
+
+ on failure from NOMINAL to ANOMALY   
+ on I2C_ask_EPS from ANOMALY to CRITICAL_FAILURE  provided( (max_timer==-1 || timer > max_timer ) )   
+ on success from ANOMALY to NOMINAL  provided( (max_timer==-1 || timer > max_timer ) )   
+ on I2C_res_EPS from CRITICAL_FAILURE to NOMINAL   
+
+
+end
+
+ 
+atomic type HK_EPS_PacketStoreModeManager
+
+   
+	export port  syncPort  disable     
+	export port  syncPort  enable     
+	export port  syncPort  mem_write_req     
+	export port  syncPort  ask_I2C_TTC   
+ 
+	place TTC ,MEMORY 
+
+initial to  MEMORY do{  }
+
+ on disable from MEMORY to TTC   
+ on mem_write_req from MEMORY to MEMORY   
+ on ask_I2C_TTC from TTC to TTC   
+ on enable from TTC to MEMORY   
+
+
+end
+
+ 
+atomic type HK_EPS_ModeManager
+
+   
+	export port  syncPort  disable     
+	export port  syncPort  enable     
+	export port  syncPort  read_HK   
+ 
+	place DISABLED ,ENABLED 
+
+initial to  ENABLED do{  }
+
+ on disable from ENABLED to DISABLED   
+ on read_HK from ENABLED to ENABLED   
+ on enable from DISABLED to ENABLED   
+
+
+end
+
+ 
+atomic type s3_5
+
+   
+	export port  syncPort  com     
+	export port  syncPort  internal     
+	export port  syncPort  enable_HK     
+	export port  syncPort  cdms     
+	export port  syncPort  eps     
+	export port  syncPort  finish     
+	export port  syncPort  pl   
+ 
+	place IDLE ,START ,END 
+
+initial to  IDLE do{  }
+
+ on enable_HK from IDLE to START   
+ on cdms from START to END   
+ on pl from START to END   
+ on eps from START to END   
+ on com from START to END   
+ on internal from END to START   
+ on finish from START to IDLE   
+
+
+end
+
+ 
+atomic type s3_6
+
+   
+	export port  syncPort  com     
+	export port  syncPort  internal     
+	export port  syncPort  cdms     
+	export port  syncPort  eps     
+	export port  syncPort  finish     
+	export port  syncPort  disable_HK     
+	export port  syncPort  pl   
+ 
+	place IDLE ,START ,END 
+
+initial to  IDLE do{  }
+
+ on disable_HK from IDLE to START   
+ on cdms from START to END   
+ on pl from START to END   
+ on eps from START to END   
+ on com from START to END   
+ on internal from END to START   
+ on finish from START to IDLE   
+
+
+end
+
+ 
+atomic type s15_1
+
+   
+	export port  syncPort  com     
+	export port  syncPort  internal     
+	export port  syncPort  enable_PS     
+	export port  syncPort  cdms     
+	export port  syncPort  eps     
+	export port  syncPort  finish     
+	export port  syncPort  pl   
+ 
+	place IDLE ,START ,END 
+
+initial to  IDLE do{  }
+
+ on enable_PS from IDLE to START   
+ on cdms from START to END   
+ on pl from START to END   
+ on eps from START to END   
+ on com from START to END   
+ on internal from END to START   
+ on finish from START to IDLE   
+
+
+end
+
+ 
+atomic type s15_2
+
+   
+	export port  syncPort  com     
+	export port  syncPort  internal     
+	export port  syncPort  cdms     
+	export port  syncPort  eps     
+	export port  syncPort  finish     
+	export port  syncPort  disable_PS     
+	export port  syncPort  pl   
+ 
+	place IDLE ,START ,END 
+
+initial to  IDLE do{  }
+
+ on disable_PS from IDLE to START   
+ on cdms from START to END   
+ on pl from START to END   
+ on eps from START to END   
+ on com from START to END   
+ on internal from END to START   
+ on finish from START to IDLE   
+
+
+end
+
+
+
+compound type CubETH
+
+
+	component MessageLibrary MSGLIB 
+	component memory_library MEMLIB 
+	component HK_EPS_processActionFlowWithAbort HKEPS_ACTFLAB 
+	component sMutex HKEPS_MUX 
+	component HK_EPS_FailureMonitoring HKEPS_FAILMON 
+	component HK_EPS_PacketStoreModeManager HKEPS_PSMODMNG 
+	component HK_EPS_ModeManager HKEPS_MODMNG 
+	component s3_5 S3_5 
+	component s3_6 S3_6 
+	component s15_1 S15_1 
+	component s15_2 S15_2 
+
+ 
+	/******** HK_EPS ***********/
+	connector RDV3 HKEPS_read_HK ( HKEPS_MUX.take ,HKEPS_ACTFLAB.read_HK ,HKEPS_MODMNG.read_HK   )  
+	connector RDV3 HKEPS_mem_res_fail ( HKEPS_MUX.release ,HKEPS_ACTFLAB.mem_res ,HKEPS_FAILMON.success   )  
+	connector RDV3 HKEPS_mem_res_return ( HKEPS_MUX.release ,HKEPS_ACTFLAB.mem_res ,HKEPS_FAILMON.success   )  
+	/* start: HK_to_I2C, MSG_LIB, I2C_SAT */
+	connector RDV2 HKEPS_I2C_ask ( HKEPS_ACTFLAB.I2C_ask_EPS ,MSGLIB.composeMessage   )  
+	connector RDV2 HKEPS_I2C_res ( HKEPS_ACTFLAB.I2C_res_EPS ,MSGLIB.decodeMessage   )  
+	connector RDV4 HKEPS_I2C_fail_error ( HKEPS_ACTFLAB.I2C_fail_EPS ,HKEPS_MUX.release ,HKEPS_FAILMON.failure ,MSGLIB.decodeMessage   )  
+	connector SINGLE HKEPS_I2C_nofail_ask ( HKEPS_FAILMON.I2C_ask_EPS   )  
+	connector SINGLE HKEPS_I2C_nofail_res ( HKEPS_FAILMON.I2C_res_EPS   )  
+	connector SINGLE HKEPS_I2C_nofail_error ( HKEPS_FAILMON.I2C_res_EPS   )  
+	connector RDV2 HKEPS_ask_I2C_TTC ( HKEPS_ACTFLAB.ask ,HKEPS_PSMODMNG.ask_I2C_TTC   )  
+	connector RDV3 HKEPS_mem_write_req ( HKEPS_ACTFLAB.ask ,HKEPS_PSMODMNG.mem_write_req ,MEMLIB.setWrite   )  
+	/* TODO for all: add in .smv file : ...pl2 > 1 */
+	connector SINGLE s3_5_pl1 ( S3_5.pl   )  
+	connector RDV2 s3_5_pl2 ( S3_5.pl ,HKEPS_MODMNG.enable   )  
+	connector SINGLE s3_6_pl1 ( S3_6.pl   )  
+	connector RDV2 s3_6_pl2 ( S3_6.pl ,HKEPS_MODMNG.disable   )  
+	connector SINGLE s15_1_pl1 ( S15_1.pl   )  
+	connector RDV2 s15_1_pl2 ( S15_1.pl ,HKEPS_PSMODMNG.enable   )  
+	connector SINGLE s15_2_pl1 ( S15_2.pl   )  
+	connector RDV2 s15_2_pl2 ( S15_2.pl ,HKEPS_PSMODMNG.disable   )  
+	connector SINGLE MEMLIB_checkCRC ( MEMLIB.checkCRC   )  
+	connector SINGLE MEMLIB_setRead ( MEMLIB.setRead   )  
+	connector SINGLE HKEPS_ACTFLAB_I2C_res_TTC ( HKEPS_ACTFLAB.I2C_res_TTC   )  
+	connector SINGLE S3_5_com ( S3_5.com   )  
+	connector SINGLE S3_5_internal ( S3_5.internal   )  
+	connector SINGLE S3_5_enable_HK ( S3_5.enable_HK   )  
+	connector SINGLE S3_5_cdms ( S3_5.cdms   )  
+	connector SINGLE S3_5_eps ( S3_5.eps   )  
+	connector SINGLE S3_5_finish ( S3_5.finish   )  
+	connector SINGLE S3_6_com ( S3_6.com   )  
+	connector SINGLE S3_6_internal ( S3_6.internal   )  
+	connector SINGLE S3_6_cdms ( S3_6.cdms   )  
+	connector SINGLE S3_6_eps ( S3_6.eps   )  
+	connector SINGLE S3_6_finish ( S3_6.finish   )  
+	connector SINGLE S3_6_disable_HK ( S3_6.disable_HK   )  
+	connector SINGLE S15_1_com ( S15_1.com   )  
+	connector SINGLE S15_1_internal ( S15_1.internal   )  
+	connector SINGLE S15_1_enable_PS ( S15_1.enable_PS   )  
+	connector SINGLE S15_1_cdms ( S15_1.cdms   )  
+	connector SINGLE S15_1_eps ( S15_1.eps   )  
+	connector SINGLE S15_1_finish ( S15_1.finish   )  
+	connector SINGLE S15_2_com ( S15_2.com   )  
+	connector SINGLE S15_2_internal ( S15_2.internal   )  
+	connector SINGLE S15_2_cdms ( S15_2.cdms   )  
+	connector SINGLE S15_2_eps ( S15_2.eps   )  
+	connector SINGLE S15_2_finish ( S15_2.finish   )  
+	connector SINGLE S15_2_disable_PS ( S15_2.disable_PS   ) 
+
+	
+ 
+	priority s3_5_pl1_after_s3_5_pl2 		s3_5_pl1 < s3_5_pl2 
+	priority s3_6_pl1_after_s3_6_pl2 		s3_6_pl1 < s3_6_pl2 
+	priority s15_1_pl1_after_s15_1_pl2 		s15_1_pl1 < s15_1_pl2 
+	priority s15_2_pl1_after_s15_2_pl2 		s15_2_pl1 < s15_2_pl2
+
+end
+
+component CubETH Root
+
+end

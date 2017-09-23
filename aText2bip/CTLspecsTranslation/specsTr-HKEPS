@@ -1,0 +1,18 @@
+-- HKEPS PS Mode Manager:
+-- MD1: AG (  HKEPS_mem_write_req -> hkeps_psmodmng.Nuplace = NuSMEMORY  )
+CTLSPEC  AG (  (NuInteraction) = (NuI11) -> hkeps_psmodmng.Nuplace = NuSMEMORY  )
+-- HKEPS PS Mode Manager:
+-- MD1: AG (  HKEPS_mem_write_req -> hkeps_psmodmng.Nuplace = NuSMEMORY  )
+CTLSPEC  AG (  (NuInteraction) = (NuI11) -> hkeps_psmodmng.Nuplace = NuSMEMORY  )
+-- MD1: AG (  HKEPS_ask_I2C_TTC -> hkeps_psmodmng.Nuplace = NuSTTC  )
+CTLSPEC  AG (  (NuInteraction) = (NuI10) -> hkeps_psmodmng.Nuplace = NuSTTC  )
+
+-- HKEPS Mode Manager:
+-- MD1: AG (  HKEPS_read_HK -> hkeps_modmng.Nuplace = NuSENABLED  )
+CTLSPEC  AG (  (NuInteraction) = (NuI1) -> hkeps_modmng.Nuplace = NuSENABLED  )
+
+-- HKEPS MUTEX:
+-- MX1: AG ( HKEPS_read_HK -> AX A [! (HKEPS_read_HK) U ( HKEPS_I2C_res |  (HKEPS_mem_res_return | HKEPS_mem_res_fail) |  HKEPS_I2C_fail_error ) ])
+CTLSPEC  AG ( (NuInteraction) = (NuI1) -> AX A [! ((NuInteraction) = (NuI1)) U ( (NuInteraction) = (NuI5) |  ((NuInteraction) = (NuI3) | (NuInteraction) = (NuI2)) |  (NuInteraction) = (NuI6) ) ])
+
+FAIRNESS ( ( (NuInteraction) = (NuI5) |  ((NuInteraction) = (NuI3) | (NuInteraction) = (NuI2)) |  (NuInteraction) = (NuI6) ) );

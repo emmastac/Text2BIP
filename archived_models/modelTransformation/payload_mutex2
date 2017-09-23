@@ -1,0 +1,8 @@
+1 s128_4_actflab.NuPstart
+2 s128_1_actflab.NuPstart
+3 ((s128_1_mux.NuPtake)&(s128_1_actflab.NuPtc128_1))
+4 ((s128_1_actflab.NuPload)&(plmodmng.NuPload))
+5 ((s128_1_actflab.NuPI2C_ask)&(msglib.NuPcomposeMessage))
+6 ((s128_1_actflab.NuPI2C_res)&(msglib.NuPdecodeMessage))
+7 ((((s128_1_mux.NuPrelease)&(s128_1_actflab.NuPloaded)))&(plmodmng.NuPto_scenario_ready))
+8 ((s128_4_mux.NuPtake)&(s128_4_actflab.NuPtc128_4))

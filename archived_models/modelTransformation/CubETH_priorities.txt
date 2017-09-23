@@ -1,0 +1,74 @@
+cdms_I2C_res3 < cdms_I2C_res4
+
+s128_4_success1 < s128_4_success2
+
+s128_1_success1 < s128_1_success2
+
+s128_5_aborted1 < s128_5_aborted2
+
+status_verif_result1 < status_verif_result2
+
+data_transfer_ask_mem1 < data_transfer_ask_mem2
+data_transfer_mem_res1 < data_transfer_mem_res2
+
+payload_ready1 < payload_ready2
+
+status_verif_to_idle1 < status_verif_to_idle2
+
+flash_memory_setRead1 < flash_memory_setRead2
+
+flash_memory_read_fail1 < flash_memory_read_fail2
+
+flash_memory_ok_read1 < flash_memory_ok_read2
+
+flash_memory_setWrite1 < flash_memory_setWrite2 
+flash_memory_write_fail1 < flash_memory_write_fail2 
+flash_memory_ok_write1 < flash_memory_ok_write2
+
+data_transfer_done1 < data_transfer_done2
+data_transfer_done1 < data_transfer_done3
+data_transfer_done1 < data_transfer_done4
+data_transfer_done2 < data_transfer_done4
+data_transfer_done3 < data_transfer_done4
+
+I2C_sat_send1 < I2C_sat_send2
+
+HKPL_I2C_res3 < HKPL_I2C_res4
+HKPL_I2C_nofail_res3 < HKPL_I2C_nofail_res4
+HKPL_mem_write_req1 < HKPL_mem_write_req2
+HKPL_mem_res_fail1 < HKPL_mem_res_fail2
+HKPL_mem_res_return1 < HKPL_mem_res_return2
+s3_5_pl1 < s3_5_pl2
+s3_6_pl1 < s3_6_pl2
+s15_1_pl1 < s15_1_pl2
+s15_2_pl1 < s15_2_pl2
+
+HKEPS_I2C_res3 < HKEPS_I2C_res4
+HKEPS_I2C_nofail_res3 < HKEPS_I2C_nofail_res4
+HKEPS_mem_write_req1 < HKEPS_mem_write_req2
+HKEPS_mem_res_fail1 < HKEPS_mem_res_fail2
+HKEPS_mem_res_return1 < HKEPS_mem_res_return2
+s3_5_eps1 < s3_5_eps2
+s3_6_eps1 < s3_6_eps2
+s15_1_eps1 < s15_1_eps2
+s15_2_eps1 < s15_2_eps2
+
+HKCOM_I2C_res3 < HKCOM_I2C_res4
+HKCOM_I2C_nofail_res3 < HKCOM_I2C_nofail_res4
+HKCOM_mem_write_req1 < HKCOM_mem_write_req2
+HKCOM_mem_res_fail1 < HKCOM_mem_res_fail2
+HKCOM_mem_res_return1 < HKCOM_mem_res_return2
+s3_5_com1 < s3_5_com2
+s3_6_com1 < s3_6_com2
+s15_1_com1 < s15_1_com2
+s15_2_com1 < s15_2_com2
+
+
+HKCDMS_mem_write_req1 < HKCDMS_mem_write_req2
+HKCDMS_mem_res_fail1 < HKCDMS_mem_res_fail2
+HKCDMS_mem_res_return1 < HKCDMS_mem_res_return2
+s3_5_cdms1 < s3_5_cdms2
+s3_6_cdms1 < s3_6_cdms2
+s15_1_cdms1 < s15_1_cdms2
+s15_2_cdms1 < s15_2_cdms2
+

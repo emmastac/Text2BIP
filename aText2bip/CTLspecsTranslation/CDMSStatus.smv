@@ -1,0 +1,103 @@
+MODULE CDMSSTATACTFL(active_interaction)
+
+	VAR
+		NuPI2C_ask		:		boolean;
+		NuPdone_reset		:		boolean;
+		NuPstart		:		boolean;
+		NuPfinish		:		boolean;
+		NuPI2C_res		:		boolean;
+		NuPstart_reset		:		boolean;
+		Nuplace		:		{NuSASKED, NuSNOMINAL, NuSSTART, NuSRESET, NuSHEARTBEAT, NuSRESULT};
+
+
+	INIT
+		( (Nuplace) = (NuSNOMINAL) );
+
+	INVAR
+		( (NuPI2C_res) <-> (( (Nuplace) = (NuSASKED) )) ) &
+		( (NuPI2C_ask) <-> (( (Nuplace) = (NuSHEARTBEAT) )) ) &
+		( (NuPstart) <-> (( (Nuplace) = (NuSNOMINAL) )) ) &
+		( (NuPstart_reset) <-> (( (Nuplace) = (NuSSTART) )) ) &
+		( (NuPdone_reset) <-> (( (Nuplace) = (NuSRESET) )) ) &
+		( (NuPfinish) <-> (( (Nuplace) = (NuSRESULT) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSNOMINAL) )) & (( (next(Nuplace)) = (NuSSTART) )) )) & (( (active_interaction) = (NuI5) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSRESET) )) )) & (( (active_interaction) = (NuI1) )) ) |
+		( (( (( (Nuplace) = (NuSRESET) )) & (( (next(Nuplace)) = (NuSHEARTBEAT) )) )) & (( (active_interaction) = (NuI2) )) ) |
+		( (( (( (Nuplace) = (NuSHEARTBEAT) )) & (( (next(Nuplace)) = (NuSASKED) )) )) & (( (active_interaction) = (NuI4) )) ) |
+		( (( (( (Nuplace) = (NuSASKED) )) & (( (next(Nuplace)) = (NuSRESULT) )) )) & (( (active_interaction) = (NuI3) )) ) |
+		( (( (( (Nuplace) = (NuSRESULT) )) & (( (next(Nuplace)) = (NuSNOMINAL) )) )) & (( (active_interaction) = (NuI6) )) ) |
+		( (( (active_interaction) != (NuI6) )) & (( (( (active_interaction) != (NuI3) )) & (( (( (active_interaction) != (NuI4) )) & (( (( (active_interaction) != (NuI2) )) & (( (( (active_interaction) != (NuI1) )) & (( (( (active_interaction) != (NuI5) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) )) );
+
+
+MODULE WATCHDOG(active_interaction)
+
+	VAR
+		NuPinternal_watchdog		:		boolean;
+		NuPdone		:		boolean;
+		NuVtimer		:		unsigned word[3];
+		Nuplace		:		{NuSS0, NuSS1};
+
+
+	INIT
+		( (Nuplace) = (NuSS0) ) &
+		( (NuVtimer) = (0ud3_0) );
+
+	INVAR
+		( (NuPinternal_watchdog) <-> (( (Nuplace) = (NuSS0) )) ) &
+		( (NuPdone) <-> (( (Nuplace) = (NuSS1) )) );
+
+	TRANS
+		( (( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS1) )) )) & (( (active_interaction) = (NuI1) )) )) & (( (next(NuVtimer)) = (0ud3_0) )) ) |
+		( (( (( (( (Nuplace) = (NuSS1) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI2) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) ) |
+		( (( (active_interaction) != (NuI2) )) & (( (( (active_interaction) != (NuI1) )) & (( (( (next(Nuplace)) = (Nuplace) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) )) );
+
+
+MODULE MSGLIB(active_interaction)
+
+	VAR
+		NuPcomposeMessage		:		boolean;
+		NuPdecodeMessage		:		boolean;
+		Nuplace		:		{NuSS0};
+
+
+	INIT
+		( (Nuplace) = (NuSS0) );
+
+	INVAR
+		( (NuPdecodeMessage) <-> (( (Nuplace) = (NuSS0) )) ) &
+		( (NuPcomposeMessage) <-> (( (Nuplace) = (NuSS0) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI3) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI4) )) ) |
+		( (( (active_interaction) != (NuI4) )) & (( (( (active_interaction) != (NuI3) )) & (( (next(Nuplace)) = (Nuplace) )) )) );
+
+
+MODULE main
+
+	VAR
+		NuInteraction		:		{NuI1, NuI2, NuI3, NuI4, NuI5, NuI6};
+		cdmsstatactfl	:	CDMSSTATACTFL(NuInteraction);
+		watchdog	:	WATCHDOG(NuInteraction);
+		msglib	:	MSGLIB(NuInteraction);
+
+	DEFINE
+		internal_watchdog		:=		( (watchdog.NuPinternal_watchdog) & (cdmsstatactfl.NuPstart_reset) );
+		reset_done		:=		( (cdmsstatactfl.NuPdone_reset) & (watchdog.NuPdone) );
+		cdms_I2C_ask		:=		( (cdmsstatactfl.NuPI2C_ask) & (msglib.NuPcomposeMessage) );
+		CDMSSTATACTFL_finish		:=		cdmsstatactfl.NuPfinish;
+		cdms_I2C_res		:=		( (cdmsstatactfl.NuPI2C_res) & (msglib.NuPdecodeMessage) );
+		CDMSSTATACTFL_start		:=		cdmsstatactfl.NuPstart;
+
+
+	INVAR
+		( (( (NuInteraction) = (NuI1) )) -> (internal_watchdog) ) &
+		( (( (NuInteraction) = (NuI2) )) -> (reset_done) ) &
+		( (( (NuInteraction) = (NuI4) )) -> (cdms_I2C_ask) ) &
+		( (( (NuInteraction) = (NuI6) )) -> (CDMSSTATACTFL_finish) ) &
+		( (( (NuInteraction) = (NuI3) )) -> (cdms_I2C_res) ) &
+		( (( (NuInteraction) = (NuI5) )) -> (CDMSSTATACTFL_start) );
+
+

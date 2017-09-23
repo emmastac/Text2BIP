@@ -1,0 +1,946 @@
+model TC_bipModel
+
+	port type syncPort
+	
+
+
+connector type SINGLE(syncPort p1)
+define p1
+end
+
+
+connector type RDV2(syncPort p1, syncPort p2)
+define p1 p2
+end	
+
+connector type RDV3(syncPort p1, syncPort p2, syncPort p3)
+define p1 p2 p3
+end	
+
+connector type RDV4(syncPort p1, syncPort p2, syncPort p3, syncPort p4)
+define p1 p2 p3 p4
+end	
+
+connector type RDV5(syncPort p1, syncPort p2, syncPort p3, syncPort p4, syncPort p5)
+define p1 p2 p3 p4 p5
+end	
+
+connector type RDV6(syncPort p1, syncPort p2, syncPort p3, syncPort p4, syncPort p5, syncPort p6)
+define p1 p2 p3 p4 p5 p6
+end	
+
+connector type RDV7(syncPort p1, syncPort p2, syncPort p3, syncPort p4, syncPort p5, syncPort p6, syncPort p7)
+define p1 p2 p3 p4 p5 p6 p7
+end	
+
+connector type RDV8(syncPort p1, syncPort p2, syncPort p3, syncPort p4, syncPort p5, syncPort p6, syncPort p7, syncPort p8)
+define p1 p2 p3 p4 p5 p6 p7 p8
+end	
+
+ 
+atomic type TC_FifoManager
+
+ 
+data int  occup ,sid ,ssid ,ackReq ,TC_CAP  
+   
+	export port  syncPort  get     
+	export port  syncPort  put     
+	export port  syncPort  empty     
+	export port  syncPort  full   
+   
+	export port  syncPort  internal2     
+	export port  syncPort  internal1     
+	export port  syncPort  internal3   
+	place S0 ,S1 ,S2 
+
+initial to  S0 do{  
+	occup=0; sid=-1; ssid=-1; ackReq=-1; TC_CAP=2;  }
+
+ on empty from S0 to S0   
+ on put from S0 to S0   do{
+  occup=occup+1;  }  
+ on internal3 from S0 to S1  provided( (occup==1) )   
+ on put from S1 to S1  provided( !(occup==0) && !(occup==TC_CAP) )   do{
+  occup=occup+1;  }  
+ on get from S1 to S1  provided( !(occup==0) && !(occup==TC_CAP) )   do{
+  occup=occup-1;  }  
+ on internal1 from S1 to S0  provided( (occup==0) )   
+ on internal2 from S1 to S2  provided( (occup==TC_CAP) )   
+ on full from S2 to S2  provided( !(occup<TC_CAP) )   
+ on get from S2 to S2  provided( !(occup<TC_CAP) )   do{
+  occup=occup-1;  }  
+ on internal3 from S2 to S1  provided( (occup<TC_CAP) )   
+
+
+end
+
+ 
+atomic type SmuTC
+
+ 
+data int  sid ,ssid ,ackReq  
+   
+	export port  syncPort  get_b     
+	export port  syncPort  get_e     
+	export port  syncPort  ask     
+	export port  syncPort  empty   
+ 
+	place S0 ,S1 ,S2 
+
+initial to  S0 do{  
+	sid=-1; ssid=-1; ackReq=-1;  }
+
+ on ask from S0 to S1   
+ on empty from S1 to S0   
+ on get_b from S1 to S2   
+ on get_e from S2 to S0   
+
+
+end
+
+ 
+atomic type SegmRcpt_ActFlowAbort
+
+   
+	export port  syncPort  acqSg_e     
+	export port  syncPort  noSg     
+	export port  syncPort  success     
+	export port  syncPort  start     
+	export port  syncPort  ask     
+	export port  syncPort  finish     
+	export port  syncPort  acqFail_e     
+	export port  syncPort  put   
+ 
+	place S3 ,S4 ,S5 ,S0 ,S1 ,S2 
+
+initial to  S0 do{  }
+
+ on start from S0 to S1   
+ on ask from S1 to S2   
+ on acqSg_e from S2 to S3   
+ on noSg from S2 to S0   
+ on put from S3 to S4   
+ on success from S4 to S5   
+ on acqFail_e from S4 to S0   
+ on finish from S5 to S0   
+
+
+end
+
+ 
+atomic type TCmngt
+
+ 
+data int  sid ,ssid ,ackReq  
+   
+	export port  syncPort  acqSg_e     
+	export port  syncPort  noSg     
+	export port  syncPort  success     
+	export port  syncPort  getGround     
+	export port  syncPort  acqSg_b     
+	export port  syncPort  acqFail_e     
+	export port  syncPort  put     
+	export port  syncPort  acqFail_b   
+ 
+	place S3 ,S0 ,S1 ,S2 
+
+initial to  S0 do{  
+	sid=-1; ssid=-1; ackReq=-1;  }
+
+ on acqSg_b from S0 to S1   
+ on acqSg_e from S1 to S0   
+ on noSg from S0 to S0   
+ on put from S0 to S3   
+ on acqFail_b from S3 to S2   
+ on acqFail_e from S2 to S0   
+ on success from S3 to S0   
+ on getGround from S0 to S0   
+
+
+end
+
+ 
+atomic type TCmngt_ModeManager
+
+   
+	export port  syncPort  toFull     
+	export port  syncPort  acqSg     
+	export port  syncPort  acqFail     
+	export port  syncPort  toNFull   
+ 
+	place nFull ,full 
+
+initial to  nFull do{  }
+
+ on acqSg from nFull to nFull   
+ on toFull from nFull to full   
+ on toNFull from full to nFull   
+ on acqFail from full to full   
+
+
+end
+
+ 
+atomic type AcqFail_Monitor
+
+   
+	export port  syncPort  tm5_3     
+	export port  syncPort  acqFail   
+ 
+	place S0 ,S1 
+
+initial to  S0 do{  }
+
+ on acqFail from S0 to S1   
+ on tm5_3 from S1 to S0   
+
+
+end
+
+ 
+atomic type PUSsvc5
+
+   
+	export port  syncPort  tm5_3   
+ 
+	place S0 
+
+initial to  S0 do{  }
+
+ on tm5_3 from S0 to S0   
+
+
+end
+
+ 
+atomic type Sndr_PriorityManager
+
+ 
+data int  sid ,ssid ,ackReq ,src  
+   
+	export port  syncPort  noTC     
+	export port  syncPort  retTC     
+	export port  syncPort  empty5     
+	export port  syncPort  empty6     
+	export port  syncPort  empty3     
+	export port  syncPort  empty4     
+	export port  syncPort  empty1     
+	export port  syncPort  get1     
+	export port  syncPort  empty2     
+	export port  syncPort  get2     
+	export port  syncPort  get3     
+	export port  syncPort  get4     
+	export port  syncPort  get5     
+	export port  syncPort  get6     
+	export port  syncPort  getTC   
+ 
+	place S3 ,S4 ,S5 ,S6 ,S7 ,S8 ,S9 ,S11 ,S10 ,S13 ,S12 ,S0 ,S1 ,S2 
+
+initial to  S0 do{  
+	sid=-1; ssid=-1; ackReq=-1; src=-1;  }
+
+ on getTC from S0 to S1   
+ on empty1 from S1 to S2   
+ on get1 from S1 to S3   do{
+  src=1;  }  
+ on retTC from S3 to S0   
+ on empty2 from S2 to S4   
+ on get2 from S2 to S5   do{
+  src=2;  }  
+ on retTC from S5 to S0   
+ on empty3 from S4 to S6   
+ on get3 from S4 to S7   do{
+  src=3;  }  
+ on retTC from S7 to S0   
+ on empty4 from S6 to S8   
+ on get4 from S6 to S9   do{
+  src=4;  }  
+ on retTC from S9 to S0   
+ on empty5 from S8 to S10   
+ on get5 from S8 to S11   do{
+  src=5;  }  
+ on retTC from S11 to S0   
+ on empty6 from S10 to S12   
+ on get6 from S10 to S13   do{
+  src=6;  }  
+ on retTC from S13 to S0   
+ on noTC from S12 to S0   
+
+
+end
+
+ 
+atomic type SndrMng_ActFlowAbort
+
+ 
+data int  sid ,ssid ,ackReq ,src  
+   
+	export port  syncPort  noTC     
+	export port  syncPort  askMod     
+	export port  syncPort  retTC     
+	export port  syncPort  start     
+	export port  syncPort  modAccX     
+	export port  syncPort  done     
+	export port  syncPort  verif     
+	export port  syncPort  lckRej     
+	export port  syncPort  modAcc     
+	export port  syncPort  askLck     
+	export port  syncPort  lckAccX     
+	export port  syncPort  lckAcc     
+	export port  syncPort  getTC     
+	export port  syncPort  modRej     
+	export port  syncPort  verifRet   
+ 
+	place S3 ,S4 ,S5 ,S6 ,S7 ,S8 ,S9 ,S0 ,S1 ,S2 
+
+initial to  S0 do{  
+	sid=-1; ssid=-1; ackReq=-1; src=-1;  }
+
+ on start from S0 to S1   
+ on getTC from S1 to S2   
+ on retTC from S2 to S3   
+ on noTC from S2 to S0   
+ on askLck from S3 to S4   
+ on lckAccX from S4 to S5   
+ on lckAcc from S4 to S5   
+ on lckRej from S4 to S0   
+ on askMod from S5 to S6   
+ on modAccX from S6 to S7   
+ on modAcc from S6 to S7   
+ on modRej from S6 to S0   
+ on verif from S7 to S8   
+ on verifRet from S8 to S9   
+ on done from S9 to S0   
+
+
+end
+
+ 
+atomic type ModeController
+
+   
+	export port  syncPort  askMod     
+	export port  syncPort  modAcc     
+	export port  syncPort  modAccX     
+	export port  syncPort  modRej   
+ 
+	place S0 ,S1 
+
+initial to  S0 do{  }
+
+ on askMod from S0 to S1   
+ on modAcc from S1 to S0   
+ on modAccX from S1 to S0   
+ on modRej from S1 to S0   
+
+
+end
+
+ 
+atomic type TcProc_ModeManager
+
+   
+	export port  syncPort  nomin     
+	export port  syncPort  restr     
+	export port  syncPort  setNom     
+	export port  syncPort  setRestr   
+ 
+	place RES ,NOM 
+
+initial to  RES do{  }
+
+ on restr from RES to RES   
+ on setNom from RES to NOM   
+ on setRestr from NOM to RES   
+ on nomin from NOM to NOM   
+
+
+end
+
+ 
+atomic type ModeReject_Monitor
+
+   
+	export port  syncPort  fail     
+	export port  syncPort  tm1_4   
+ 
+	place S0 ,S1 
+
+initial to  S0 do{  }
+
+ on fail from S0 to S1   
+ on tm1_4 from S1 to S0   
+
+
+end
+
+ 
+atomic type PUSsvc1
+
+   
+	export port  syncPort  tm1_7     
+	export port  syncPort  tm1_8     
+	export port  syncPort  tm1_4     
+	export port  syncPort  tm1_1     
+	export port  syncPort  tm1_2   
+ 
+	place S0 
+
+initial to  S0 do{  }
+
+ on tm1_4 from S0 to S0   
+ on tm1_2 from S0 to S0   
+ on tm1_8 from S0 to S0   
+ on tm1_7 from S0 to S0   
+ on tm1_1 from S0 to S0   
+
+
+end
+
+ 
+atomic type LockController
+
+   
+	export port  syncPort  lckRej     
+	export port  syncPort  askLck     
+	export port  syncPort  lckAccX     
+	export port  syncPort  lckAcc   
+ 
+	place S0 ,S1 
+
+initial to  S0 do{  }
+
+ on askLck from S0 to S1   
+ on lckAcc from S1 to S0   
+ on lckAccX from S1 to S0   
+ on lckRej from S1 to S0   
+
+
+end
+
+ 
+atomic type TcProc_LockManager
+
+   
+	export port  syncPort  setLock     
+	export port  syncPort  setUlock     
+	export port  syncPort  ulock     
+	export port  syncPort  lock   
+ 
+	place ULOCK ,LOCK 
+
+initial to  ULOCK do{  }
+
+ on ulock from ULOCK to ULOCK   
+ on setLock from ULOCK to LOCK   
+ on setUlock from LOCK to ULOCK   
+ on lock from LOCK to LOCK   
+
+
+end
+
+ 
+atomic type LockReject_Monitor
+
+   
+	export port  syncPort  fail     
+	export port  syncPort  tm1_2   
+ 
+	place S0 ,S1 
+
+initial to  S0 do{  }
+
+ on fail from S0 to S1   
+ on tm1_2 from S1 to S0   
+
+
+end
+
+ 
+atomic type PUSsvc228
+
+   
+	export port  syncPort  exec228_2     
+	export port  syncPort  exec228_3     
+	export port  syncPort  exec228_1     
+	export port  syncPort  exec228_4   
+ 
+	place S0 
+
+initial to  S0 do{  }
+
+ on exec228_1 from S0 to S0   
+ on exec228_2 from S0 to S0   
+ on exec228_3 from S0 to S0   
+ on exec228_4 from S0 to S0   
+
+
+end
+
+ 
+atomic type SndrPrior0_ActFlowAbort
+
+   
+	export port  syncPort  emptyOPS     
+	export port  syncPort  getOPS     
+	export port  syncPort  getMTL     
+	export port  syncPort  start     
+	export port  syncPort  ask0     
+	export port  syncPort  emptyMTL   
+ 
+	place S3 ,S0 ,S1 ,S2 
+
+initial to  S0 do{  }
+
+ on start from S0 to S1   
+ on ask0 from S1 to S2   
+ on getMTL from S2 to S0   
+ on emptyMTL from S2 to S3   
+ on getOPS from S3 to S0   
+ on emptyOPS from S3 to S0   
+
+
+end
+
+ 
+atomic type SndrPrior1_ActFlowAbort
+
+   
+	export port  syncPort  emptyOPS     
+	export port  syncPort  getOPS     
+	export port  syncPort  ask1     
+	export port  syncPort  getMTL     
+	export port  syncPort  start     
+	export port  syncPort  emptyMTL   
+ 
+	place S3 ,S0 ,S1 ,S2 
+
+initial to  S0 do{  }
+
+ on start from S0 to S1   
+ on ask1 from S1 to S2   
+ on getOPS from S2 to S0   
+ on emptyOPS from S2 to S3   
+ on getMTL from S3 to S0   
+ on emptyMTL from S3 to S0   
+
+
+end
+
+ 
+atomic type SndrPrior_ModeManager
+
+   
+	export port  syncPort  start1     
+	export port  syncPort  start0     
+	export port  syncPort  set1     
+	export port  syncPort  set0   
+ 
+	place S0 ,S1 
+
+initial to  S0 do{  }
+
+ on start0 from S0 to S0   
+ on set1 from S0 to S1   
+ on set0 from S1 to S0   
+ on start1 from S1 to S1   
+
+
+end
+
+ 
+atomic type TcVerif_ActFlowAbort
+
+ 
+data int  LEGAL_APID ,sid ,ssid ,ackReq ,src  
+   
+	export port  syncPort  disptch     
+	export port  syncPort  PUSaccept     
+	export port  syncPort  reject     
+	export port  syncPort  start     
+	export port  syncPort  ask     
+	export port  syncPort  PUSreject     
+	export port  syncPort  finish     
+	export port  syncPort  dispRet     
+	export port  syncPort  PUSver     
+	export port  syncPort  accept   
+ 
+	place S3 ,S4 ,S5 ,S6 ,S7 ,S0 ,S1 ,S2 
+
+initial to  S0 do{  
+	LEGAL_APID=-1; sid=-1; ssid=-1; ackReq=-1; src=-1;  }
+
+ on start from S0 to S1   
+ on ask from S1 to S2   do{
+  LEGAL_APID=-1;  }  
+ on accept from S2 to S3  provided( (LEGAL_APID==-1 || LEGAL_APID==1) )   do{
+  LEGAL_APID=1;  }  
+ on reject from S2 to S0  provided( (LEGAL_APID==-1 || LEGAL_APID==0) )   do{
+  LEGAL_APID=0;  }  
+ on PUSver from S3 to S4   
+ on PUSaccept from S4 to S5   
+ on PUSreject from S4 to S0   
+ on disptch from S5 to S6   
+ on dispRet from S6 to S7   
+ on finish from S7 to S0   
+
+
+end
+
+ 
+atomic type PUSsvc1Verif
+
+ 
+data int  sid ,ssid ,ackReq ,src  
+   
+	export port  syncPort  PUSaccept     
+	export port  syncPort  PUSreject     
+	export port  syncPort  PUSver   
+ 
+	place S0 ,S1 
+
+initial to  S0 do{  
+	sid=-1; ssid=-1; ackReq=-1; src=-1;  }
+
+ on PUSver from S0 to S1   
+ on PUSreject from S1 to S0   
+ on PUSaccept from S1 to S0   
+
+
+end
+
+ 
+atomic type TCverif
+
+ 
+data int  sid ,ssid ,ackReq ,src  
+   
+	export port  syncPort  reject     
+	export port  syncPort  ask     
+	export port  syncPort  accept   
+ 
+	place S0 ,S1 
+
+initial to  S0 do{  
+	sid=-1; ssid=-1; ackReq=-1; src=-1;  }
+
+ on ask from S0 to S1   
+ on reject from S1 to S0   
+ on accept from S1 to S0   
+
+
+end
+
+ 
+atomic type VerifAcceptFailure_Monitor
+
+   
+	export port  syncPort  fail     
+	export port  syncPort  tm1_2   
+ 
+	place S0 ,S1 
+
+initial to  S0 do{  }
+
+ on fail from S0 to S1   
+ on tm1_2 from S1 to S0   
+
+
+end
+
+ 
+atomic type TcDisptch_ActFlowAbort
+
+ 
+data int  sid ,ssid ,ackReq ,src  
+   
+	export port  syncPort  accOK_ack     
+	export port  syncPort  start     
+	export port  syncPort  accOK     
+	export port  syncPort  execOK     
+	export port  syncPort  execOK_ack     
+	export port  syncPort  PUSdisp     
+	export port  syncPort  accFail     
+	export port  syncPort  execFail   
+ 
+	place S3 ,S0 ,S1 ,S2 
+
+initial to  S0 do{  
+	sid=-1; ssid=-1; ackReq=-1; src=-1;  }
+
+ on start from S0 to S1   
+ on PUSdisp from S1 to S2   
+ on accOK_ack from S2 to S3  provided( (ackReq==-1 || ackReq==1) )   do{
+  ackReq=1;  }  
+ on accOK from S2 to S3  provided( (ackReq==-1 || ackReq==0) )   do{
+  ackReq=0;  }  
+ on accFail from S2 to S0   
+ on execFail from S3 to S0   
+ on execOK from S3 to S0  provided( (ackReq==-1 || ackReq==1) )   do{
+  ackReq=1;  }  
+ on execOK_ack from S3 to S0  provided( (ackReq==-1 || ackReq==1) )   do{
+  ackReq=1;  }  
+
+
+end
+
+ 
+atomic type AppExecAck_Monitor
+
+   
+	export port  syncPort  tm1_7     
+	export port  syncPort  ack   
+ 
+	place S0 ,S1 
+
+initial to  S0 do{  }
+
+ on ack from S0 to S1   
+ on tm1_7 from S1 to S0   
+
+
+end
+
+ 
+atomic type ExecFailure_Monitor
+
+   
+	export port  syncPort  fail     
+	export port  syncPort  tm1_8   
+ 
+	place S0 ,S1 
+
+initial to  S0 do{  }
+
+ on fail from S0 to S1   
+ on tm1_8 from S1 to S0   
+
+
+end
+
+ 
+atomic type AppAccFailure_Monitor
+
+   
+	export port  syncPort  fail     
+	export port  syncPort  tm1_2   
+ 
+	place S0 ,S1 
+
+initial to  S0 do{  }
+
+ on fail from S0 to S1   
+ on tm1_2 from S1 to S0   
+
+
+end
+
+ 
+atomic type AppAccAck_Monitor
+
+   
+	export port  syncPort  ack     
+	export port  syncPort  tm1_1   
+ 
+	place S0 ,S1 
+
+initial to  S0 do{  }
+
+ on ack from S0 to S1   
+ on tm1_1 from S1 to S0   
+
+
+end
+
+ 
+atomic type PUSsvc1Disptch
+
+ 
+data int  sid ,ssid ,ackReq ,src  
+   
+	export port  syncPort  accOK_ack     
+	export port  syncPort  accOK     
+	export port  syncPort  execOK     
+	export port  syncPort  execOK_ack     
+	export port  syncPort  PUSdisp     
+	export port  syncPort  accFail     
+	export port  syncPort  execFail   
+ 
+	place S0 
+
+initial to  S0 do{  
+	sid=-1; ssid=-1; ackReq=-1; src=-1;  }
+
+ on PUSdisp from S0 to S0   
+ on accOK_ack from S0 to S0   
+ on accOK from S0 to S0   
+ on accFail from S0 to S0   
+ on execFail from S0 to S0   
+ on execOK from S0 to S0   
+ on execOK_ack from S0 to S0   
+
+
+end
+
+
+
+compound type TCFunction
+
+
+	component TC_FifoManager TCFIFO 
+	component SegmRcpt_ActFlowAbort SEGMRCPT 
+	component TCmngt TCMNG 
+	component SmuTC SMUTC 
+	component TCmngt_ModeManager TCMNGTMOD 
+	component AcqFail_Monitor ACQFAILMON 
+	component PUSsvc5 PUS5 
+	component Sndr_PriorityManager SNDRPRIOR 
+	component SndrMng_ActFlowAbort SNDRACTFLAB 
+	component ModeController MODCTRL 
+	component LockController LCKCTRL 
+	component TcProc_ModeManager TCPROCMOD 
+	component ModeReject_Monitor MODREJMON 
+	component TcProc_LockManager TCLOCKMOD 
+	component LockReject_Monitor LOCKREJMON 
+	component SndrPrior0_ActFlowAbort PRIORACTFLAB0 
+	component SndrPrior1_ActFlowAbort PRIORACTFLAB1 
+	component SndrPrior_ModeManager PRIORMOD 
+	component PUSsvc1 PUS1 
+	component PUSsvc228 PUS228 
+	component TcVerif_ActFlowAbort VERIFACTFLAB 
+	component PUSsvc1Verif PUS1_VERIF 
+	component TCverif TCVERIF 
+	component VerifAcceptFailure_Monitor VERACCFAILMON 
+	component TcDisptch_ActFlowAbort DISPACTFLAB 
+	component AppExecAck_Monitor EXECACKMON 
+	component ExecFailure_Monitor EXECFAILMON 
+	component AppAccFailure_Monitor APPACCFAILMON 
+	component AppAccAck_Monitor APPACCACKMON 
+	component PUSsvc1Disptch PUS1_DISP 
+
+ 
+	connector RDV3 storeTC ( TCMNG.put ,SEGMRCPT.put ,TCFIFO.put   )  
+	/* fullFifo2 > fullFifo1 */
+	connector RDV4 fullFifo2 ( TCMNG.put ,SEGMRCPT.put ,TCFIFO.full ,TCMNGTMOD.toFull   )  
+	connector RDV3 fullFifo1 ( TCMNG.put ,SEGMRCPT.put ,TCFIFO.full   )  
+	connector RDV3 acqSg_b ( TCMNG.acqSg_b ,SMUTC.get_b ,TCMNGTMOD.acqSg   )  
+	connector RDV3 acqSg_e ( SMUTC.get_e ,TCMNG.acqSg_e ,SEGMRCPT.acqSg_e   )  
+	connector RDV3 acqFail_e ( TCMNG.acqFail_e ,SEGMRCPT.acqFail_e ,ACQFAILMON.acqFail   )  
+	connector RDV3 emptySg ( SMUTC.empty ,TCMNG.noSg ,SEGMRCPT.noSg   )  
+	connector RDV2 acqFail_b ( TCMNG.acqFail_b ,TCMNGTMOD.acqFail   )  
+	connector RDV2 success ( TCMNG.success ,SEGMRCPT.success   )  
+	connector RDV2 emptyGround ( TCFIFO.empty ,TCMNG.getGround   )  
+	connector RDV2 askSg ( SEGMRCPT.ask ,SMUTC.ask   )  
+	connector RDV2 ACQFAILMON_tm5_3 ( ACQFAILMON.tm5_3 ,PUS5.tm5_3   )  
+	connector RDV3 nfullFifo2 ( TCFIFO.get ,SNDRPRIOR.get5 ,TCMNGTMOD.toNFull   )  
+	connector RDV2 nfullFifo1 ( TCFIFO.get ,SNDRPRIOR.get5   )  
+	connector RDV2 empty5 ( TCFIFO.empty ,SNDRPRIOR.empty5   )  
+	connector RDV2 SNDRMNGgetTC ( SNDRACTFLAB.getTC ,SNDRPRIOR.getTC   )  
+	connector RDV2 SNDRMNGretTC ( SNDRPRIOR.retTC ,SNDRACTFLAB.retTC   )  
+	connector RDV2 SNDRMNGnoTCs ( SNDRPRIOR.noTC ,SNDRACTFLAB.noTC   )  
+	connector RDV2 askMod ( SNDRACTFLAB.askMod ,MODCTRL.askMod   )  
+	connector RDV3 modAcc ( SNDRACTFLAB.modAcc ,MODCTRL.modAcc ,TCPROCMOD.nomin   )  
+	connector RDV3 modAccX ( SNDRACTFLAB.modAccX ,MODCTRL.modAccX ,TCPROCMOD.restr   )  
+	connector RDV4 modRej ( SNDRACTFLAB.modRej ,MODCTRL.modRej ,TCPROCMOD.restr ,MODREJMON.fail   )  
+	connector RDV2 askLck ( SNDRACTFLAB.askLck ,LCKCTRL.askLck   )  
+	connector RDV3 lckAcc ( SNDRACTFLAB.lckAcc ,LCKCTRL.lckAcc ,TCLOCKMOD.ulock   )  
+	connector RDV3 lckAccX ( SNDRACTFLAB.lckAccX ,LCKCTRL.lckAccX ,TCLOCKMOD.lock   )  
+	connector RDV4 lckRej ( SNDRACTFLAB.lckRej ,LCKCTRL.lckRej ,TCLOCKMOD.lock ,LOCKREJMON.fail   )  
+	connector RDV2 MODREJMON_tm1_4 ( MODREJMON.tm1_4 ,PUS1.tm1_4   )  
+	connector RDV2 LOCKREJMON_tm1_2 ( LOCKREJMON.tm1_2 ,PUS1.tm1_2   )  
+	connector RDV2 start0 ( PRIORMOD.start0 ,PRIORACTFLAB0.ask0   )  
+	connector RDV2 start1 ( PRIORMOD.start1 ,PRIORACTFLAB1.ask1   )  
+	connector RDV2 getMTLget3 ( SNDRPRIOR.get3 ,PRIORACTFLAB0.getMTL   )  
+	connector RDV2 getMTLempty3 ( SNDRPRIOR.empty3 ,PRIORACTFLAB0.emptyMTL   )  
+	connector RDV2 getOPSget4 ( SNDRPRIOR.get4 ,PRIORACTFLAB0.getOPS   )  
+	connector RDV2 getOPSempty4 ( SNDRPRIOR.empty4 ,PRIORACTFLAB0.emptyOPS   )  
+	connector RDV2 getOPSget3 ( SNDRPRIOR.get3 ,PRIORACTFLAB1.getOPS   )  
+	connector RDV2 getOPSempty3 ( SNDRPRIOR.empty3 ,PRIORACTFLAB1.emptyOPS   )  
+	connector RDV2 getMTLget4 ( SNDRPRIOR.get4 ,PRIORACTFLAB1.getMTL   )  
+	connector RDV2 getMTLempty4 ( SNDRPRIOR.empty4 ,PRIORACTFLAB1.emptyMTL   )  
+	connector RDV2 PUSver ( VERIFACTFLAB.PUSver ,PUS1_VERIF.PUSver   )  
+	connector RDV2 PUSaccept ( VERIFACTFLAB.PUSaccept ,PUS1_VERIF.PUSaccept   )  
+	connector RDV4 PUSreject ( VERIFACTFLAB.PUSreject ,PUS1_VERIF.PUSreject ,VERACCFAILMON.fail ,SNDRACTFLAB.verifRet   )  
+	connector RDV2 verif_ask ( VERIFACTFLAB.ask ,TCVERIF.ask   )  
+	connector RDV2 verif_accept ( VERIFACTFLAB.accept ,TCVERIF.accept   )  
+	connector RDV4 verif_reject ( VERIFACTFLAB.reject ,TCVERIF.reject ,VERACCFAILMON.fail ,SNDRACTFLAB.verifRet   )  
+	connector RDV2 VERACCFAILMON_tm1_2 ( VERACCFAILMON.tm1_2 ,PUS1.tm1_2   )  
+	connector RDV4 execFail ( DISPACTFLAB.execFail ,EXECFAILMON.fail ,PUS1_DISP.execFail ,VERIFACTFLAB.dispRet   )  
+	/* distinct application commands w/ ack*/
+	connector RDV6 execOK_ack_228_12 ( DISPACTFLAB.execOK_ack ,EXECACKMON.ack ,PUS1_DISP.execOK_ack ,VERIFACTFLAB.dispRet ,PUS228.exec228_1 ,TCPROCMOD.setNom   )  
+	/* execOK_ack_228_12 > execOK_ack_228_11 */
+	connector RDV5 execOK_ack_228_11 ( DISPACTFLAB.execOK_ack ,EXECACKMON.ack ,PUS1_DISP.execOK_ack ,VERIFACTFLAB.dispRet ,PUS228.exec228_1   )  
+	connector RDV6 execOK_ack_228_22 ( DISPACTFLAB.execOK_ack ,EXECACKMON.ack ,PUS1_DISP.execOK_ack ,VERIFACTFLAB.dispRet ,PUS228.exec228_2 ,TCPROCMOD.setRestr   )  
+	/* execOK_ack_228_22 > execOK_ack_228_21 */
+	connector RDV5 execOK_ack_228_21 ( DISPACTFLAB.execOK_ack ,EXECACKMON.ack ,PUS1_DISP.execOK_ack ,VERIFACTFLAB.dispRet ,PUS228.exec228_2   )  
+	connector RDV6 execOK_ack_228_32 ( DISPACTFLAB.execOK_ack ,EXECACKMON.ack ,PUS1_DISP.execOK_ack ,VERIFACTFLAB.dispRet ,PUS228.exec228_3 ,TCLOCKMOD.setUlock   )  
+	/* execOK_ack_228_32 > execOK_ack_228_31 */
+	connector RDV5 execOK_ack_228_31 ( DISPACTFLAB.execOK_ack ,EXECACKMON.ack ,PUS1_DISP.execOK_ack ,VERIFACTFLAB.dispRet ,PUS228.exec228_3   )  
+	connector RDV6 execOK_ack_228_42 ( DISPACTFLAB.execOK_ack ,EXECACKMON.ack ,PUS1_DISP.execOK_ack ,VERIFACTFLAB.dispRet ,PUS228.exec228_4 ,TCLOCKMOD.setLock   )  
+	/* execOK_ack_228_42 > execOK_ack_228_41 */
+	connector RDV5 execOK_ack_228_41 ( DISPACTFLAB.execOK_ack ,EXECACKMON.ack ,PUS1_DISP.execOK_ack ,VERIFACTFLAB.dispRet ,PUS228.exec228_4   )  
+	connector RDV4 execOK_ack_Any ( DISPACTFLAB.execOK_ack ,EXECACKMON.ack ,PUS1_DISP.execOK_ack ,VERIFACTFLAB.dispRet   )  
+	/* distinct application commands no ack */
+	connector RDV5 execOK_228_12 ( DISPACTFLAB.execOK ,PUS1_DISP.execOK ,VERIFACTFLAB.dispRet ,PUS228.exec228_1 ,TCPROCMOD.setNom   )  
+	/* execOK_228_12 > execOK_228_11 */
+	connector RDV4 execOK_228_11 ( DISPACTFLAB.execOK ,PUS1_DISP.execOK ,VERIFACTFLAB.dispRet ,PUS228.exec228_1   )  
+	connector RDV5 execOK_228_22 ( DISPACTFLAB.execOK ,PUS1_DISP.execOK ,VERIFACTFLAB.dispRet ,PUS228.exec228_2 ,TCPROCMOD.setRestr   )  
+	/* execOK_228_22 > execOK_228_21 */
+	connector RDV4 execOK_228_21 ( DISPACTFLAB.execOK ,PUS1_DISP.execOK ,VERIFACTFLAB.dispRet ,PUS228.exec228_2   )  
+	connector RDV5 execOK_228_32 ( DISPACTFLAB.execOK ,PUS1_DISP.execOK ,VERIFACTFLAB.dispRet ,PUS228.exec228_3 ,TCLOCKMOD.setUlock   )  
+	/* execOK_228_32 > execOK_228_31 */
+	connector RDV4 execOK_228_31 ( DISPACTFLAB.execOK ,PUS1_DISP.execOK ,VERIFACTFLAB.dispRet ,PUS228.exec228_3   )  
+	connector RDV5 execOK_228_42 ( DISPACTFLAB.execOK ,PUS1_DISP.execOK ,VERIFACTFLAB.dispRet ,PUS228.exec228_4 ,TCLOCKMOD.setLock   )  
+	/* execOK_228_42 > execOK_228_41 */
+	connector RDV4 execOK_228_41 ( DISPACTFLAB.execOK ,PUS1_DISP.execOK ,VERIFACTFLAB.dispRet ,PUS228.exec228_4   )  
+	connector RDV3 execOK_Any ( DISPACTFLAB.execOK ,PUS1_DISP.execOK ,VERIFACTFLAB.dispRet   )  
+	connector RDV4 accOK_ack ( DISPACTFLAB.accOK_ack ,APPACCACKMON.ack ,PUS1_DISP.accOK_ack ,VERIFACTFLAB.dispRet   )  
+	connector RDV4 accFail ( DISPACTFLAB.accFail ,APPACCFAILMON.fail ,PUS1_DISP.accFail ,VERIFACTFLAB.dispRet   )  
+	connector RDV2 EXECACKMON_tm1_7 ( EXECACKMON.tm1_7 ,PUS1.tm1_7   )  
+	connector RDV2 EXECFAILMON_tm1_8 ( EXECFAILMON.tm1_8 ,PUS1.tm1_8   )  
+	connector RDV2 APPACCACKMON_tm1_1 ( APPACCACKMON.tm1_1 ,PUS1.tm1_1   )  
+	connector RDV2 APPACCFAILMON_tm1_2 ( APPACCFAILMON.tm1_2 ,PUS1.tm1_2   )  
+	connector RDV2 PUSdisp ( DISPACTFLAB.PUSdisp ,PUS1_DISP.PUSdisp   )  
+	connector RDV2 execOK ( DISPACTFLAB.execOK ,PUS1_DISP.execOK   )  
+	connector RDV2 accOK ( DISPACTFLAB.accOK ,PUS1_DISP.accOK   )  
+	connector RDV2 verif ( SNDRACTFLAB.verif ,VERIFACTFLAB.start   )  
+	connector RDV2 verifReject ( SNDRACTFLAB.verifRet ,VERIFACTFLAB.reject   )  
+	connector RDV2 verifFinish ( SNDRACTFLAB.verifRet ,VERIFACTFLAB.finish   )  
+	connector RDV2 disptch ( VERIFACTFLAB.disptch ,DISPACTFLAB.start   )  
+	connector SINGLE TCFIFO_internal2 ( TCFIFO.internal2   )  
+	connector SINGLE TCFIFO_internal1 ( TCFIFO.internal1   )  
+	connector SINGLE TCFIFO_internal3 ( TCFIFO.internal3   )  
+	connector SINGLE SEGMRCPT_start ( SEGMRCPT.start   )  
+	connector SINGLE SEGMRCPT_finish ( SEGMRCPT.finish   )  
+	connector SINGLE SNDRPRIOR_empty6 ( SNDRPRIOR.empty6   )  
+	connector SINGLE SNDRPRIOR_empty1 ( SNDRPRIOR.empty1   )  
+	connector SINGLE SNDRPRIOR_get1 ( SNDRPRIOR.get1   )  
+	connector SINGLE SNDRPRIOR_empty2 ( SNDRPRIOR.empty2   )  
+	connector SINGLE SNDRPRIOR_get2 ( SNDRPRIOR.get2   )  
+	connector SINGLE SNDRPRIOR_get6 ( SNDRPRIOR.get6   )  
+	connector SINGLE SNDRACTFLAB_start ( SNDRACTFLAB.start   )  
+	connector SINGLE SNDRACTFLAB_done ( SNDRACTFLAB.done   )  
+	connector SINGLE PRIORACTFLAB0_start ( PRIORACTFLAB0.start   )  
+	connector SINGLE PRIORACTFLAB1_start ( PRIORACTFLAB1.start   )  
+	connector SINGLE PRIORMOD_set1 ( PRIORMOD.set1   )  
+	connector SINGLE PRIORMOD_set0 ( PRIORMOD.set0   ) 
+
+	
+ 
+	priority success_after_acqFail_b 		success < acqFail_b 
+	priority fullFifo1_after_fullFifo2 		fullFifo1 < fullFifo2 
+	priority nfullFifo1_after_nfullFifo2 		nfullFifo1 < nfullFifo2 
+	priority execOK_ack_228_11_after_execOK_ack_228_12 		execOK_ack_228_11 < execOK_ack_228_12 
+	priority execOK_ack_228_21_after_execOK_ack_228_22 		execOK_ack_228_21 < execOK_ack_228_22 
+	priority execOK_ack_228_31_after_execOK_ack_228_32 		execOK_ack_228_31 < execOK_ack_228_32 
+	priority execOK_ack_228_41_after_execOK_ack_228_42 		execOK_ack_228_41 < execOK_ack_228_42 
+	priority execOK_228_11_after_execOK_228_12 		execOK_228_11 < execOK_228_12 
+	priority execOK_228_21_after_execOK_228_22 		execOK_228_21 < execOK_228_22 
+	priority execOK_228_31_after_execOK_228_32 		execOK_228_31 < execOK_228_32 
+	priority execOK_228_41_after_execOK_228_42 		execOK_228_41 < execOK_228_42
+
+end
+
+component TCFunction Root
+
+end

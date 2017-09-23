@@ -1,0 +1,6 @@
+go_bmc
+echo "G F sband.NuPget"
+check_ltlspec_sbmc_inc -p "G F sband.NuPget"
+echo "G F sband.NuPget"
+check_ltlspec_sbmc_inc -p "G F sband.NuPget"
+quit

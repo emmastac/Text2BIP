@@ -1,0 +1,147 @@
+
+
+$!-------------------------MessageLibrary---------------------------------------!$
+atom: MessageLibrary
+init: S0
+ports: 
+S0,S0,decodeMessage
+S0,S0,composeMessage
+end
+
+ $!-------------------------sMutex---------------------------------------!$
+atom: sMutex
+init: IDLE
+ports: 
+IDLE,BUSY,take
+BUSY,IDLE,release
+end
+
+
+$!-------------------------memory_library---------------------------------------!$
+atom: memory_library
+init: S0
+ports: 
+S0, S0, setWrite
+S0, S0, setRead
+S0, S0, checkCRC
+end
+
+$!-------------------------HK_CDMS_processActionFlowWithAbort---------------------------------------!$
+atom: HK_CDMS_processActionFlowWithAbort
+init: WAIT
+ports: 
+WAIT, SEND_HK_REPORT, read_HK
+SEND_HK_REPORT, ASK, ask
+ASK, WAIT, mem_res
+ASK, WAIT, I2C_res
+end
+
+$!-------------------------HK_CDMS_PacketStoreModeManager---------------------------------------!$
+atom: HK_CDMS_PacketStoreModeManager
+init: MEMORY
+ports: 
+MEMORY, SAT, disable
+MEMORY, MEMORY, mem_write_req
+SAT, SAT, I2C_ask_sat
+SAT, MEMORY, enable
+end
+
+$!-------------------------HK_CDMS_ModeManager---------------------------------------!$
+atom: HK_CDMS_ModeManager
+init: ENABLED
+ports: 
+ENABLED, DISABLED, disable
+ENABLED, ENABLED, read_HK
+DISABLED, ENABLED, enable
+end
+
+$!-------------------------s3_5---------------------------------------!$
+atom: s3_5
+init: IDLE
+ports: 
+IDLE, START, enable_HK
+START, END, cdms
+START, END, pl
+START, END, eps
+START, END, com
+END, START, internal
+START, IDLE, finish
+end
+
+$!-------------------------s3_6---------------------------------------!$
+atom: s3_6
+init: IDLE
+ports: 
+IDLE, START, disable_HK
+START, END, cdms
+START, END, pl
+START, END, eps
+START, END, com
+END, START, internal
+START, IDLE, finish
+end
+
+$!-------------------------s15_1---------------------------------------!$
+atom: s15_1
+init: IDLE
+ports: 
+IDLE, START, enable_PS
+START, END, cdms
+START, END, pl
+START, END, eps
+START, END, com
+END, START, internal
+START, IDLE, finish
+end
+
+$!-------------------------s15_2---------------------------------------!$
+atom: s15_2
+init: IDLE
+ports: 
+IDLE, START, disable_PS
+START, END, cdms
+START, END, pl
+START, END, eps
+START, END, com
+END, START, internal
+START, IDLE, finish
+end
+
+
+$!-------------------------------mainModel---------------------------------!$
+compound: CubETH
+component: MessageLibrary, MSGLIB
+component: memory_library, MEMLIB
+component: HK_CDMS_processActionFlowWithAbort, HKCDMS_ACTFLAB
+component: sMutex, HKCDMS_MUX
+component: HK_CDMS_PacketStoreModeManager, HKCDMS_PSMODMNG
+component: HK_CDMS_ModeManager, HKCDMS_MODMNG
+component: s3_5, S3_5
+component: s3_6, S3_6
+component: s15_1, S15_1
+component: s15_2, S15_2
+connectors: 
+
+/******** HK_CDMS ***********/
+RDV3, HKCDMS_read_HK, , HKCDMS_MUX.take, HKCDMS_ACTFLAB.read_HK, HKCDMS_MODMNG.read_HK
+$! mem_res -> flash_mem fail, return !$
+RDV2, HKCDMS_mem_res, , HKCDMS_MUX.release, HKCDMS_ACTFLAB.mem_res
+
+RDV3, HKCDMS_I2C_res, , HKCDMS_MUX.release, HKCDMS_ACTFLAB.I2C_res, MSGLIB.decodeMessage
+
+RDV3, HKCDMS_ask_sat, , HKCDMS_ACTFLAB.ask, HKCDMS_PSMODMNG.I2C_ask_sat, MSGLIB.composeMessage
+/* HKCDMS_mem_write_req2> HKCDMS_mem_write_req1  */
+RDV3, HKCDMS_mem_write_req, , HKCDMS_ACTFLAB.ask, HKCDMS_PSMODMNG.mem_write_req, MEMLIB.setWrite
+
+/* TODO for all: add in .smv file : ...cdms2 > 1 */
+SINGLE, s3_5_cdms1, , S3_5.cdms
+RDV2, s3_5_cdms2, , S3_5.cdms, HKCDMS_MODMNG.enable
+SINGLE, s3_6_cdms1, , S3_6.cdms
+RDV2, s3_6_cdms2, , S3_6.cdms, HKCDMS_MODMNG.disable
+SINGLE, s15_1_cdms1, , S15_1.cdms
+RDV2, s15_1_cdms2, , S15_1.cdms, HKCDMS_PSMODMNG.enable
+SINGLE, s15_2_cdms1, , S15_2.cdms
+RDV2, s15_2_cdms2, , S15_2.cdms, HKCDMS_PSMODMNG.disable
+
+end
+

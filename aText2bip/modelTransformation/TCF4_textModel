@@ -1,0 +1,146 @@
+
+$!----------------------------PUSsvc1------------------------------------!$
+atom: PUSsvc1
+init: S0
+ports: 
+S0,S0,tm1_4
+S0,S0,tm1_2
+S0,S0,tm1_8
+S0,S0,tm1_7
+S0,S0,tm1_1
+end
+
+$!----------------------------PUSsvc228------------------------------------!$
+atom: PUSsvc228
+init: S0
+ports: 
+S0,S0,exec228_1
+S0,S0,exec228_2
+S0,S0,exec228_3
+S0,S0,exec228_4
+end
+
+$!----------------------------TcDisptch_ActFlowAbort------------------------------------!$
+atom: TcDisptch_ActFlowAbort
+data: sid, ssid, ackReq, src
+init: S0
+initAct: sid=-1; ssid=-1; ackReq=-1; src=-1;
+ports: 
+S0,S1, start(sid, ssid, ackReq, src)
+S1,S2, PUSdisp(sid, ssid, ackReq, src)
+
+S2,S3, accOK_ack, (ackReq==-1 || ackReq==1), ackReq=1;
+S2,S3, accOK, (ackReq==-1 || ackReq==0), ackReq=0;
+S2,S0, accFail,
+
+S3,S0, execFail
+S3,S0, execOK,  (ackReq==-1 || ackReq==1), ackReq=1;
+S3,S0, execOK_ack, (ackReq==-1 || ackReq==1), ackReq=1;
+end
+
+$!----------------------------AppExecAck_Monitor------------------------------------!$
+atom: AppExecAck_Monitor
+init: S0
+ports: 
+S0,S1, ack
+S1,S0, tm1_7
+end
+
+$!----------------------------ExecFailure_Monitor------------------------------------!$
+atom: ExecFailure_Monitor
+init: S0
+ports: 
+S0,S1, fail
+S1,S0, tm1_8
+end
+
+$!----------------------------AppAccFailure_Monitor------------------------------------!$
+atom: AppAccFailure_Monitor
+init: S0
+ports: 
+S0,S1, fail
+S1,S0, tm1_2
+end
+
+$!----------------------------AppAccAck_Monitor------------------------------------!$
+atom: AppAccAck_Monitor
+init: S0
+ports: 
+S0,S1, ack
+S1,S0, tm1_1
+end
+
+$!----------------------------PUSsvc1Disptch------------------------------------!$
+atom: PUSsvc1Disptch
+data: sid,ssid,ackReq,src
+init: S0
+initAct: sid=-1; ssid=-1; ackReq=-1; src=-1;
+ports: 
+S0,S0, PUSdisp(sid,ssid,ackReq,src)
+S0,S0, accOK_ack
+S0,S0, accOK
+S0,S0, accFail
+
+S0,S0, execFail
+S0,S0, execOK
+S0,S0, execOK_ack
+end
+
+$!-------------------------------mainModel---------------------------------!$
+
+
+compound: TCFunction
+component: PUSsvc1, PUS1
+component: PUSsvc228, PUS228
+
+component: TcDisptch_ActFlowAbort,DISPACTFLAB
+component: AppExecAck_Monitor,EXECACKMON
+component: ExecFailure_Monitor,EXECFAILMON
+component: AppAccFailure_Monitor,APPACCFAILMON
+component: AppAccAck_Monitor,APPACCACKMON
+component: PUSsvc1Disptch,PUS1_DISP
+
+
+connectors: 
+
+$! TCM-F4 TC dispatching function !$
+
+RDV3, execFail, , DISPACTFLAB.execFail, EXECFAILMON.fail, PUS1_DISP.execFail
+
+/* distinct application commands w/ ack*/
+RDV4, execOK_ack_228_1, , DISPACTFLAB.execOK_ack, EXECACKMON.ack, PUS1_DISP.execOK_ack, PUS228.exec228_1
+RDV4, execOK_ack_228_2, , DISPACTFLAB.execOK_ack, EXECACKMON.ack, PUS1_DISP.execOK_ack, PUS228.exec228_2
+RDV4, execOK_ack_228_3, , DISPACTFLAB.execOK_ack, EXECACKMON.ack, PUS1_DISP.execOK_ack, PUS228.exec228_3
+RDV4, execOK_ack_228_4, , DISPACTFLAB.execOK_ack, EXECACKMON.ack, PUS1_DISP.execOK_ack, PUS228.exec228_4
+
+RDV3, execOK_ack_Any, , DISPACTFLAB.execOK_ack, EXECACKMON.ack, PUS1_DISP.execOK_ack
+
+/* distinct application commands no ack */
+RDV3, execOK_228_1, , DISPACTFLAB.execOK, PUS1_DISP.execOK, PUS228.exec228_1
+RDV3, execOK_228_2, , DISPACTFLAB.execOK, PUS1_DISP.execOK, PUS228.exec228_2
+RDV3, execOK_228_3, , DISPACTFLAB.execOK, PUS1_DISP.execOK, PUS228.exec228_3
+RDV3, execOK_228_4, , DISPACTFLAB.execOK, PUS1_DISP.execOK, PUS228.exec228_4
+
+RDV2, execOK_Any, , DISPACTFLAB.execOK,  PUS1_DISP.execOK
+
+
+
+RDV3, accOK_ack, , DISPACTFLAB.accOK_ack, APPACCACKMON.ack, PUS1_DISP.accOK_ack
+RDV3, accFail, , DISPACTFLAB.accFail, APPACCFAILMON.fail, PUS1_DISP.accFail
+
+RDV2, EXECACKMON_tm1_7, , EXECACKMON.tm1_7, PUS1.tm1_7
+RDV2, EXECFAILMON_tm1_8, , EXECFAILMON.tm1_8, PUS1.tm1_8
+RDV2, APPACCACKMON_tm1_1, , APPACCACKMON.tm1_1, PUS1.tm1_1
+RDV2, APPACCFAILMON_tm1_2, , APPACCFAILMON.tm1_2, PUS1.tm1_2
+
+CPTCXT2, PUSdisp, , DISPACTFLAB.PUSdisp, PUS1_DISP.PUSdisp
+RDV2, execOK, , DISPACTFLAB.execOK, PUS1_DISP.execOK
+RDV2, accOK, , DISPACTFLAB.accOK, PUS1_DISP.accOK
+
+
+end
+
+
+
+
+

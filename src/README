@@ -1,0 +1,13 @@
+steps
+
+In order to create a BIP2 model
+----------------------------------
+1. run Text2BIP2 using the <infilename> of the input file as argument => output: <infilename>_bipModel.bip
+
+
+In order to create a NuSMV model
+----------------------------------
+1. run Text2BIP4NuSMV using the <infilename> of the input file as argument => output: <infilename>_bipModel.bip
+2. run bip2nusmv
+3. run NusmvTransform
+

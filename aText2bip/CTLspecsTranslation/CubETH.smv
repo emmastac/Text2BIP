@@ -1,0 +1,2272 @@
+MODULE MEMRD_MODMNG(active_interaction)
+
+	VAR
+		NuPread		:		boolean;
+		NuPcontin		:		boolean;
+		NuPdone		:		boolean;
+		Nuplace		:		{NuSREAD, NuSIDLE};
+
+
+	INIT
+		( (Nuplace) = (NuSIDLE) );
+
+	INVAR
+		( (NuPcontin) <-> (( (Nuplace) = (NuSREAD) )) ) &
+		( (NuPdone) <-> (( (Nuplace) = (NuSREAD) )) ) &
+		( (NuPread) <-> (( (Nuplace) = (NuSIDLE) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSREAD) )) )) & (( (active_interaction) = (NuI66) )) ) |
+		( (( (( (Nuplace) = (NuSREAD) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI69) )) ) |
+		( (( (( (Nuplace) = (NuSREAD) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI71) )) ) |
+		( (( (( (Nuplace) = (NuSREAD) )) & (( (next(Nuplace)) = (NuSREAD) )) )) & (( (active_interaction) = (NuI68) )) ) |
+		( (( (active_interaction) != (NuI68) )) & (( (( (active_interaction) != (NuI71) )) & (( (( (active_interaction) != (NuI69) )) & (( (( (active_interaction) != (NuI66) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) );
+
+
+MODULE HKCOM_MUX(active_interaction)
+
+	VAR
+		NuPtake		:		boolean;
+		NuPrelease		:		boolean;
+		Nuplace		:		{NuSIDLE, NuSBUSY};
+
+
+	INIT
+		( (Nuplace) = (NuSIDLE) );
+
+	INVAR
+		( (NuPrelease) <-> (( (Nuplace) = (NuSBUSY) )) ) &
+		( (NuPtake) <-> (( (Nuplace) = (NuSIDLE) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI130) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI131) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI132) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI133) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI134) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI135) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI139) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI140) )) ) |
+		( (( (active_interaction) != (NuI140) )) & (( (( (active_interaction) != (NuI139) )) & (( (( (active_interaction) != (NuI135) )) & (( (( (active_interaction) != (NuI134) )) & (( (( (active_interaction) != (NuI133) )) & (( (( (active_interaction) != (NuI132) )) & (( (( (active_interaction) != (NuI131) )) & (( (( (active_interaction) != (NuI130) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) )) )) )) );
+
+
+MODULE S128_5_ACTFLAB(active_interaction)
+
+	VAR
+		NuPfail		:		boolean;
+		NuPtc128_5		:		boolean;
+		NuPI2C_ask		:		boolean;
+		NuPaborted		:		boolean;
+		NuPI2C_res		:		boolean;
+		NuPI2C_fail		:		boolean;
+		Nuplace		:		{NuSIDLE, NuSSTART, NuSEND, NuSI2C};
+
+
+	INIT
+		( (Nuplace) = (NuSIDLE) );
+
+	INVAR
+		( (NuPI2C_fail) <-> (( (Nuplace) = (NuSI2C) )) ) &
+		( (NuPfail) <-> (( (Nuplace) = (NuSEND) )) ) &
+		( (NuPI2C_ask) <-> (( (Nuplace) = (NuSSTART) )) ) &
+		( (NuPI2C_res) <-> (( (Nuplace) = (NuSI2C) )) ) &
+		( (NuPaborted) <-> (( (Nuplace) = (NuSEND) )) ) &
+		( (NuPtc128_5) <-> (( (Nuplace) = (NuSIDLE) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSSTART) )) )) & (( (active_interaction) = (NuI32) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSI2C) )) )) & (( (active_interaction) = (NuI33) )) ) |
+		( (( (( (Nuplace) = (NuSI2C) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI35) )) ) |
+		( (( (( (Nuplace) = (NuSI2C) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI36) )) ) |
+		( (( (( (Nuplace) = (NuSI2C) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI34) )) ) |
+		( (( (( (Nuplace) = (NuSEND) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI30) )) ) |
+		( (( (( (Nuplace) = (NuSEND) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI31) )) ) |
+		( (( (( (Nuplace) = (NuSEND) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI29) )) ) |
+		( (( (active_interaction) != (NuI29) )) & (( (( (active_interaction) != (NuI31) )) & (( (( (active_interaction) != (NuI30) )) & (( (( (active_interaction) != (NuI34) )) & (( (( (active_interaction) != (NuI36) )) & (( (( (active_interaction) != (NuI35) )) & (( (( (active_interaction) != (NuI33) )) & (( (( (active_interaction) != (NuI32) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) )) )) )) );
+
+
+MODULE HKCOM_FAILMON(active_interaction)
+
+	VAR
+		NuPI2C_res_COM		:		boolean;
+		NuPfailure		:		boolean;
+		NuPsuccess		:		boolean;
+		NuPI2C_ask_COM		:		boolean;
+		NuVtimer		:		unsigned word[3];
+		NuVmax_timer		:		unsigned word[3];
+		Nuplace		:		{NuSNOMINAL, NuSCRITICAL_FAILURE, NuSANOMALY};
+
+
+	INIT
+		( (Nuplace) = (NuSNOMINAL) ) &
+		( (NuVtimer) = (0ud3_0) ) &
+		( (NuVmax_timer) = (( -(0ud3_1) )) );
+
+	INVAR
+		( (NuPsuccess) <-> (( (( (Nuplace) = (NuSANOMALY) )) & (( (( (NuVmax_timer) = (( -(0ud3_1) )) )) | (( (NuVtimer) > (NuVmax_timer) )) )) )) ) &
+		( (NuPI2C_res_COM) <-> (( (Nuplace) = (NuSCRITICAL_FAILURE) )) ) &
+		( (NuPI2C_ask_COM) <-> (( (( (Nuplace) = (NuSANOMALY) )) & (( (( (NuVmax_timer) = (( -(0ud3_1) )) )) | (( (NuVtimer) > (NuVmax_timer) )) )) )) ) &
+		( (NuPfailure) <-> (( (Nuplace) = (NuSNOMINAL) )) );
+
+	TRANS
+		( (( (( (( (( (Nuplace) = (NuSNOMINAL) )) & (( (next(Nuplace)) = (NuSANOMALY) )) )) & (( (active_interaction) = (NuI139) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVmax_timer)) = (NuVmax_timer) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSNOMINAL) )) & (( (next(Nuplace)) = (NuSANOMALY) )) )) & (( (active_interaction) = (NuI140) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVmax_timer)) = (NuVmax_timer) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSANOMALY) )) & (( (next(Nuplace)) = (NuSCRITICAL_FAILURE) )) )) & (( (active_interaction) = (NuI141) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVmax_timer)) = (NuVmax_timer) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSANOMALY) )) & (( (next(Nuplace)) = (NuSNOMINAL) )) )) & (( (active_interaction) = (NuI131) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVmax_timer)) = (NuVmax_timer) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSANOMALY) )) & (( (next(Nuplace)) = (NuSNOMINAL) )) )) & (( (active_interaction) = (NuI132) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVmax_timer)) = (NuVmax_timer) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSANOMALY) )) & (( (next(Nuplace)) = (NuSNOMINAL) )) )) & (( (active_interaction) = (NuI133) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVmax_timer)) = (NuVmax_timer) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSANOMALY) )) & (( (next(Nuplace)) = (NuSNOMINAL) )) )) & (( (active_interaction) = (NuI134) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVmax_timer)) = (NuVmax_timer) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSANOMALY) )) & (( (next(Nuplace)) = (NuSNOMINAL) )) )) & (( (active_interaction) = (NuI135) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVmax_timer)) = (NuVmax_timer) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSCRITICAL_FAILURE) )) & (( (next(Nuplace)) = (NuSNOMINAL) )) )) & (( (active_interaction) = (NuI142) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVmax_timer)) = (NuVmax_timer) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSCRITICAL_FAILURE) )) & (( (next(Nuplace)) = (NuSNOMINAL) )) )) & (( (active_interaction) = (NuI143) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVmax_timer)) = (NuVmax_timer) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSCRITICAL_FAILURE) )) & (( (next(Nuplace)) = (NuSNOMINAL) )) )) & (( (active_interaction) = (NuI144) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVmax_timer)) = (NuVmax_timer) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSCRITICAL_FAILURE) )) & (( (next(Nuplace)) = (NuSNOMINAL) )) )) & (( (active_interaction) = (NuI145) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVmax_timer)) = (NuVmax_timer) )) ) |
+		( (( (active_interaction) != (NuI145) )) & (( (( (active_interaction) != (NuI144) )) & (( (( (active_interaction) != (NuI143) )) & (( (( (active_interaction) != (NuI142) )) & (( (( (active_interaction) != (NuI135) )) & (( (( (active_interaction) != (NuI134) )) & (( (( (active_interaction) != (NuI133) )) & (( (( (active_interaction) != (NuI132) )) & (( (( (active_interaction) != (NuI131) )) & (( (( (active_interaction) != (NuI141) )) & (( (( (active_interaction) != (NuI140) )) & (( (( (active_interaction) != (NuI139) )) & (( (( (( (next(Nuplace)) = (Nuplace) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVmax_timer)) = (NuVmax_timer) )) )) )) )) )) )) )) )) )) )) )) )) )) );
+
+
+MODULE MEMWR_ACTFLAB(active_interaction)
+
+	VAR
+		NuPfail		:		boolean;
+		NuPwait		:		boolean;
+		NuPok_write		:		boolean;
+		NuPcontin		:		boolean;
+		NuPfinish		:		boolean;
+		NuPwrite		:		boolean;
+		Nuplace		:		{NuSSTATUS_WRITE, NuSDONE, NuSWRITE_BUFFER, NuSWAIT};
+
+
+	INIT
+		( (Nuplace) = (NuSWRITE_BUFFER) );
+
+	INVAR
+		( (NuPfinish) <-> (( (Nuplace) = (NuSDONE) )) ) &
+		( (NuPwrite) <-> (( (Nuplace) = (NuSWRITE_BUFFER) )) ) &
+		( (NuPcontin) <-> (( (Nuplace) = (NuSSTATUS_WRITE) )) ) &
+		( (NuPfail) <-> (( (Nuplace) = (NuSSTATUS_WRITE) )) ) &
+		( (NuPwait) <-> (( (Nuplace) = (NuSWAIT) )) ) &
+		( (NuPok_write) <-> (( (Nuplace) = (NuSSTATUS_WRITE) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSWRITE_BUFFER) )) & (( (next(Nuplace)) = (NuSWAIT) )) )) & (( (active_interaction) = (NuI75) )) ) |
+		( (( (( (Nuplace) = (NuSWAIT) )) & (( (next(Nuplace)) = (NuSSTATUS_WRITE) )) )) & (( (active_interaction) = (NuI181) )) ) |
+		( (( (( (Nuplace) = (NuSSTATUS_WRITE) )) & (( (next(Nuplace)) = (NuSWRITE_BUFFER) )) )) & (( (active_interaction) = (NuI182) )) ) |
+		( (( (( (Nuplace) = (NuSSTATUS_WRITE) )) & (( (next(Nuplace)) = (NuSWRITE_BUFFER) )) )) & (( (active_interaction) = (NuI77) )) ) |
+		( (( (( (Nuplace) = (NuSSTATUS_WRITE) )) & (( (next(Nuplace)) = (NuSWRITE_BUFFER) )) )) & (( (active_interaction) = (NuI78) )) ) |
+		( (( (( (Nuplace) = (NuSSTATUS_WRITE) )) & (( (next(Nuplace)) = (NuSWRITE_BUFFER) )) )) & (( (active_interaction) = (NuI104) )) ) |
+		( (( (( (Nuplace) = (NuSSTATUS_WRITE) )) & (( (next(Nuplace)) = (NuSWRITE_BUFFER) )) )) & (( (active_interaction) = (NuI105) )) ) |
+		( (( (( (Nuplace) = (NuSSTATUS_WRITE) )) & (( (next(Nuplace)) = (NuSWRITE_BUFFER) )) )) & (( (active_interaction) = (NuI131) )) ) |
+		( (( (( (Nuplace) = (NuSSTATUS_WRITE) )) & (( (next(Nuplace)) = (NuSWRITE_BUFFER) )) )) & (( (active_interaction) = (NuI132) )) ) |
+		( (( (( (Nuplace) = (NuSSTATUS_WRITE) )) & (( (next(Nuplace)) = (NuSWRITE_BUFFER) )) )) & (( (active_interaction) = (NuI158) )) ) |
+		( (( (( (Nuplace) = (NuSSTATUS_WRITE) )) & (( (next(Nuplace)) = (NuSWRITE_BUFFER) )) )) & (( (active_interaction) = (NuI159) )) ) |
+		( (( (( (Nuplace) = (NuSSTATUS_WRITE) )) & (( (next(Nuplace)) = (NuSDONE) )) )) & (( (active_interaction) = (NuI59) )) ) |
+		( (( (( (Nuplace) = (NuSSTATUS_WRITE) )) & (( (next(Nuplace)) = (NuSDONE) )) )) & (( (active_interaction) = (NuI60) )) ) |
+		( (( (( (Nuplace) = (NuSSTATUS_WRITE) )) & (( (next(Nuplace)) = (NuSDONE) )) )) & (( (active_interaction) = (NuI79) )) ) |
+		( (( (( (Nuplace) = (NuSSTATUS_WRITE) )) & (( (next(Nuplace)) = (NuSDONE) )) )) & (( (active_interaction) = (NuI80) )) ) |
+		( (( (( (Nuplace) = (NuSSTATUS_WRITE) )) & (( (next(Nuplace)) = (NuSDONE) )) )) & (( (active_interaction) = (NuI106) )) ) |
+		( (( (( (Nuplace) = (NuSSTATUS_WRITE) )) & (( (next(Nuplace)) = (NuSDONE) )) )) & (( (active_interaction) = (NuI107) )) ) |
+		( (( (( (Nuplace) = (NuSSTATUS_WRITE) )) & (( (next(Nuplace)) = (NuSDONE) )) )) & (( (active_interaction) = (NuI133) )) ) |
+		( (( (( (Nuplace) = (NuSSTATUS_WRITE) )) & (( (next(Nuplace)) = (NuSDONE) )) )) & (( (active_interaction) = (NuI134) )) ) |
+		( (( (( (Nuplace) = (NuSSTATUS_WRITE) )) & (( (next(Nuplace)) = (NuSDONE) )) )) & (( (active_interaction) = (NuI160) )) ) |
+		( (( (( (Nuplace) = (NuSSTATUS_WRITE) )) & (( (next(Nuplace)) = (NuSDONE) )) )) & (( (active_interaction) = (NuI161) )) ) |
+		( (( (( (Nuplace) = (NuSDONE) )) & (( (next(Nuplace)) = (NuSWRITE_BUFFER) )) )) & (( (active_interaction) = (NuI183) )) ) |
+		( (( (active_interaction) != (NuI183) )) & (( (( (active_interaction) != (NuI161) )) & (( (( (active_interaction) != (NuI160) )) & (( (( (active_interaction) != (NuI134) )) & (( (( (active_interaction) != (NuI133) )) & (( (( (active_interaction) != (NuI107) )) & (( (( (active_interaction) != (NuI106) )) & (( (( (active_interaction) != (NuI80) )) & (( (( (active_interaction) != (NuI79) )) & (( (( (active_interaction) != (NuI60) )) & (( (( (active_interaction) != (NuI59) )) & (( (( (active_interaction) != (NuI159) )) & (( (( (active_interaction) != (NuI158) )) & (( (( (active_interaction) != (NuI132) )) & (( (( (active_interaction) != (NuI131) )) & (( (( (active_interaction) != (NuI105) )) & (( (( (active_interaction) != (NuI104) )) & (( (( (active_interaction) != (NuI78) )) & (( (( (active_interaction) != (NuI77) )) & (( (( (active_interaction) != (NuI182) )) & (( (( (active_interaction) != (NuI181) )) & (( (( (active_interaction) != (NuI75) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) );
+
+
+MODULE HKCOM_MODMNG(active_interaction)
+
+	VAR
+		NuPdisable		:		boolean;
+		NuPenable		:		boolean;
+		NuPread_HK		:		boolean;
+		Nuplace		:		{NuSDISABLED, NuSENABLED};
+
+
+	INIT
+		( (Nuplace) = (NuSENABLED) );
+
+	INVAR
+		( (NuPread_HK) <-> (( (Nuplace) = (NuSENABLED) )) ) &
+		( (NuPenable) <-> (( (Nuplace) = (NuSDISABLED) )) ) &
+		( (NuPdisable) <-> (( (Nuplace) = (NuSENABLED) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSENABLED) )) & (( (next(Nuplace)) = (NuSDISABLED) )) )) & (( (active_interaction) = (NuI152) )) ) |
+		( (( (( (Nuplace) = (NuSENABLED) )) & (( (next(Nuplace)) = (NuSENABLED) )) )) & (( (active_interaction) = (NuI130) )) ) |
+		( (( (( (Nuplace) = (NuSDISABLED) )) & (( (next(Nuplace)) = (NuSENABLED) )) )) & (( (active_interaction) = (NuI150) )) ) |
+		( (( (active_interaction) != (NuI150) )) & (( (( (active_interaction) != (NuI130) )) & (( (( (active_interaction) != (NuI152) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) );
+
+
+MODULE WATCHDOG(active_interaction)
+
+	VAR
+		NuPinternal_watchdog		:		boolean;
+		NuPdone		:		boolean;
+		NuVtimer		:		unsigned word[3];
+		Nuplace		:		{NuSS0, NuSS1};
+
+
+	INIT
+		( (Nuplace) = (NuSS0) ) &
+		( (NuVtimer) = (0ud3_0) );
+
+	INVAR
+		( (NuPinternal_watchdog) <-> (( (Nuplace) = (NuSS0) )) ) &
+		( (NuPdone) <-> (( (Nuplace) = (NuSS1) )) );
+
+	TRANS
+		( (( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS1) )) )) & (( (active_interaction) = (NuI1) )) )) & (( (next(NuVtimer)) = (0ud3_0) )) ) |
+		( (( (( (( (Nuplace) = (NuSS1) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI2) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) ) |
+		( (( (( (( (Nuplace) = (NuSS1) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI8) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) ) |
+		( (( (active_interaction) != (NuI8) )) & (( (( (active_interaction) != (NuI2) )) & (( (( (active_interaction) != (NuI1) )) & (( (( (next(Nuplace)) = (Nuplace) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) )) )) );
+
+
+MODULE HKPL_FAILMON(active_interaction)
+
+	VAR
+		NuPfailure		:		boolean;
+		NuPsuccess		:		boolean;
+		NuPI2C_res_PL		:		boolean;
+		NuPI2C_ask_PL		:		boolean;
+		NuVtimer		:		unsigned word[3];
+		NuVmax_timer		:		unsigned word[3];
+		Nuplace		:		{NuSNOMINAL, NuSCRITICAL_FAILURE, NuSANOMALY};
+
+
+	INIT
+		( (Nuplace) = (NuSNOMINAL) ) &
+		( (NuVtimer) = (0ud3_0) ) &
+		( (NuVmax_timer) = (( -(0ud3_1) )) );
+
+	INVAR
+		( (NuPfailure) <-> (( (Nuplace) = (NuSNOMINAL) )) ) &
+		( (NuPsuccess) <-> (( (( (Nuplace) = (NuSANOMALY) )) & (( (( (NuVmax_timer) = (( -(0ud3_1) )) )) | (( (NuVtimer) > (NuVmax_timer) )) )) )) ) &
+		( (NuPI2C_ask_PL) <-> (( (( (Nuplace) = (NuSANOMALY) )) & (( (( (NuVmax_timer) = (( -(0ud3_1) )) )) | (( (NuVtimer) > (NuVmax_timer) )) )) )) ) &
+		( (NuPI2C_res_PL) <-> (( (Nuplace) = (NuSCRITICAL_FAILURE) )) );
+
+	TRANS
+		( (( (( (( (( (Nuplace) = (NuSNOMINAL) )) & (( (next(Nuplace)) = (NuSANOMALY) )) )) & (( (active_interaction) = (NuI85) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVmax_timer)) = (NuVmax_timer) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSNOMINAL) )) & (( (next(Nuplace)) = (NuSANOMALY) )) )) & (( (active_interaction) = (NuI86) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVmax_timer)) = (NuVmax_timer) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSANOMALY) )) & (( (next(Nuplace)) = (NuSCRITICAL_FAILURE) )) )) & (( (active_interaction) = (NuI87) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVmax_timer)) = (NuVmax_timer) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSANOMALY) )) & (( (next(Nuplace)) = (NuSNOMINAL) )) )) & (( (active_interaction) = (NuI77) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVmax_timer)) = (NuVmax_timer) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSANOMALY) )) & (( (next(Nuplace)) = (NuSNOMINAL) )) )) & (( (active_interaction) = (NuI78) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVmax_timer)) = (NuVmax_timer) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSANOMALY) )) & (( (next(Nuplace)) = (NuSNOMINAL) )) )) & (( (active_interaction) = (NuI79) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVmax_timer)) = (NuVmax_timer) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSANOMALY) )) & (( (next(Nuplace)) = (NuSNOMINAL) )) )) & (( (active_interaction) = (NuI80) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVmax_timer)) = (NuVmax_timer) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSANOMALY) )) & (( (next(Nuplace)) = (NuSNOMINAL) )) )) & (( (active_interaction) = (NuI81) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVmax_timer)) = (NuVmax_timer) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSCRITICAL_FAILURE) )) & (( (next(Nuplace)) = (NuSNOMINAL) )) )) & (( (active_interaction) = (NuI88) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVmax_timer)) = (NuVmax_timer) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSCRITICAL_FAILURE) )) & (( (next(Nuplace)) = (NuSNOMINAL) )) )) & (( (active_interaction) = (NuI89) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVmax_timer)) = (NuVmax_timer) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSCRITICAL_FAILURE) )) & (( (next(Nuplace)) = (NuSNOMINAL) )) )) & (( (active_interaction) = (NuI90) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVmax_timer)) = (NuVmax_timer) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSCRITICAL_FAILURE) )) & (( (next(Nuplace)) = (NuSNOMINAL) )) )) & (( (active_interaction) = (NuI91) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVmax_timer)) = (NuVmax_timer) )) ) |
+		( (( (active_interaction) != (NuI91) )) & (( (( (active_interaction) != (NuI90) )) & (( (( (active_interaction) != (NuI89) )) & (( (( (active_interaction) != (NuI88) )) & (( (( (active_interaction) != (NuI81) )) & (( (( (active_interaction) != (NuI80) )) & (( (( (active_interaction) != (NuI79) )) & (( (( (active_interaction) != (NuI78) )) & (( (( (active_interaction) != (NuI77) )) & (( (( (active_interaction) != (NuI87) )) & (( (( (active_interaction) != (NuI86) )) & (( (( (active_interaction) != (NuI85) )) & (( (( (( (next(Nuplace)) = (Nuplace) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVmax_timer)) = (NuVmax_timer) )) )) )) )) )) )) )) )) )) )) )) )) )) );
+
+
+MODULE HKEPS_MODMNG(active_interaction)
+
+	VAR
+		NuPdisable		:		boolean;
+		NuPenable		:		boolean;
+		NuPread_HK		:		boolean;
+		Nuplace		:		{NuSDISABLED, NuSENABLED};
+
+
+	INIT
+		( (Nuplace) = (NuSENABLED) );
+
+	INVAR
+		( (NuPenable) <-> (( (Nuplace) = (NuSDISABLED) )) ) &
+		( (NuPdisable) <-> (( (Nuplace) = (NuSENABLED) )) ) &
+		( (NuPread_HK) <-> (( (Nuplace) = (NuSENABLED) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSENABLED) )) & (( (next(Nuplace)) = (NuSDISABLED) )) )) & (( (active_interaction) = (NuI125) )) ) |
+		( (( (( (Nuplace) = (NuSENABLED) )) & (( (next(Nuplace)) = (NuSENABLED) )) )) & (( (active_interaction) = (NuI103) )) ) |
+		( (( (( (Nuplace) = (NuSDISABLED) )) & (( (next(Nuplace)) = (NuSENABLED) )) )) & (( (active_interaction) = (NuI123) )) ) |
+		( (( (active_interaction) != (NuI123) )) & (( (( (active_interaction) != (NuI103) )) & (( (( (active_interaction) != (NuI125) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) );
+
+
+MODULE S128_5_MUX(active_interaction)
+
+	VAR
+		NuPtake		:		boolean;
+		NuPrelease		:		boolean;
+		Nuplace		:		{NuSIDLE, NuSBUSY};
+
+
+	INIT
+		( (Nuplace) = (NuSIDLE) );
+
+	INVAR
+		( (NuPtake) <-> (( (Nuplace) = (NuSIDLE) )) ) &
+		( (NuPrelease) <-> (( (Nuplace) = (NuSBUSY) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI32) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI29) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI30) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI31) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI35) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI36) )) ) |
+		( (( (active_interaction) != (NuI36) )) & (( (( (active_interaction) != (NuI35) )) & (( (( (active_interaction) != (NuI31) )) & (( (( (active_interaction) != (NuI30) )) & (( (( (active_interaction) != (NuI29) )) & (( (( (active_interaction) != (NuI32) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) )) );
+
+
+MODULE STAT_VER_MUX(active_interaction)
+
+	VAR
+		NuPtake		:		boolean;
+		NuPrelease		:		boolean;
+		Nuplace		:		{NuSIDLE, NuSBUSY};
+
+
+	INIT
+		( (Nuplace) = (NuSIDLE) );
+
+	INVAR
+		( (NuPtake) <-> (( (Nuplace) = (NuSIDLE) )) ) &
+		( (NuPrelease) <-> (( (Nuplace) = (NuSBUSY) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI37) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI38) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI39) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI40) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI41) )) ) |
+		( (( (active_interaction) != (NuI41) )) & (( (( (active_interaction) != (NuI40) )) & (( (( (active_interaction) != (NuI39) )) & (( (( (active_interaction) != (NuI38) )) & (( (( (active_interaction) != (NuI37) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) );
+
+
+MODULE LOG(active_interaction)
+
+	VAR
+		NuPlog		:		boolean;
+		NuPdone		:		boolean;
+		Nuplace		:		{NuSIDLE};
+
+
+	INIT
+		( (Nuplace) = (NuSIDLE) );
+
+	INVAR
+		( (NuPlog) <-> (( (Nuplace) = (NuSIDLE) )) ) &
+		( (NuPdone) <-> (( (Nuplace) = (NuSIDLE) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI5) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI6) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI17) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI18) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI27) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI28) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI35) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI36) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI44) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI45) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI55) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI56) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI59) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI60) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI64) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI69) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI70) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI71) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI72) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI74) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI77) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI78) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI79) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI80) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI85) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI86) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI90) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI91) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI104) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI105) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI106) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI107) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI112) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI113) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI117) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI118) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI131) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI132) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI133) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI134) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI139) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI140) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI144) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI145) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI158) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI159) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI160) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI161) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI65) )) ) |
+		( (( (active_interaction) != (NuI65) )) & (( (( (active_interaction) != (NuI161) )) & (( (( (active_interaction) != (NuI160) )) & (( (( (active_interaction) != (NuI159) )) & (( (( (active_interaction) != (NuI158) )) & (( (( (active_interaction) != (NuI145) )) & (( (( (active_interaction) != (NuI144) )) & (( (( (active_interaction) != (NuI140) )) & (( (( (active_interaction) != (NuI139) )) & (( (( (active_interaction) != (NuI134) )) & (( (( (active_interaction) != (NuI133) )) & (( (( (active_interaction) != (NuI132) )) & (( (( (active_interaction) != (NuI131) )) & (( (( (active_interaction) != (NuI118) )) & (( (( (active_interaction) != (NuI117) )) & (( (( (active_interaction) != (NuI113) )) & (( (( (active_interaction) != (NuI112) )) & (( (( (active_interaction) != (NuI107) )) & (( (( (active_interaction) != (NuI106) )) & (( (( (active_interaction) != (NuI105) )) & (( (( (active_interaction) != (NuI104) )) & (( (( (active_interaction) != (NuI91) )) & (( (( (active_interaction) != (NuI90) )) & (( (( (active_interaction) != (NuI86) )) & (( (( (active_interaction) != (NuI85) )) & (( (( (active_interaction) != (NuI80) )) & (( (( (active_interaction) != (NuI79) )) & (( (( (active_interaction) != (NuI78) )) & (( (( (active_interaction) != (NuI77) )) & (( (( (active_interaction) != (NuI74) )) & (( (( (active_interaction) != (NuI72) )) & (( (( (active_interaction) != (NuI71) )) & (( (( (active_interaction) != (NuI70) )) & (( (( (active_interaction) != (NuI69) )) & (( (( (active_interaction) != (NuI64) )) & (( (( (active_interaction) != (NuI60) )) & (( (( (active_interaction) != (NuI59) )) & (( (( (active_interaction) != (NuI56) )) & (( (( (active_interaction) != (NuI55) )) & (( (( (active_interaction) != (NuI45) )) & (( (( (active_interaction) != (NuI44) )) & (( (( (active_interaction) != (NuI36) )) & (( (( (active_interaction) != (NuI35) )) & (( (( (active_interaction) != (NuI28) )) & (( (( (active_interaction) != (NuI27) )) & (( (( (active_interaction) != (NuI18) )) & (( (( (active_interaction) != (NuI17) )) & (( (( (active_interaction) != (NuI6) )) & (( (( (active_interaction) != (NuI5) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) );
+
+
+MODULE HKPL_MUX(active_interaction)
+
+	VAR
+		NuPtake		:		boolean;
+		NuPrelease		:		boolean;
+		Nuplace		:		{NuSIDLE, NuSBUSY};
+
+
+	INIT
+		( (Nuplace) = (NuSIDLE) );
+
+	INVAR
+		( (NuPtake) <-> (( (Nuplace) = (NuSIDLE) )) ) &
+		( (NuPrelease) <-> (( (Nuplace) = (NuSBUSY) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI76) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI77) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI78) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI79) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI80) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI81) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI85) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI86) )) ) |
+		( (( (active_interaction) != (NuI86) )) & (( (( (active_interaction) != (NuI85) )) & (( (( (active_interaction) != (NuI81) )) & (( (( (active_interaction) != (NuI80) )) & (( (( (active_interaction) != (NuI79) )) & (( (( (active_interaction) != (NuI78) )) & (( (( (active_interaction) != (NuI77) )) & (( (( (active_interaction) != (NuI76) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) )) )) )) );
+
+
+MODULE CDMSSTATACTFL(active_interaction)
+
+	VAR
+		NuPI2C_ask		:		boolean;
+		NuPdone_reset		:		boolean;
+		NuPstart		:		boolean;
+		NuPfinish		:		boolean;
+		NuPI2C_res		:		boolean;
+		NuPstart_reset		:		boolean;
+		Nuplace		:		{NuSASKED, NuSNOMINAL, NuSSTART, NuSRESET, NuSHEARTBEAT, NuSRESULT};
+
+
+	INIT
+		( (Nuplace) = (NuSNOMINAL) );
+
+	INVAR
+		( (NuPfinish) <-> (( (Nuplace) = (NuSRESULT) )) ) &
+		( (NuPstart) <-> (( (Nuplace) = (NuSNOMINAL) )) ) &
+		( (NuPdone_reset) <-> (( (Nuplace) = (NuSRESET) )) ) &
+		( (NuPI2C_ask) <-> (( (Nuplace) = (NuSHEARTBEAT) )) ) &
+		( (NuPI2C_res) <-> (( (Nuplace) = (NuSASKED) )) ) &
+		( (NuPstart_reset) <-> (( (Nuplace) = (NuSSTART) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSNOMINAL) )) & (( (next(Nuplace)) = (NuSSTART) )) )) & (( (active_interaction) = (NuI174) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSRESET) )) )) & (( (active_interaction) = (NuI1) )) ) |
+		( (( (( (Nuplace) = (NuSRESET) )) & (( (next(Nuplace)) = (NuSHEARTBEAT) )) )) & (( (active_interaction) = (NuI2) )) ) |
+		( (( (( (Nuplace) = (NuSRESET) )) & (( (next(Nuplace)) = (NuSHEARTBEAT) )) )) & (( (active_interaction) = (NuI8) )) ) |
+		( (( (( (Nuplace) = (NuSHEARTBEAT) )) & (( (next(Nuplace)) = (NuSASKED) )) )) & (( (active_interaction) = (NuI7) )) ) |
+		( (( (( (Nuplace) = (NuSASKED) )) & (( (next(Nuplace)) = (NuSRESULT) )) )) & (( (active_interaction) = (NuI3) )) ) |
+		( (( (( (Nuplace) = (NuSASKED) )) & (( (next(Nuplace)) = (NuSRESULT) )) )) & (( (active_interaction) = (NuI4) )) ) |
+		( (( (( (Nuplace) = (NuSASKED) )) & (( (next(Nuplace)) = (NuSRESULT) )) )) & (( (active_interaction) = (NuI5) )) ) |
+		( (( (( (Nuplace) = (NuSASKED) )) & (( (next(Nuplace)) = (NuSRESULT) )) )) & (( (active_interaction) = (NuI6) )) ) |
+		( (( (( (Nuplace) = (NuSRESULT) )) & (( (next(Nuplace)) = (NuSNOMINAL) )) )) & (( (active_interaction) = (NuI175) )) ) |
+		( (( (active_interaction) != (NuI175) )) & (( (( (active_interaction) != (NuI6) )) & (( (( (active_interaction) != (NuI5) )) & (( (( (active_interaction) != (NuI4) )) & (( (( (active_interaction) != (NuI3) )) & (( (( (active_interaction) != (NuI7) )) & (( (( (active_interaction) != (NuI8) )) & (( (( (active_interaction) != (NuI2) )) & (( (( (active_interaction) != (NuI1) )) & (( (( (active_interaction) != (NuI174) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) )) )) )) )) )) );
+
+
+MODULE HKCDMS_PSMODMNG(active_interaction)
+
+	VAR
+		NuPdisable		:		boolean;
+		NuPenable		:		boolean;
+		NuPmem_write_req		:		boolean;
+		NuPI2C_ask_sat		:		boolean;
+		Nuplace		:		{NuSMEMORY, NuSSAT};
+
+
+	INIT
+		( (Nuplace) = (NuSMEMORY) );
+
+	INVAR
+		( (NuPdisable) <-> (( (Nuplace) = (NuSMEMORY) )) ) &
+		( (NuPmem_write_req) <-> (( (Nuplace) = (NuSMEMORY) )) ) &
+		( (NuPenable) <-> (( (Nuplace) = (NuSSAT) )) ) &
+		( (NuPI2C_ask_sat) <-> (( (Nuplace) = (NuSSAT) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSMEMORY) )) & (( (next(Nuplace)) = (NuSSAT) )) )) & (( (active_interaction) = (NuI173) )) ) |
+		( (( (( (Nuplace) = (NuSMEMORY) )) & (( (next(Nuplace)) = (NuSMEMORY) )) )) & (( (active_interaction) = (NuI164) )) ) |
+		( (( (( (Nuplace) = (NuSMEMORY) )) & (( (next(Nuplace)) = (NuSMEMORY) )) )) & (( (active_interaction) = (NuI165) )) ) |
+		( (( (( (Nuplace) = (NuSSAT) )) & (( (next(Nuplace)) = (NuSSAT) )) )) & (( (active_interaction) = (NuI163) )) ) |
+		( (( (( (Nuplace) = (NuSSAT) )) & (( (next(Nuplace)) = (NuSMEMORY) )) )) & (( (active_interaction) = (NuI171) )) ) |
+		( (( (active_interaction) != (NuI171) )) & (( (( (active_interaction) != (NuI163) )) & (( (( (active_interaction) != (NuI165) )) & (( (( (active_interaction) != (NuI164) )) & (( (( (active_interaction) != (NuI173) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) );
+
+
+MODULE HKCDMS_ACTFLAB(active_interaction)
+
+	VAR
+		NuPask		:		boolean;
+		NuPread_HK		:		boolean;
+		NuPmem_res		:		boolean;
+		NuPI2C_res		:		boolean;
+		NuVtimer		:		unsigned word[3];
+		NuVperiod		:		unsigned word[3];
+		Nuplace		:		{NuSSEND_HK_REPORT, NuSASK, NuSWAIT};
+
+
+	INIT
+		( (Nuplace) = (NuSWAIT) ) &
+		( (NuVtimer) = (0ud3_0) ) &
+		( (NuVperiod) = (( -(0ud3_1) )) );
+
+	INVAR
+		( (NuPI2C_res) <-> (( (Nuplace) = (NuSASK) )) ) &
+		( (NuPmem_res) <-> (( (Nuplace) = (NuSASK) )) ) &
+		( (NuPask) <-> (( (Nuplace) = (NuSSEND_HK_REPORT) )) ) &
+		( (NuPread_HK) <-> (( (( (Nuplace) = (NuSWAIT) )) & (( (( (NuVperiod) = (( -(0ud3_1) )) )) | (( (NuVtimer) = (NuVperiod) )) )) )) );
+
+	TRANS
+		( (( (( (( (( (Nuplace) = (NuSWAIT) )) & (( (next(Nuplace)) = (NuSSEND_HK_REPORT) )) )) & (( (active_interaction) = (NuI157) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSSEND_HK_REPORT) )) & (( (next(Nuplace)) = (NuSASK) )) )) & (( (active_interaction) = (NuI163) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSSEND_HK_REPORT) )) & (( (next(Nuplace)) = (NuSASK) )) )) & (( (active_interaction) = (NuI164) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSSEND_HK_REPORT) )) & (( (next(Nuplace)) = (NuSASK) )) )) & (( (active_interaction) = (NuI165) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSASK) )) & (( (next(Nuplace)) = (NuSWAIT) )) )) & (( (active_interaction) = (NuI158) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSASK) )) & (( (next(Nuplace)) = (NuSWAIT) )) )) & (( (active_interaction) = (NuI159) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSASK) )) & (( (next(Nuplace)) = (NuSWAIT) )) )) & (( (active_interaction) = (NuI160) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSASK) )) & (( (next(Nuplace)) = (NuSWAIT) )) )) & (( (active_interaction) = (NuI161) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSASK) )) & (( (next(Nuplace)) = (NuSWAIT) )) )) & (( (active_interaction) = (NuI162) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (active_interaction) != (NuI162) )) & (( (( (active_interaction) != (NuI161) )) & (( (( (active_interaction) != (NuI160) )) & (( (( (active_interaction) != (NuI159) )) & (( (( (active_interaction) != (NuI158) )) & (( (( (active_interaction) != (NuI165) )) & (( (( (active_interaction) != (NuI164) )) & (( (( (active_interaction) != (NuI163) )) & (( (( (active_interaction) != (NuI157) )) & (( (( (( (next(Nuplace)) = (Nuplace) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) )) )) )) )) )) )) )) )) )) );
+
+
+MODULE HKEPS_FAILMON(active_interaction)
+
+	VAR
+		NuPfailure		:		boolean;
+		NuPsuccess		:		boolean;
+		NuPI2C_ask_EPS		:		boolean;
+		NuPI2C_res_EPS		:		boolean;
+		NuVtimer		:		unsigned word[3];
+		NuVmax_timer		:		unsigned word[3];
+		Nuplace		:		{NuSNOMINAL, NuSCRITICAL_FAILURE, NuSANOMALY};
+
+
+	INIT
+		( (Nuplace) = (NuSNOMINAL) ) &
+		( (NuVtimer) = (0ud3_0) ) &
+		( (NuVmax_timer) = (( -(0ud3_1) )) );
+
+	INVAR
+		( (NuPI2C_ask_EPS) <-> (( (( (Nuplace) = (NuSANOMALY) )) & (( (( (NuVmax_timer) = (( -(0ud3_1) )) )) | (( (NuVtimer) > (NuVmax_timer) )) )) )) ) &
+		( (NuPI2C_res_EPS) <-> (( (Nuplace) = (NuSCRITICAL_FAILURE) )) ) &
+		( (NuPfailure) <-> (( (Nuplace) = (NuSNOMINAL) )) ) &
+		( (NuPsuccess) <-> (( (( (Nuplace) = (NuSANOMALY) )) & (( (( (NuVmax_timer) = (( -(0ud3_1) )) )) | (( (NuVtimer) > (NuVmax_timer) )) )) )) );
+
+	TRANS
+		( (( (( (( (( (Nuplace) = (NuSNOMINAL) )) & (( (next(Nuplace)) = (NuSANOMALY) )) )) & (( (active_interaction) = (NuI112) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVmax_timer)) = (NuVmax_timer) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSNOMINAL) )) & (( (next(Nuplace)) = (NuSANOMALY) )) )) & (( (active_interaction) = (NuI113) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVmax_timer)) = (NuVmax_timer) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSANOMALY) )) & (( (next(Nuplace)) = (NuSCRITICAL_FAILURE) )) )) & (( (active_interaction) = (NuI114) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVmax_timer)) = (NuVmax_timer) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSANOMALY) )) & (( (next(Nuplace)) = (NuSNOMINAL) )) )) & (( (active_interaction) = (NuI104) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVmax_timer)) = (NuVmax_timer) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSANOMALY) )) & (( (next(Nuplace)) = (NuSNOMINAL) )) )) & (( (active_interaction) = (NuI105) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVmax_timer)) = (NuVmax_timer) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSANOMALY) )) & (( (next(Nuplace)) = (NuSNOMINAL) )) )) & (( (active_interaction) = (NuI106) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVmax_timer)) = (NuVmax_timer) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSANOMALY) )) & (( (next(Nuplace)) = (NuSNOMINAL) )) )) & (( (active_interaction) = (NuI107) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVmax_timer)) = (NuVmax_timer) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSANOMALY) )) & (( (next(Nuplace)) = (NuSNOMINAL) )) )) & (( (active_interaction) = (NuI108) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVmax_timer)) = (NuVmax_timer) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSCRITICAL_FAILURE) )) & (( (next(Nuplace)) = (NuSNOMINAL) )) )) & (( (active_interaction) = (NuI115) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVmax_timer)) = (NuVmax_timer) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSCRITICAL_FAILURE) )) & (( (next(Nuplace)) = (NuSNOMINAL) )) )) & (( (active_interaction) = (NuI116) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVmax_timer)) = (NuVmax_timer) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSCRITICAL_FAILURE) )) & (( (next(Nuplace)) = (NuSNOMINAL) )) )) & (( (active_interaction) = (NuI117) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVmax_timer)) = (NuVmax_timer) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSCRITICAL_FAILURE) )) & (( (next(Nuplace)) = (NuSNOMINAL) )) )) & (( (active_interaction) = (NuI118) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVmax_timer)) = (NuVmax_timer) )) ) |
+		( (( (active_interaction) != (NuI118) )) & (( (( (active_interaction) != (NuI117) )) & (( (( (active_interaction) != (NuI116) )) & (( (( (active_interaction) != (NuI115) )) & (( (( (active_interaction) != (NuI108) )) & (( (( (active_interaction) != (NuI107) )) & (( (( (active_interaction) != (NuI106) )) & (( (( (active_interaction) != (NuI105) )) & (( (( (active_interaction) != (NuI104) )) & (( (( (active_interaction) != (NuI114) )) & (( (( (active_interaction) != (NuI113) )) & (( (( (active_interaction) != (NuI112) )) & (( (( (( (next(Nuplace)) = (Nuplace) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVmax_timer)) = (NuVmax_timer) )) )) )) )) )) )) )) )) )) )) )) )) )) );
+
+
+MODULE S15_2(active_interaction)
+
+	VAR
+		NuPcom		:		boolean;
+		NuPinternal		:		boolean;
+		NuPcdms		:		boolean;
+		NuPeps		:		boolean;
+		NuPfinish		:		boolean;
+		NuPdisable_PS		:		boolean;
+		NuPpl		:		boolean;
+		Nuplace		:		{NuSIDLE, NuSSTART, NuSEND};
+
+
+	INIT
+		( (Nuplace) = (NuSIDLE) );
+
+	INVAR
+		( (NuPcom) <-> (( (Nuplace) = (NuSSTART) )) ) &
+		( (NuPdisable_PS) <-> (( (Nuplace) = (NuSIDLE) )) ) &
+		( (NuPfinish) <-> (( (Nuplace) = (NuSSTART) )) ) &
+		( (NuPpl) <-> (( (Nuplace) = (NuSSTART) )) ) &
+		( (NuPcdms) <-> (( (Nuplace) = (NuSSTART) )) ) &
+		( (NuPeps) <-> (( (Nuplace) = (NuSSTART) )) ) &
+		( (NuPinternal) <-> (( (Nuplace) = (NuSEND) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSSTART) )) )) & (( (active_interaction) = (NuI195) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI172) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI173) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI101) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI102) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI128) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI129) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI155) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI156) )) ) |
+		( (( (( (Nuplace) = (NuSEND) )) & (( (next(Nuplace)) = (NuSSTART) )) )) & (( (active_interaction) = (NuI193) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI194) )) ) |
+		( (( (active_interaction) != (NuI194) )) & (( (( (active_interaction) != (NuI193) )) & (( (( (active_interaction) != (NuI156) )) & (( (( (active_interaction) != (NuI155) )) & (( (( (active_interaction) != (NuI129) )) & (( (( (active_interaction) != (NuI128) )) & (( (( (active_interaction) != (NuI102) )) & (( (( (active_interaction) != (NuI101) )) & (( (( (active_interaction) != (NuI173) )) & (( (( (active_interaction) != (NuI172) )) & (( (( (active_interaction) != (NuI195) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) )) )) )) )) )) )) );
+
+
+MODULE MSGLIB(active_interaction)
+
+	VAR
+		NuPcomposeMessage		:		boolean;
+		NuPdecodeMessage		:		boolean;
+		Nuplace		:		{NuSS0};
+
+
+	INIT
+		( (Nuplace) = (NuSS0) );
+
+	INVAR
+		( (NuPdecodeMessage) <-> (( (Nuplace) = (NuSS0) )) ) &
+		( (NuPcomposeMessage) <-> (( (Nuplace) = (NuSS0) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI3) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI4) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI5) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI6) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI16) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI17) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI18) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI26) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI27) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI28) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI34) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI35) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI36) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI43) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI44) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI45) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI54) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI55) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI56) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI83) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI84) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI85) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI86) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI110) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI111) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI112) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI113) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI137) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI138) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI139) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI140) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI162) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI7) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI15) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI25) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI33) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI42) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI53) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI82) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI109) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI136) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI163) )) ) |
+		( (( (active_interaction) != (NuI163) )) & (( (( (active_interaction) != (NuI136) )) & (( (( (active_interaction) != (NuI109) )) & (( (( (active_interaction) != (NuI82) )) & (( (( (active_interaction) != (NuI53) )) & (( (( (active_interaction) != (NuI42) )) & (( (( (active_interaction) != (NuI33) )) & (( (( (active_interaction) != (NuI25) )) & (( (( (active_interaction) != (NuI15) )) & (( (( (active_interaction) != (NuI7) )) & (( (( (active_interaction) != (NuI162) )) & (( (( (active_interaction) != (NuI140) )) & (( (( (active_interaction) != (NuI139) )) & (( (( (active_interaction) != (NuI138) )) & (( (( (active_interaction) != (NuI137) )) & (( (( (active_interaction) != (NuI113) )) & (( (( (active_interaction) != (NuI112) )) & (( (( (active_interaction) != (NuI111) )) & (( (( (active_interaction) != (NuI110) )) & (( (( (active_interaction) != (NuI86) )) & (( (( (active_interaction) != (NuI85) )) & (( (( (active_interaction) != (NuI84) )) & (( (( (active_interaction) != (NuI83) )) & (( (( (active_interaction) != (NuI56) )) & (( (( (active_interaction) != (NuI55) )) & (( (( (active_interaction) != (NuI54) )) & (( (( (active_interaction) != (NuI45) )) & (( (( (active_interaction) != (NuI44) )) & (( (( (active_interaction) != (NuI43) )) & (( (( (active_interaction) != (NuI36) )) & (( (( (active_interaction) != (NuI35) )) & (( (( (active_interaction) != (NuI34) )) & (( (( (active_interaction) != (NuI28) )) & (( (( (active_interaction) != (NuI27) )) & (( (( (active_interaction) != (NuI26) )) & (( (( (active_interaction) != (NuI18) )) & (( (( (active_interaction) != (NuI17) )) & (( (( (active_interaction) != (NuI16) )) & (( (( (active_interaction) != (NuI6) )) & (( (( (active_interaction) != (NuI5) )) & (( (( (active_interaction) != (NuI4) )) & (( (( (active_interaction) != (NuI3) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) );
+
+
+MODULE STAT_VER_ACTFLAB(active_interaction)
+
+	VAR
+		NuPI2C_ask		:		boolean;
+		NuPstarted		:		boolean;
+		NuPcomplete		:		boolean;
+		NuPI2C_res		:		boolean;
+		NuPI2C_fail		:		boolean;
+		NuPfull		:		boolean;
+		Nuplace		:		{NuSCHECK_STATUS, NuSIDLE, NuSEND, NuSI2C};
+
+
+	INIT
+		( (Nuplace) = (NuSIDLE) );
+
+	INVAR
+		( (NuPcomplete) <-> (( (Nuplace) = (NuSEND) )) ) &
+		( (NuPstarted) <-> (( (Nuplace) = (NuSIDLE) )) ) &
+		( (NuPI2C_ask) <-> (( (Nuplace) = (NuSCHECK_STATUS) )) ) &
+		( (NuPfull) <-> (( (Nuplace) = (NuSEND) )) ) &
+		( (NuPI2C_res) <-> (( (Nuplace) = (NuSI2C) )) ) &
+		( (NuPI2C_fail) <-> (( (Nuplace) = (NuSI2C) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSCHECK_STATUS) )) )) & (( (active_interaction) = (NuI37) )) ) |
+		( (( (( (Nuplace) = (NuSCHECK_STATUS) )) & (( (next(Nuplace)) = (NuSI2C) )) )) & (( (active_interaction) = (NuI42) )) ) |
+		( (( (( (Nuplace) = (NuSI2C) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI44) )) ) |
+		( (( (( (Nuplace) = (NuSI2C) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI45) )) ) |
+		( (( (( (Nuplace) = (NuSI2C) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI43) )) ) |
+		( (( (( (Nuplace) = (NuSEND) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI40) )) ) |
+		( (( (( (Nuplace) = (NuSEND) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI41) )) ) |
+		( (( (( (Nuplace) = (NuSEND) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI38) )) ) |
+		( (( (( (Nuplace) = (NuSEND) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI39) )) ) |
+		( (( (active_interaction) != (NuI39) )) & (( (( (active_interaction) != (NuI38) )) & (( (( (active_interaction) != (NuI41) )) & (( (( (active_interaction) != (NuI40) )) & (( (( (active_interaction) != (NuI43) )) & (( (( (active_interaction) != (NuI45) )) & (( (( (active_interaction) != (NuI44) )) & (( (( (active_interaction) != (NuI42) )) & (( (( (active_interaction) != (NuI37) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) )) )) )) )) );
+
+
+MODULE HKPL_PSMODMNG(active_interaction)
+
+	VAR
+		NuPdisable		:		boolean;
+		NuPenable		:		boolean;
+		NuPmem_write_req		:		boolean;
+		NuPask_I2C_TTC		:		boolean;
+		Nuplace		:		{NuSTTC, NuSMEMORY};
+
+
+	INIT
+		( (Nuplace) = (NuSMEMORY) );
+
+	INVAR
+		( (NuPask_I2C_TTC) <-> (( (Nuplace) = (NuSTTC) )) ) &
+		( (NuPenable) <-> (( (Nuplace) = (NuSTTC) )) ) &
+		( (NuPdisable) <-> (( (Nuplace) = (NuSMEMORY) )) ) &
+		( (NuPmem_write_req) <-> (( (Nuplace) = (NuSMEMORY) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSMEMORY) )) & (( (next(Nuplace)) = (NuSTTC) )) )) & (( (active_interaction) = (NuI102) )) ) |
+		( (( (( (Nuplace) = (NuSMEMORY) )) & (( (next(Nuplace)) = (NuSMEMORY) )) )) & (( (active_interaction) = (NuI93) )) ) |
+		( (( (( (Nuplace) = (NuSMEMORY) )) & (( (next(Nuplace)) = (NuSMEMORY) )) )) & (( (active_interaction) = (NuI94) )) ) |
+		( (( (( (Nuplace) = (NuSTTC) )) & (( (next(Nuplace)) = (NuSTTC) )) )) & (( (active_interaction) = (NuI92) )) ) |
+		( (( (( (Nuplace) = (NuSTTC) )) & (( (next(Nuplace)) = (NuSMEMORY) )) )) & (( (active_interaction) = (NuI100) )) ) |
+		( (( (active_interaction) != (NuI100) )) & (( (( (active_interaction) != (NuI92) )) & (( (( (active_interaction) != (NuI94) )) & (( (( (active_interaction) != (NuI93) )) & (( (( (active_interaction) != (NuI102) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) );
+
+
+MODULE S3_5(active_interaction)
+
+	VAR
+		NuPcom		:		boolean;
+		NuPinternal		:		boolean;
+		NuPenable_HK		:		boolean;
+		NuPcdms		:		boolean;
+		NuPeps		:		boolean;
+		NuPfinish		:		boolean;
+		NuPpl		:		boolean;
+		Nuplace		:		{NuSIDLE, NuSSTART, NuSEND};
+
+
+	INIT
+		( (Nuplace) = (NuSIDLE) );
+
+	INVAR
+		( (NuPenable_HK) <-> (( (Nuplace) = (NuSIDLE) )) ) &
+		( (NuPinternal) <-> (( (Nuplace) = (NuSEND) )) ) &
+		( (NuPcdms) <-> (( (Nuplace) = (NuSSTART) )) ) &
+		( (NuPeps) <-> (( (Nuplace) = (NuSSTART) )) ) &
+		( (NuPpl) <-> (( (Nuplace) = (NuSSTART) )) ) &
+		( (NuPcom) <-> (( (Nuplace) = (NuSSTART) )) ) &
+		( (NuPfinish) <-> (( (Nuplace) = (NuSSTART) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSSTART) )) )) & (( (active_interaction) = (NuI185) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI166) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI167) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI95) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI96) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI122) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI123) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI149) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI150) )) ) |
+		( (( (( (Nuplace) = (NuSEND) )) & (( (next(Nuplace)) = (NuSSTART) )) )) & (( (active_interaction) = (NuI184) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI186) )) ) |
+		( (( (active_interaction) != (NuI186) )) & (( (( (active_interaction) != (NuI184) )) & (( (( (active_interaction) != (NuI150) )) & (( (( (active_interaction) != (NuI149) )) & (( (( (active_interaction) != (NuI123) )) & (( (( (active_interaction) != (NuI122) )) & (( (( (active_interaction) != (NuI96) )) & (( (( (active_interaction) != (NuI95) )) & (( (( (active_interaction) != (NuI167) )) & (( (( (active_interaction) != (NuI166) )) & (( (( (active_interaction) != (NuI185) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) )) )) )) )) )) )) );
+
+
+MODULE S128_4_MUX(active_interaction)
+
+	VAR
+		NuPtake		:		boolean;
+		NuPrelease		:		boolean;
+		Nuplace		:		{NuSIDLE, NuSBUSY};
+
+
+	INIT
+		( (Nuplace) = (NuSIDLE) );
+
+	INVAR
+		( (NuPtake) <-> (( (Nuplace) = (NuSIDLE) )) ) &
+		( (NuPrelease) <-> (( (Nuplace) = (NuSBUSY) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI11) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI9) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI10) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI13) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI14) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI17) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI18) )) ) |
+		( (( (active_interaction) != (NuI18) )) & (( (( (active_interaction) != (NuI17) )) & (( (( (active_interaction) != (NuI14) )) & (( (( (active_interaction) != (NuI13) )) & (( (( (active_interaction) != (NuI10) )) & (( (( (active_interaction) != (NuI9) )) & (( (( (active_interaction) != (NuI11) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) )) )) );
+
+
+MODULE HKPL_ACTFLAB(active_interaction)
+
+	VAR
+		NuPI2C_res_TTC		:		boolean;
+		NuPask		:		boolean;
+		NuPread_HK		:		boolean;
+		NuPI2C_res_PL		:		boolean;
+		NuPI2C_fail_PL		:		boolean;
+		NuPmem_res		:		boolean;
+		NuPI2C_ask_PL		:		boolean;
+		NuVtimer		:		unsigned word[3];
+		NuVperiod		:		unsigned word[3];
+		Nuplace		:		{NuSSEND_HK_REPORT, NuSASK, NuSSTART, NuSI2C, NuSWAIT};
+
+
+	INIT
+		( (Nuplace) = (NuSWAIT) ) &
+		( (NuVtimer) = (0ud3_0) ) &
+		( (NuVperiod) = (( -(0ud3_1) )) );
+
+	INVAR
+		( (NuPread_HK) <-> (( (( (Nuplace) = (NuSWAIT) )) & (( (( (NuVperiod) = (( -(0ud3_1) )) )) | (( (NuVtimer) = (NuVperiod) )) )) )) ) &
+		( (NuPI2C_res_PL) <-> (( (Nuplace) = (NuSI2C) )) ) &
+		( (NuPask) <-> (( (Nuplace) = (NuSSEND_HK_REPORT) )) ) &
+		( (NuPI2C_res_TTC) <-> (( (Nuplace) = (NuSASK) )) ) &
+		( (NuPmem_res) <-> (( (Nuplace) = (NuSASK) )) ) &
+		( (NuPI2C_ask_PL) <-> (( (Nuplace) = (NuSSTART) )) ) &
+		( (NuPI2C_fail_PL) <-> (( (Nuplace) = (NuSI2C) )) );
+
+	TRANS
+		( (( (( (( (( (Nuplace) = (NuSWAIT) )) & (( (next(Nuplace)) = (NuSSTART) )) )) & (( (active_interaction) = (NuI76) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSI2C) )) )) & (( (active_interaction) = (NuI82) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSI2C) )) & (( (next(Nuplace)) = (NuSSEND_HK_REPORT) )) )) & (( (active_interaction) = (NuI83) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSI2C) )) & (( (next(Nuplace)) = (NuSSEND_HK_REPORT) )) )) & (( (active_interaction) = (NuI84) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSI2C) )) & (( (next(Nuplace)) = (NuSWAIT) )) )) & (( (active_interaction) = (NuI85) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSI2C) )) & (( (next(Nuplace)) = (NuSWAIT) )) )) & (( (active_interaction) = (NuI86) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSSEND_HK_REPORT) )) & (( (next(Nuplace)) = (NuSASK) )) )) & (( (active_interaction) = (NuI92) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSSEND_HK_REPORT) )) & (( (next(Nuplace)) = (NuSASK) )) )) & (( (active_interaction) = (NuI93) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSSEND_HK_REPORT) )) & (( (next(Nuplace)) = (NuSASK) )) )) & (( (active_interaction) = (NuI94) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSASK) )) & (( (next(Nuplace)) = (NuSWAIT) )) )) & (( (active_interaction) = (NuI77) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSASK) )) & (( (next(Nuplace)) = (NuSWAIT) )) )) & (( (active_interaction) = (NuI78) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSASK) )) & (( (next(Nuplace)) = (NuSWAIT) )) )) & (( (active_interaction) = (NuI79) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSASK) )) & (( (next(Nuplace)) = (NuSWAIT) )) )) & (( (active_interaction) = (NuI80) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSASK) )) & (( (next(Nuplace)) = (NuSWAIT) )) )) & (( (active_interaction) = (NuI81) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (active_interaction) != (NuI81) )) & (( (( (active_interaction) != (NuI80) )) & (( (( (active_interaction) != (NuI79) )) & (( (( (active_interaction) != (NuI78) )) & (( (( (active_interaction) != (NuI77) )) & (( (( (active_interaction) != (NuI94) )) & (( (( (active_interaction) != (NuI93) )) & (( (( (active_interaction) != (NuI92) )) & (( (( (active_interaction) != (NuI86) )) & (( (( (active_interaction) != (NuI85) )) & (( (( (active_interaction) != (NuI84) )) & (( (( (active_interaction) != (NuI83) )) & (( (( (active_interaction) != (NuI82) )) & (( (( (active_interaction) != (NuI76) )) & (( (( (( (next(Nuplace)) = (Nuplace) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) );
+
+
+MODULE S128_4_ACTFLAB(active_interaction)
+
+	VAR
+		NuPtc128_4		:		boolean;
+		NuPfail		:		boolean;
+		NuPI2C_ask		:		boolean;
+		NuPwrong_state		:		boolean;
+		NuPstart		:		boolean;
+		NuPexecuted		:		boolean;
+		NuPI2C_res		:		boolean;
+		NuPexec		:		boolean;
+		NuPI2C_fail		:		boolean;
+		Nuplace		:		{NuSIDLE, NuSBUSY, NuSVALIDATE, NuSSTART, NuSEND, NuSI2C};
+
+
+	INIT
+		( (Nuplace) = (NuSIDLE) );
+
+	INVAR
+		( (NuPstart) <-> (( (Nuplace) = (NuSIDLE) )) ) &
+		( (NuPI2C_res) <-> (( (Nuplace) = (NuSI2C) )) ) &
+		( (NuPI2C_ask) <-> (( (Nuplace) = (NuSSTART) )) ) &
+		( (NuPexec) <-> (( (Nuplace) = (NuSVALIDATE) )) ) &
+		( (NuPI2C_fail) <-> (( (Nuplace) = (NuSI2C) )) ) &
+		( (NuPfail) <-> (( (Nuplace) = (NuSEND) )) ) &
+		( (NuPwrong_state) <-> (( (Nuplace) = (NuSVALIDATE) )) ) &
+		( (NuPexecuted) <-> (( (Nuplace) = (NuSEND) )) ) &
+		( (NuPtc128_4) <-> (( (Nuplace) = (NuSBUSY) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI176) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSVALIDATE) )) )) & (( (active_interaction) = (NuI11) )) ) |
+		( (( (( (Nuplace) = (NuSVALIDATE) )) & (( (next(Nuplace)) = (NuSSTART) )) )) & (( (active_interaction) = (NuI12) )) ) |
+		( (( (( (Nuplace) = (NuSVALIDATE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI10) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSI2C) )) )) & (( (active_interaction) = (NuI15) )) ) |
+		( (( (( (Nuplace) = (NuSI2C) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI17) )) ) |
+		( (( (( (Nuplace) = (NuSI2C) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI18) )) ) |
+		( (( (( (Nuplace) = (NuSI2C) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI16) )) ) |
+		( (( (( (Nuplace) = (NuSEND) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI13) )) ) |
+		( (( (( (Nuplace) = (NuSEND) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI14) )) ) |
+		( (( (( (Nuplace) = (NuSEND) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI9) )) ) |
+		( (( (active_interaction) != (NuI9) )) & (( (( (active_interaction) != (NuI14) )) & (( (( (active_interaction) != (NuI13) )) & (( (( (active_interaction) != (NuI16) )) & (( (( (active_interaction) != (NuI18) )) & (( (( (active_interaction) != (NuI17) )) & (( (( (active_interaction) != (NuI15) )) & (( (( (active_interaction) != (NuI10) )) & (( (( (active_interaction) != (NuI12) )) & (( (( (active_interaction) != (NuI11) )) & (( (( (active_interaction) != (NuI176) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) )) )) )) )) )) )) );
+
+
+MODULE MEM_MUX(active_interaction)
+
+	VAR
+		NuPtake		:		boolean;
+		NuPrelease		:		boolean;
+		Nuplace		:		{NuSIDLE, NuSBUSY};
+
+
+	INIT
+		( (Nuplace) = (NuSIDLE) );
+
+	INVAR
+		( (NuPtake) <-> (( (Nuplace) = (NuSIDLE) )) ) &
+		( (NuPrelease) <-> (( (Nuplace) = (NuSBUSY) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI57) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI58) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI66) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI67) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI93) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI94) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI120) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI121) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI147) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI148) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI164) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI165) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI59) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI60) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI69) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI70) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI71) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI72) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI77) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI78) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI79) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI80) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI104) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI105) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI106) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI107) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI131) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI132) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI133) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI134) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI158) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI159) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI160) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI161) )) ) |
+		( (( (active_interaction) != (NuI161) )) & (( (( (active_interaction) != (NuI160) )) & (( (( (active_interaction) != (NuI159) )) & (( (( (active_interaction) != (NuI158) )) & (( (( (active_interaction) != (NuI134) )) & (( (( (active_interaction) != (NuI133) )) & (( (( (active_interaction) != (NuI132) )) & (( (( (active_interaction) != (NuI131) )) & (( (( (active_interaction) != (NuI107) )) & (( (( (active_interaction) != (NuI106) )) & (( (( (active_interaction) != (NuI105) )) & (( (( (active_interaction) != (NuI104) )) & (( (( (active_interaction) != (NuI80) )) & (( (( (active_interaction) != (NuI79) )) & (( (( (active_interaction) != (NuI78) )) & (( (( (active_interaction) != (NuI77) )) & (( (( (active_interaction) != (NuI72) )) & (( (( (active_interaction) != (NuI71) )) & (( (( (active_interaction) != (NuI70) )) & (( (( (active_interaction) != (NuI69) )) & (( (( (active_interaction) != (NuI60) )) & (( (( (active_interaction) != (NuI59) )) & (( (( (active_interaction) != (NuI165) )) & (( (( (active_interaction) != (NuI164) )) & (( (( (active_interaction) != (NuI148) )) & (( (( (active_interaction) != (NuI147) )) & (( (( (active_interaction) != (NuI121) )) & (( (( (active_interaction) != (NuI120) )) & (( (( (active_interaction) != (NuI94) )) & (( (( (active_interaction) != (NuI93) )) & (( (( (active_interaction) != (NuI67) )) & (( (( (active_interaction) != (NuI66) )) & (( (( (active_interaction) != (NuI58) )) & (( (( (active_interaction) != (NuI57) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) );
+
+
+MODULE HKCDMS_MUX(active_interaction)
+
+	VAR
+		NuPtake		:		boolean;
+		NuPrelease		:		boolean;
+		Nuplace		:		{NuSIDLE, NuSBUSY};
+
+
+	INIT
+		( (Nuplace) = (NuSIDLE) );
+
+	INVAR
+		( (NuPrelease) <-> (( (Nuplace) = (NuSBUSY) )) ) &
+		( (NuPtake) <-> (( (Nuplace) = (NuSIDLE) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI157) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI158) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI159) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI160) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI161) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI162) )) ) |
+		( (( (active_interaction) != (NuI162) )) & (( (( (active_interaction) != (NuI161) )) & (( (( (active_interaction) != (NuI160) )) & (( (( (active_interaction) != (NuI159) )) & (( (( (active_interaction) != (NuI158) )) & (( (( (active_interaction) != (NuI157) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) )) );
+
+
+MODULE MEMRD_ACTFLAB(active_interaction)
+
+	VAR
+		NuPfail		:		boolean;
+		NuPread		:		boolean;
+		NuPok_read		:		boolean;
+		NuPfinish		:		boolean;
+		NuPcheck_CRC		:		boolean;
+		NuPbad_CRC		:		boolean;
+		Nuplace		:		{NuSREAD_BUFFER, NuSDONE, NuSCRC, NuSSTATUS_READ, NuSIDLE};
+
+
+	INIT
+		( (Nuplace) = (NuSREAD_BUFFER) );
+
+	INVAR
+		( (NuPfail) <-> (( (Nuplace) = (NuSSTATUS_READ) )) ) &
+		( (NuPok_read) <-> (( (Nuplace) = (NuSSTATUS_READ) )) ) &
+		( (NuPfinish) <-> (( (Nuplace) = (NuSDONE) )) ) &
+		( (NuPread) <-> (( (Nuplace) = (NuSREAD_BUFFER) )) ) &
+		( (NuPcheck_CRC) <-> (( (Nuplace) = (NuSCRC) )) ) &
+		( (NuPbad_CRC) <-> (( (Nuplace) = (NuSSTATUS_READ) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSREAD_BUFFER) )) & (( (next(Nuplace)) = (NuSCRC) )) )) & (( (active_interaction) = (NuI68) )) ) |
+		( (( (( (Nuplace) = (NuSCRC) )) & (( (next(Nuplace)) = (NuSSTATUS_READ) )) )) & (( (active_interaction) = (NuI73) )) ) |
+		( (( (( (Nuplace) = (NuSSTATUS_READ) )) & (( (next(Nuplace)) = (NuSREAD_BUFFER) )) )) & (( (active_interaction) = (NuI74) )) ) |
+		( (( (( (Nuplace) = (NuSSTATUS_READ) )) & (( (next(Nuplace)) = (NuSREAD_BUFFER) )) )) & (( (active_interaction) = (NuI69) )) ) |
+		( (( (( (Nuplace) = (NuSSTATUS_READ) )) & (( (next(Nuplace)) = (NuSREAD_BUFFER) )) )) & (( (active_interaction) = (NuI70) )) ) |
+		( (( (( (Nuplace) = (NuSSTATUS_READ) )) & (( (next(Nuplace)) = (NuSDONE) )) )) & (( (active_interaction) = (NuI71) )) ) |
+		( (( (( (Nuplace) = (NuSSTATUS_READ) )) & (( (next(Nuplace)) = (NuSDONE) )) )) & (( (active_interaction) = (NuI72) )) ) |
+		( (( (( (Nuplace) = (NuSDONE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI180) )) ) |
+		( (( (active_interaction) != (NuI180) )) & (( (( (active_interaction) != (NuI72) )) & (( (( (active_interaction) != (NuI71) )) & (( (( (active_interaction) != (NuI70) )) & (( (( (active_interaction) != (NuI69) )) & (( (( (active_interaction) != (NuI74) )) & (( (( (active_interaction) != (NuI73) )) & (( (( (active_interaction) != (NuI68) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) )) )) )) );
+
+
+MODULE HKCOM_ACTFLAB(active_interaction)
+
+	VAR
+		NuPI2C_res_COM		:		boolean;
+		NuPI2C_fail_COM		:		boolean;
+		NuPI2C_ask_COM		:		boolean;
+		NuPI2C_res_TTC		:		boolean;
+		NuPask		:		boolean;
+		NuPread_HK		:		boolean;
+		NuPmem_res		:		boolean;
+		NuVtimer		:		unsigned word[3];
+		NuVperiod		:		unsigned word[3];
+		Nuplace		:		{NuSSEND_HK_REPORT, NuSASK, NuSSTART, NuSI2C, NuSWAIT};
+
+
+	INIT
+		( (Nuplace) = (NuSWAIT) ) &
+		( (NuVtimer) = (0ud3_0) ) &
+		( (NuVperiod) = (( -(0ud3_1) )) );
+
+	INVAR
+		( (NuPI2C_res_TTC) <-> (( (Nuplace) = (NuSASK) )) ) &
+		( (NuPI2C_fail_COM) <-> (( (Nuplace) = (NuSI2C) )) ) &
+		( (NuPmem_res) <-> (( (Nuplace) = (NuSASK) )) ) &
+		( (NuPask) <-> (( (Nuplace) = (NuSSEND_HK_REPORT) )) ) &
+		( (NuPI2C_res_COM) <-> (( (Nuplace) = (NuSI2C) )) ) &
+		( (NuPI2C_ask_COM) <-> (( (Nuplace) = (NuSSTART) )) ) &
+		( (NuPread_HK) <-> (( (( (Nuplace) = (NuSWAIT) )) & (( (( (NuVperiod) = (( -(0ud3_1) )) )) | (( (NuVtimer) = (NuVperiod) )) )) )) );
+
+	TRANS
+		( (( (( (( (( (Nuplace) = (NuSWAIT) )) & (( (next(Nuplace)) = (NuSSTART) )) )) & (( (active_interaction) = (NuI130) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSI2C) )) )) & (( (active_interaction) = (NuI136) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSI2C) )) & (( (next(Nuplace)) = (NuSSEND_HK_REPORT) )) )) & (( (active_interaction) = (NuI137) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSI2C) )) & (( (next(Nuplace)) = (NuSSEND_HK_REPORT) )) )) & (( (active_interaction) = (NuI138) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSI2C) )) & (( (next(Nuplace)) = (NuSWAIT) )) )) & (( (active_interaction) = (NuI139) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSI2C) )) & (( (next(Nuplace)) = (NuSWAIT) )) )) & (( (active_interaction) = (NuI140) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSSEND_HK_REPORT) )) & (( (next(Nuplace)) = (NuSASK) )) )) & (( (active_interaction) = (NuI146) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSSEND_HK_REPORT) )) & (( (next(Nuplace)) = (NuSASK) )) )) & (( (active_interaction) = (NuI147) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSSEND_HK_REPORT) )) & (( (next(Nuplace)) = (NuSASK) )) )) & (( (active_interaction) = (NuI148) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSASK) )) & (( (next(Nuplace)) = (NuSWAIT) )) )) & (( (active_interaction) = (NuI131) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSASK) )) & (( (next(Nuplace)) = (NuSWAIT) )) )) & (( (active_interaction) = (NuI132) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSASK) )) & (( (next(Nuplace)) = (NuSWAIT) )) )) & (( (active_interaction) = (NuI133) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSASK) )) & (( (next(Nuplace)) = (NuSWAIT) )) )) & (( (active_interaction) = (NuI134) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSASK) )) & (( (next(Nuplace)) = (NuSWAIT) )) )) & (( (active_interaction) = (NuI135) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (active_interaction) != (NuI135) )) & (( (( (active_interaction) != (NuI134) )) & (( (( (active_interaction) != (NuI133) )) & (( (( (active_interaction) != (NuI132) )) & (( (( (active_interaction) != (NuI131) )) & (( (( (active_interaction) != (NuI148) )) & (( (( (active_interaction) != (NuI147) )) & (( (( (active_interaction) != (NuI146) )) & (( (( (active_interaction) != (NuI140) )) & (( (( (active_interaction) != (NuI139) )) & (( (( (active_interaction) != (NuI138) )) & (( (( (active_interaction) != (NuI137) )) & (( (( (active_interaction) != (NuI136) )) & (( (( (active_interaction) != (NuI130) )) & (( (( (( (next(Nuplace)) = (Nuplace) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) );
+
+
+MODULE HKPL_MODMNG(active_interaction)
+
+	VAR
+		NuPdisable		:		boolean;
+		NuPenable		:		boolean;
+		NuPread_HK		:		boolean;
+		Nuplace		:		{NuSDISABLED, NuSENABLED};
+
+
+	INIT
+		( (Nuplace) = (NuSENABLED) );
+
+	INVAR
+		( (NuPenable) <-> (( (Nuplace) = (NuSDISABLED) )) ) &
+		( (NuPdisable) <-> (( (Nuplace) = (NuSENABLED) )) ) &
+		( (NuPread_HK) <-> (( (Nuplace) = (NuSENABLED) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSENABLED) )) & (( (next(Nuplace)) = (NuSDISABLED) )) )) & (( (active_interaction) = (NuI98) )) ) |
+		( (( (( (Nuplace) = (NuSENABLED) )) & (( (next(Nuplace)) = (NuSENABLED) )) )) & (( (active_interaction) = (NuI76) )) ) |
+		( (( (( (Nuplace) = (NuSDISABLED) )) & (( (next(Nuplace)) = (NuSENABLED) )) )) & (( (active_interaction) = (NuI96) )) ) |
+		( (( (active_interaction) != (NuI96) )) & (( (( (active_interaction) != (NuI76) )) & (( (( (active_interaction) != (NuI98) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) );
+
+
+MODULE HKCOM_PSMODMNG(active_interaction)
+
+	VAR
+		NuPdisable		:		boolean;
+		NuPenable		:		boolean;
+		NuPmem_write_req		:		boolean;
+		NuPask_I2C_TTC		:		boolean;
+		Nuplace		:		{NuSTTC, NuSMEMORY};
+
+
+	INIT
+		( (Nuplace) = (NuSMEMORY) );
+
+	INVAR
+		( (NuPask_I2C_TTC) <-> (( (Nuplace) = (NuSTTC) )) ) &
+		( (NuPmem_write_req) <-> (( (Nuplace) = (NuSMEMORY) )) ) &
+		( (NuPenable) <-> (( (Nuplace) = (NuSTTC) )) ) &
+		( (NuPdisable) <-> (( (Nuplace) = (NuSMEMORY) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSMEMORY) )) & (( (next(Nuplace)) = (NuSTTC) )) )) & (( (active_interaction) = (NuI156) )) ) |
+		( (( (( (Nuplace) = (NuSMEMORY) )) & (( (next(Nuplace)) = (NuSMEMORY) )) )) & (( (active_interaction) = (NuI147) )) ) |
+		( (( (( (Nuplace) = (NuSMEMORY) )) & (( (next(Nuplace)) = (NuSMEMORY) )) )) & (( (active_interaction) = (NuI148) )) ) |
+		( (( (( (Nuplace) = (NuSTTC) )) & (( (next(Nuplace)) = (NuSTTC) )) )) & (( (active_interaction) = (NuI146) )) ) |
+		( (( (( (Nuplace) = (NuSTTC) )) & (( (next(Nuplace)) = (NuSMEMORY) )) )) & (( (active_interaction) = (NuI154) )) ) |
+		( (( (active_interaction) != (NuI154) )) & (( (( (active_interaction) != (NuI146) )) & (( (( (active_interaction) != (NuI148) )) & (( (( (active_interaction) != (NuI147) )) & (( (( (active_interaction) != (NuI156) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) );
+
+
+MODULE DATRANS_MODMNG(active_interaction)
+
+	VAR
+		NuPto_idle		:		boolean;
+		NuPto_busy		:		boolean;
+		NuPcontin		:		boolean;
+		Nuplace		:		{NuSIDLE, NuSBUSY};
+
+
+	INIT
+		( (Nuplace) = (NuSIDLE) );
+
+	INVAR
+		( (NuPcontin) <-> (( (Nuplace) = (NuSBUSY) )) ) &
+		( (NuPto_busy) <-> (( (Nuplace) = (NuSIDLE) )) ) &
+		( (NuPto_idle) <-> (( (Nuplace) = (NuSBUSY) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI47) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI50) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI52) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI48) )) ) |
+		( (( (active_interaction) != (NuI48) )) & (( (( (active_interaction) != (NuI52) )) & (( (( (active_interaction) != (NuI50) )) & (( (( (active_interaction) != (NuI47) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) );
+
+
+MODULE MEMLIB(active_interaction)
+
+	VAR
+		NuPsetWrite		:		boolean;
+		NuPcheckCRC		:		boolean;
+		NuPsetRead		:		boolean;
+		Nuplace		:		{NuSS0};
+
+
+	INIT
+		( (Nuplace) = (NuSS0) );
+
+	INVAR
+		( (NuPcheckCRC) <-> (( (Nuplace) = (NuSS0) )) ) &
+		( (NuPsetRead) <-> (( (Nuplace) = (NuSS0) )) ) &
+		( (NuPsetWrite) <-> (( (Nuplace) = (NuSS0) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI57) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI58) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI93) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI94) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI120) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI121) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI147) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI148) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI164) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI165) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI66) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI67) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI73) )) ) |
+		( (( (active_interaction) != (NuI73) )) & (( (( (active_interaction) != (NuI67) )) & (( (( (active_interaction) != (NuI66) )) & (( (( (active_interaction) != (NuI165) )) & (( (( (active_interaction) != (NuI164) )) & (( (( (active_interaction) != (NuI148) )) & (( (( (active_interaction) != (NuI147) )) & (( (( (active_interaction) != (NuI121) )) & (( (( (active_interaction) != (NuI120) )) & (( (( (active_interaction) != (NuI94) )) & (( (( (active_interaction) != (NuI93) )) & (( (( (active_interaction) != (NuI58) )) & (( (( (active_interaction) != (NuI57) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) )) )) )) )) )) )) )) )) );
+
+
+MODULE HKEPS_ACTFLAB(active_interaction)
+
+	VAR
+		NuPI2C_res_TTC		:		boolean;
+		NuPask		:		boolean;
+		NuPread_HK		:		boolean;
+		NuPmem_res		:		boolean;
+		NuPI2C_ask_EPS		:		boolean;
+		NuPI2C_res_EPS		:		boolean;
+		NuPI2C_fail_EPS		:		boolean;
+		NuVtimer		:		unsigned word[3];
+		NuVperiod		:		unsigned word[3];
+		Nuplace		:		{NuSSEND_HK_REPORT, NuSASK, NuSSTART, NuSI2C, NuSWAIT};
+
+
+	INIT
+		( (Nuplace) = (NuSWAIT) ) &
+		( (NuVtimer) = (0ud3_0) ) &
+		( (NuVperiod) = (( -(0ud3_1) )) );
+
+	INVAR
+		( (NuPread_HK) <-> (( (( (Nuplace) = (NuSWAIT) )) & (( (( (NuVperiod) = (( -(0ud3_1) )) )) | (( (NuVtimer) = (NuVperiod) )) )) )) ) &
+		( (NuPI2C_fail_EPS) <-> (( (Nuplace) = (NuSI2C) )) ) &
+		( (NuPI2C_res_TTC) <-> (( (Nuplace) = (NuSASK) )) ) &
+		( (NuPask) <-> (( (Nuplace) = (NuSSEND_HK_REPORT) )) ) &
+		( (NuPmem_res) <-> (( (Nuplace) = (NuSASK) )) ) &
+		( (NuPI2C_res_EPS) <-> (( (Nuplace) = (NuSI2C) )) ) &
+		( (NuPI2C_ask_EPS) <-> (( (Nuplace) = (NuSSTART) )) );
+
+	TRANS
+		( (( (( (( (( (Nuplace) = (NuSWAIT) )) & (( (next(Nuplace)) = (NuSSTART) )) )) & (( (active_interaction) = (NuI103) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSI2C) )) )) & (( (active_interaction) = (NuI109) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSI2C) )) & (( (next(Nuplace)) = (NuSSEND_HK_REPORT) )) )) & (( (active_interaction) = (NuI110) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSI2C) )) & (( (next(Nuplace)) = (NuSSEND_HK_REPORT) )) )) & (( (active_interaction) = (NuI111) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSI2C) )) & (( (next(Nuplace)) = (NuSWAIT) )) )) & (( (active_interaction) = (NuI112) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSI2C) )) & (( (next(Nuplace)) = (NuSWAIT) )) )) & (( (active_interaction) = (NuI113) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSSEND_HK_REPORT) )) & (( (next(Nuplace)) = (NuSASK) )) )) & (( (active_interaction) = (NuI119) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSSEND_HK_REPORT) )) & (( (next(Nuplace)) = (NuSASK) )) )) & (( (active_interaction) = (NuI120) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSSEND_HK_REPORT) )) & (( (next(Nuplace)) = (NuSASK) )) )) & (( (active_interaction) = (NuI121) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSASK) )) & (( (next(Nuplace)) = (NuSWAIT) )) )) & (( (active_interaction) = (NuI104) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSASK) )) & (( (next(Nuplace)) = (NuSWAIT) )) )) & (( (active_interaction) = (NuI105) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSASK) )) & (( (next(Nuplace)) = (NuSWAIT) )) )) & (( (active_interaction) = (NuI106) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSASK) )) & (( (next(Nuplace)) = (NuSWAIT) )) )) & (( (active_interaction) = (NuI107) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSASK) )) & (( (next(Nuplace)) = (NuSWAIT) )) )) & (( (active_interaction) = (NuI108) )) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) ) |
+		( (( (active_interaction) != (NuI108) )) & (( (( (active_interaction) != (NuI107) )) & (( (( (active_interaction) != (NuI106) )) & (( (( (active_interaction) != (NuI105) )) & (( (( (active_interaction) != (NuI104) )) & (( (( (active_interaction) != (NuI121) )) & (( (( (active_interaction) != (NuI120) )) & (( (( (active_interaction) != (NuI119) )) & (( (( (active_interaction) != (NuI113) )) & (( (( (active_interaction) != (NuI112) )) & (( (( (active_interaction) != (NuI111) )) & (( (( (active_interaction) != (NuI110) )) & (( (( (active_interaction) != (NuI109) )) & (( (( (active_interaction) != (NuI103) )) & (( (( (( (next(Nuplace)) = (Nuplace) )) & (( (next(NuVtimer)) = (NuVtimer) )) )) & (( (next(NuVperiod)) = (NuVperiod) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) );
+
+
+MODULE HKEPS_PSMODMNG(active_interaction)
+
+	VAR
+		NuPdisable		:		boolean;
+		NuPenable		:		boolean;
+		NuPmem_write_req		:		boolean;
+		NuPask_I2C_TTC		:		boolean;
+		Nuplace		:		{NuSTTC, NuSMEMORY};
+
+
+	INIT
+		( (Nuplace) = (NuSMEMORY) );
+
+	INVAR
+		( (NuPdisable) <-> (( (Nuplace) = (NuSMEMORY) )) ) &
+		( (NuPmem_write_req) <-> (( (Nuplace) = (NuSMEMORY) )) ) &
+		( (NuPask_I2C_TTC) <-> (( (Nuplace) = (NuSTTC) )) ) &
+		( (NuPenable) <-> (( (Nuplace) = (NuSTTC) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSMEMORY) )) & (( (next(Nuplace)) = (NuSTTC) )) )) & (( (active_interaction) = (NuI129) )) ) |
+		( (( (( (Nuplace) = (NuSMEMORY) )) & (( (next(Nuplace)) = (NuSMEMORY) )) )) & (( (active_interaction) = (NuI120) )) ) |
+		( (( (( (Nuplace) = (NuSMEMORY) )) & (( (next(Nuplace)) = (NuSMEMORY) )) )) & (( (active_interaction) = (NuI121) )) ) |
+		( (( (( (Nuplace) = (NuSTTC) )) & (( (next(Nuplace)) = (NuSTTC) )) )) & (( (active_interaction) = (NuI119) )) ) |
+		( (( (( (Nuplace) = (NuSTTC) )) & (( (next(Nuplace)) = (NuSMEMORY) )) )) & (( (active_interaction) = (NuI127) )) ) |
+		( (( (active_interaction) != (NuI127) )) & (( (( (active_interaction) != (NuI119) )) & (( (( (active_interaction) != (NuI121) )) & (( (( (active_interaction) != (NuI120) )) & (( (( (active_interaction) != (NuI129) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) );
+
+
+MODULE HKCDMS_MODMNG(active_interaction)
+
+	VAR
+		NuPdisable		:		boolean;
+		NuPenable		:		boolean;
+		NuPread_HK		:		boolean;
+		Nuplace		:		{NuSDISABLED, NuSENABLED};
+
+
+	INIT
+		( (Nuplace) = (NuSENABLED) );
+
+	INVAR
+		( (NuPenable) <-> (( (Nuplace) = (NuSDISABLED) )) ) &
+		( (NuPread_HK) <-> (( (Nuplace) = (NuSENABLED) )) ) &
+		( (NuPdisable) <-> (( (Nuplace) = (NuSENABLED) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSENABLED) )) & (( (next(Nuplace)) = (NuSDISABLED) )) )) & (( (active_interaction) = (NuI169) )) ) |
+		( (( (( (Nuplace) = (NuSENABLED) )) & (( (next(Nuplace)) = (NuSENABLED) )) )) & (( (active_interaction) = (NuI157) )) ) |
+		( (( (( (Nuplace) = (NuSDISABLED) )) & (( (next(Nuplace)) = (NuSENABLED) )) )) & (( (active_interaction) = (NuI167) )) ) |
+		( (( (active_interaction) != (NuI167) )) & (( (( (active_interaction) != (NuI157) )) & (( (( (active_interaction) != (NuI169) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) );
+
+
+MODULE I2C_SAT_MODMNG(active_interaction)
+
+	VAR
+		NuPpoll		:		boolean;
+		NuPsend		:		boolean;
+		NuPreturn		:		boolean;
+		Nuplace		:		{NuSS0, NuSS1};
+
+
+	INIT
+		( (Nuplace) = (NuSS0) );
+
+	INVAR
+		( (NuPpoll) <-> (( (Nuplace) = (NuSS1) )) ) &
+		( (NuPsend) <-> (( (Nuplace) = (NuSS0) )) ) &
+		( (NuPreturn) <-> (( (Nuplace) = (NuSS1) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS1) )) )) & (( (active_interaction) = (NuI62) )) ) |
+		( (( (( (Nuplace) = (NuSS1) )) & (( (next(Nuplace)) = (NuSS1) )) )) & (( (active_interaction) = (NuI61) )) ) |
+		( (( (( (Nuplace) = (NuSS1) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI3) )) ) |
+		( (( (( (Nuplace) = (NuSS1) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI83) )) ) |
+		( (( (( (Nuplace) = (NuSS1) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI88) )) ) |
+		( (( (( (Nuplace) = (NuSS1) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI110) )) ) |
+		( (( (( (Nuplace) = (NuSS1) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI115) )) ) |
+		( (( (( (Nuplace) = (NuSS1) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI137) )) ) |
+		( (( (( (Nuplace) = (NuSS1) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI142) )) ) |
+		( (( (active_interaction) != (NuI142) )) & (( (( (active_interaction) != (NuI137) )) & (( (( (active_interaction) != (NuI115) )) & (( (( (active_interaction) != (NuI110) )) & (( (( (active_interaction) != (NuI88) )) & (( (( (active_interaction) != (NuI83) )) & (( (( (active_interaction) != (NuI3) )) & (( (( (active_interaction) != (NuI61) )) & (( (( (active_interaction) != (NuI62) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) )) )) )) )) );
+
+
+MODULE I2C_SAT_LIB(active_interaction)
+
+	VAR
+		NuPmasterWrite		:		boolean;
+		NuPmasterRead		:		boolean;
+		Nuplace		:		{NuSS0};
+
+
+	INIT
+		( (Nuplace) = (NuSS0) );
+
+	INVAR
+		( (NuPmasterRead) <-> (( (Nuplace) = (NuSS0) )) ) &
+		( (NuPmasterWrite) <-> (( (Nuplace) = (NuSS0) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI62) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI63) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI61) )) ) |
+		( (( (active_interaction) != (NuI61) )) & (( (( (active_interaction) != (NuI63) )) & (( (( (active_interaction) != (NuI62) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) );
+
+
+MODULE S3_6(active_interaction)
+
+	VAR
+		NuPcom		:		boolean;
+		NuPinternal		:		boolean;
+		NuPcdms		:		boolean;
+		NuPeps		:		boolean;
+		NuPfinish		:		boolean;
+		NuPdisable_HK		:		boolean;
+		NuPpl		:		boolean;
+		Nuplace		:		{NuSIDLE, NuSSTART, NuSEND};
+
+
+	INIT
+		( (Nuplace) = (NuSIDLE) );
+
+	INVAR
+		( (NuPfinish) <-> (( (Nuplace) = (NuSSTART) )) ) &
+		( (NuPdisable_HK) <-> (( (Nuplace) = (NuSIDLE) )) ) &
+		( (NuPeps) <-> (( (Nuplace) = (NuSSTART) )) ) &
+		( (NuPcom) <-> (( (Nuplace) = (NuSSTART) )) ) &
+		( (NuPpl) <-> (( (Nuplace) = (NuSSTART) )) ) &
+		( (NuPcdms) <-> (( (Nuplace) = (NuSSTART) )) ) &
+		( (NuPinternal) <-> (( (Nuplace) = (NuSEND) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSSTART) )) )) & (( (active_interaction) = (NuI189) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI168) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI169) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI97) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI98) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI124) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI125) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI151) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI152) )) ) |
+		( (( (( (Nuplace) = (NuSEND) )) & (( (next(Nuplace)) = (NuSSTART) )) )) & (( (active_interaction) = (NuI187) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI188) )) ) |
+		( (( (active_interaction) != (NuI188) )) & (( (( (active_interaction) != (NuI187) )) & (( (( (active_interaction) != (NuI152) )) & (( (( (active_interaction) != (NuI151) )) & (( (( (active_interaction) != (NuI125) )) & (( (( (active_interaction) != (NuI124) )) & (( (( (active_interaction) != (NuI98) )) & (( (( (active_interaction) != (NuI97) )) & (( (( (active_interaction) != (NuI169) )) & (( (( (active_interaction) != (NuI168) )) & (( (( (active_interaction) != (NuI189) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) )) )) )) )) )) )) );
+
+
+MODULE I2C_SAT_ACTFL(active_interaction)
+
+	VAR
+		NuPpoll		:		boolean;
+		NuPno_message		:		boolean;
+		NuPerror1		:		boolean;
+		NuPreturn		:		boolean;
+		NuVno_msg		:		unsigned word[3];
+		NuVbad_crc		:		unsigned word[3];
+		Nuplace		:		{NuSREAD, NuSVERIFY};
+
+
+	INIT
+		( (Nuplace) = (NuSREAD) ) &
+		( (NuVno_msg) = (0ud3_0) ) &
+		( (NuVbad_crc) = (0ud3_0) );
+
+	INVAR
+		( (NuPpoll) <-> (( (Nuplace) = (NuSREAD) )) ) &
+		( (NuPerror1) <-> (( (( (Nuplace) = (NuSVERIFY) )) & (( (( (NuVbad_crc) = (( -(0ud3_1) )) )) | (( (NuVbad_crc) = (0ud3_1) )) )) )) ) &
+		( (NuPno_message) <-> (( (( (Nuplace) = (NuSVERIFY) )) & (( (( (NuVno_msg) = (( -(0ud3_1) )) )) | (( (NuVno_msg) = (0ud3_1) )) )) )) ) &
+		( (NuPreturn) <-> (( (( (Nuplace) = (NuSVERIFY) )) & (( (( (( (NuVno_msg) = (( -(0ud3_1) )) )) | (( (NuVbad_crc) = (( -(0ud3_1) )) )) )) | (( (( (NuVno_msg) = (0ud3_0) )) & (( (NuVbad_crc) = (0ud3_0) )) )) )) )) );
+
+	TRANS
+		( (( (( (( (( (Nuplace) = (NuSREAD) )) & (( (next(Nuplace)) = (NuSVERIFY) )) )) & (( (active_interaction) = (NuI61) )) )) & (( (next(NuVno_msg)) = (( -(0ud3_1) )) )) )) & (( (next(NuVbad_crc)) = (( -(0ud3_1) )) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSVERIFY) )) & (( (next(Nuplace)) = (NuSREAD) )) )) & (( (active_interaction) = (NuI179) )) )) & (( (next(NuVno_msg)) = (NuVno_msg) )) )) & (( (next(NuVbad_crc)) = (NuVbad_crc) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSVERIFY) )) & (( (next(Nuplace)) = (NuSREAD) )) )) & (( (active_interaction) = (NuI3) )) )) & (( (next(NuVno_msg)) = (NuVno_msg) )) )) & (( (next(NuVbad_crc)) = (NuVbad_crc) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSVERIFY) )) & (( (next(Nuplace)) = (NuSREAD) )) )) & (( (active_interaction) = (NuI4) )) )) & (( (next(NuVno_msg)) = (NuVno_msg) )) )) & (( (next(NuVbad_crc)) = (NuVbad_crc) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSVERIFY) )) & (( (next(Nuplace)) = (NuSREAD) )) )) & (( (active_interaction) = (NuI83) )) )) & (( (next(NuVno_msg)) = (NuVno_msg) )) )) & (( (next(NuVbad_crc)) = (NuVbad_crc) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSVERIFY) )) & (( (next(Nuplace)) = (NuSREAD) )) )) & (( (active_interaction) = (NuI84) )) )) & (( (next(NuVno_msg)) = (NuVno_msg) )) )) & (( (next(NuVbad_crc)) = (NuVbad_crc) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSVERIFY) )) & (( (next(Nuplace)) = (NuSREAD) )) )) & (( (active_interaction) = (NuI88) )) )) & (( (next(NuVno_msg)) = (NuVno_msg) )) )) & (( (next(NuVbad_crc)) = (NuVbad_crc) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSVERIFY) )) & (( (next(Nuplace)) = (NuSREAD) )) )) & (( (active_interaction) = (NuI89) )) )) & (( (next(NuVno_msg)) = (NuVno_msg) )) )) & (( (next(NuVbad_crc)) = (NuVbad_crc) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSVERIFY) )) & (( (next(Nuplace)) = (NuSREAD) )) )) & (( (active_interaction) = (NuI110) )) )) & (( (next(NuVno_msg)) = (NuVno_msg) )) )) & (( (next(NuVbad_crc)) = (NuVbad_crc) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSVERIFY) )) & (( (next(Nuplace)) = (NuSREAD) )) )) & (( (active_interaction) = (NuI111) )) )) & (( (next(NuVno_msg)) = (NuVno_msg) )) )) & (( (next(NuVbad_crc)) = (NuVbad_crc) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSVERIFY) )) & (( (next(Nuplace)) = (NuSREAD) )) )) & (( (active_interaction) = (NuI115) )) )) & (( (next(NuVno_msg)) = (NuVno_msg) )) )) & (( (next(NuVbad_crc)) = (NuVbad_crc) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSVERIFY) )) & (( (next(Nuplace)) = (NuSREAD) )) )) & (( (active_interaction) = (NuI116) )) )) & (( (next(NuVno_msg)) = (NuVno_msg) )) )) & (( (next(NuVbad_crc)) = (NuVbad_crc) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSVERIFY) )) & (( (next(Nuplace)) = (NuSREAD) )) )) & (( (active_interaction) = (NuI137) )) )) & (( (next(NuVno_msg)) = (NuVno_msg) )) )) & (( (next(NuVbad_crc)) = (NuVbad_crc) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSVERIFY) )) & (( (next(Nuplace)) = (NuSREAD) )) )) & (( (active_interaction) = (NuI138) )) )) & (( (next(NuVno_msg)) = (NuVno_msg) )) )) & (( (next(NuVbad_crc)) = (NuVbad_crc) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSVERIFY) )) & (( (next(Nuplace)) = (NuSREAD) )) )) & (( (active_interaction) = (NuI142) )) )) & (( (next(NuVno_msg)) = (NuVno_msg) )) )) & (( (next(NuVbad_crc)) = (NuVbad_crc) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSVERIFY) )) & (( (next(Nuplace)) = (NuSREAD) )) )) & (( (active_interaction) = (NuI143) )) )) & (( (next(NuVno_msg)) = (NuVno_msg) )) )) & (( (next(NuVbad_crc)) = (NuVbad_crc) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSVERIFY) )) & (( (next(Nuplace)) = (NuSREAD) )) )) & (( (active_interaction) = (NuI64) )) )) & (( (next(NuVno_msg)) = (NuVno_msg) )) )) & (( (next(NuVbad_crc)) = (NuVbad_crc) )) ) |
+		( (( (active_interaction) != (NuI64) )) & (( (( (active_interaction) != (NuI143) )) & (( (( (active_interaction) != (NuI142) )) & (( (( (active_interaction) != (NuI138) )) & (( (( (active_interaction) != (NuI137) )) & (( (( (active_interaction) != (NuI116) )) & (( (( (active_interaction) != (NuI115) )) & (( (( (active_interaction) != (NuI111) )) & (( (( (active_interaction) != (NuI110) )) & (( (( (active_interaction) != (NuI89) )) & (( (( (active_interaction) != (NuI88) )) & (( (( (active_interaction) != (NuI84) )) & (( (( (active_interaction) != (NuI83) )) & (( (( (active_interaction) != (NuI4) )) & (( (( (active_interaction) != (NuI3) )) & (( (( (active_interaction) != (NuI179) )) & (( (( (active_interaction) != (NuI61) )) & (( (( (( (next(Nuplace)) = (Nuplace) )) & (( (next(NuVno_msg)) = (NuVno_msg) )) )) & (( (next(NuVbad_crc)) = (NuVbad_crc) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) );
+
+
+MODULE S15_1(active_interaction)
+
+	VAR
+		NuPcom		:		boolean;
+		NuPinternal		:		boolean;
+		NuPenable_PS		:		boolean;
+		NuPcdms		:		boolean;
+		NuPeps		:		boolean;
+		NuPfinish		:		boolean;
+		NuPpl		:		boolean;
+		Nuplace		:		{NuSIDLE, NuSSTART, NuSEND};
+
+
+	INIT
+		( (Nuplace) = (NuSIDLE) );
+
+	INVAR
+		( (NuPpl) <-> (( (Nuplace) = (NuSSTART) )) ) &
+		( (NuPinternal) <-> (( (Nuplace) = (NuSEND) )) ) &
+		( (NuPcdms) <-> (( (Nuplace) = (NuSSTART) )) ) &
+		( (NuPcom) <-> (( (Nuplace) = (NuSSTART) )) ) &
+		( (NuPeps) <-> (( (Nuplace) = (NuSSTART) )) ) &
+		( (NuPenable_PS) <-> (( (Nuplace) = (NuSIDLE) )) ) &
+		( (NuPfinish) <-> (( (Nuplace) = (NuSSTART) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSSTART) )) )) & (( (active_interaction) = (NuI191) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI170) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI171) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI99) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI100) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI126) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI127) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI153) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI154) )) ) |
+		( (( (( (Nuplace) = (NuSEND) )) & (( (next(Nuplace)) = (NuSSTART) )) )) & (( (active_interaction) = (NuI190) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI192) )) ) |
+		( (( (active_interaction) != (NuI192) )) & (( (( (active_interaction) != (NuI190) )) & (( (( (active_interaction) != (NuI154) )) & (( (( (active_interaction) != (NuI153) )) & (( (( (active_interaction) != (NuI127) )) & (( (( (active_interaction) != (NuI126) )) & (( (( (active_interaction) != (NuI100) )) & (( (( (active_interaction) != (NuI99) )) & (( (( (active_interaction) != (NuI171) )) & (( (( (active_interaction) != (NuI170) )) & (( (( (active_interaction) != (NuI191) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) )) )) )) )) )) )) );
+
+
+MODULE LOG_MUX(active_interaction)
+
+	VAR
+		NuPtake		:		boolean;
+		NuPrelease		:		boolean;
+		Nuplace		:		{NuSIDLE, NuSBUSY};
+
+
+	INIT
+		( (Nuplace) = (NuSIDLE) );
+
+	INVAR
+		( (NuPrelease) <-> (( (Nuplace) = (NuSBUSY) )) ) &
+		( (NuPtake) <-> (( (Nuplace) = (NuSIDLE) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI5) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI6) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI17) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI18) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI27) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI28) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI35) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI36) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI44) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI45) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI55) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI56) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI59) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI60) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI64) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI69) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI70) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI71) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI72) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI74) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI77) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI78) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI79) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI80) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI85) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI86) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI90) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI91) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI104) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI105) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI106) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI107) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI112) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI113) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI117) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI118) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI131) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI132) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI133) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI134) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI139) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI140) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI144) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI145) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI158) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI159) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI160) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI161) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI65) )) ) |
+		( (( (active_interaction) != (NuI65) )) & (( (( (active_interaction) != (NuI161) )) & (( (( (active_interaction) != (NuI160) )) & (( (( (active_interaction) != (NuI159) )) & (( (( (active_interaction) != (NuI158) )) & (( (( (active_interaction) != (NuI145) )) & (( (( (active_interaction) != (NuI144) )) & (( (( (active_interaction) != (NuI140) )) & (( (( (active_interaction) != (NuI139) )) & (( (( (active_interaction) != (NuI134) )) & (( (( (active_interaction) != (NuI133) )) & (( (( (active_interaction) != (NuI132) )) & (( (( (active_interaction) != (NuI131) )) & (( (( (active_interaction) != (NuI118) )) & (( (( (active_interaction) != (NuI117) )) & (( (( (active_interaction) != (NuI113) )) & (( (( (active_interaction) != (NuI112) )) & (( (( (active_interaction) != (NuI107) )) & (( (( (active_interaction) != (NuI106) )) & (( (( (active_interaction) != (NuI105) )) & (( (( (active_interaction) != (NuI104) )) & (( (( (active_interaction) != (NuI91) )) & (( (( (active_interaction) != (NuI90) )) & (( (( (active_interaction) != (NuI86) )) & (( (( (active_interaction) != (NuI85) )) & (( (( (active_interaction) != (NuI80) )) & (( (( (active_interaction) != (NuI79) )) & (( (( (active_interaction) != (NuI78) )) & (( (( (active_interaction) != (NuI77) )) & (( (( (active_interaction) != (NuI74) )) & (( (( (active_interaction) != (NuI72) )) & (( (( (active_interaction) != (NuI71) )) & (( (( (active_interaction) != (NuI70) )) & (( (( (active_interaction) != (NuI69) )) & (( (( (active_interaction) != (NuI64) )) & (( (( (active_interaction) != (NuI60) )) & (( (( (active_interaction) != (NuI59) )) & (( (( (active_interaction) != (NuI56) )) & (( (( (active_interaction) != (NuI55) )) & (( (( (active_interaction) != (NuI45) )) & (( (( (active_interaction) != (NuI44) )) & (( (( (active_interaction) != (NuI36) )) & (( (( (active_interaction) != (NuI35) )) & (( (( (active_interaction) != (NuI28) )) & (( (( (active_interaction) != (NuI27) )) & (( (( (active_interaction) != (NuI18) )) & (( (( (active_interaction) != (NuI17) )) & (( (( (active_interaction) != (NuI6) )) & (( (( (active_interaction) != (NuI5) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) );
+
+
+MODULE MEMWR_MODMNG(active_interaction)
+
+	VAR
+		NuPcontin		:		boolean;
+		NuPwrite		:		boolean;
+		NuPdone		:		boolean;
+		Nuplace		:		{NuSREAD, NuSIDLE};
+
+
+	INIT
+		( (Nuplace) = (NuSIDLE) );
+
+	INVAR
+		( (NuPcontin) <-> (( (Nuplace) = (NuSREAD) )) ) &
+		( (NuPdone) <-> (( (Nuplace) = (NuSREAD) )) ) &
+		( (NuPwrite) <-> (( (Nuplace) = (NuSIDLE) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSREAD) )) )) & (( (active_interaction) = (NuI57) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSREAD) )) )) & (( (active_interaction) = (NuI93) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSREAD) )) )) & (( (active_interaction) = (NuI120) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSREAD) )) )) & (( (active_interaction) = (NuI147) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSREAD) )) )) & (( (active_interaction) = (NuI164) )) ) |
+		( (( (( (Nuplace) = (NuSREAD) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI59) )) ) |
+		( (( (( (Nuplace) = (NuSREAD) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI77) )) ) |
+		( (( (( (Nuplace) = (NuSREAD) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI79) )) ) |
+		( (( (( (Nuplace) = (NuSREAD) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI104) )) ) |
+		( (( (( (Nuplace) = (NuSREAD) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI106) )) ) |
+		( (( (( (Nuplace) = (NuSREAD) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI131) )) ) |
+		( (( (( (Nuplace) = (NuSREAD) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI133) )) ) |
+		( (( (( (Nuplace) = (NuSREAD) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI158) )) ) |
+		( (( (( (Nuplace) = (NuSREAD) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI160) )) ) |
+		( (( (( (Nuplace) = (NuSREAD) )) & (( (next(Nuplace)) = (NuSREAD) )) )) & (( (active_interaction) = (NuI75) )) ) |
+		( (( (active_interaction) != (NuI75) )) & (( (( (active_interaction) != (NuI160) )) & (( (( (active_interaction) != (NuI158) )) & (( (( (active_interaction) != (NuI133) )) & (( (( (active_interaction) != (NuI131) )) & (( (( (active_interaction) != (NuI106) )) & (( (( (active_interaction) != (NuI104) )) & (( (( (active_interaction) != (NuI79) )) & (( (( (active_interaction) != (NuI77) )) & (( (( (active_interaction) != (NuI59) )) & (( (( (active_interaction) != (NuI164) )) & (( (( (active_interaction) != (NuI147) )) & (( (( (active_interaction) != (NuI120) )) & (( (( (active_interaction) != (NuI93) )) & (( (( (active_interaction) != (NuI57) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) );
+
+
+MODULE S128_1_MUX(active_interaction)
+
+	VAR
+		NuPtake		:		boolean;
+		NuPrelease		:		boolean;
+		Nuplace		:		{NuSIDLE, NuSBUSY};
+
+
+	INIT
+		( (Nuplace) = (NuSIDLE) );
+
+	INVAR
+		( (NuPrelease) <-> (( (Nuplace) = (NuSBUSY) )) ) &
+		( (NuPtake) <-> (( (Nuplace) = (NuSIDLE) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI21) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI19) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI20) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI23) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI24) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI27) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI28) )) ) |
+		( (( (active_interaction) != (NuI28) )) & (( (( (active_interaction) != (NuI27) )) & (( (( (active_interaction) != (NuI24) )) & (( (( (active_interaction) != (NuI23) )) & (( (( (active_interaction) != (NuI20) )) & (( (( (active_interaction) != (NuI19) )) & (( (( (active_interaction) != (NuI21) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) )) )) );
+
+
+MODULE PLMODMNG(active_interaction)
+
+	VAR
+		NuPto_idle		:		boolean;
+		NuPto_result_ready		:		boolean;
+		NuPto_scenario_ready		:		boolean;
+		NuPto_started		:		boolean;
+		NuPload		:		boolean;
+		NuPready		:		boolean;
+		NuPstarted		:		boolean;
+		NuPexec		:		boolean;
+		Nuplace		:		{NuSSCENARIO_READY, NuSIDLE, NuSSTARTED, NuSRESULT_READY};
+
+
+	INIT
+		( (Nuplace) = (NuSIDLE) );
+
+	INVAR
+		( (NuPto_started) <-> (( (( (Nuplace) = (NuSSCENARIO_READY) )) | (( (Nuplace) = (NuSRESULT_READY) )) )) ) &
+		( (NuPload) <-> (( (Nuplace) = (NuSIDLE) )) ) &
+		( (NuPexec) <-> (( (Nuplace) = (NuSSCENARIO_READY) )) ) &
+		( (NuPto_idle) <-> (( (( (( (Nuplace) = (NuSSCENARIO_READY) )) | (( (Nuplace) = (NuSSTARTED) )) )) | (( (Nuplace) = (NuSRESULT_READY) )) )) ) &
+		( (NuPready) <-> (( (Nuplace) = (NuSRESULT_READY) )) ) &
+		( (NuPstarted) <-> (( (Nuplace) = (NuSSTARTED) )) ) &
+		( (NuPto_result_ready) <-> (( (Nuplace) = (NuSSTARTED) )) ) &
+		( (NuPto_scenario_ready) <-> (( (Nuplace) = (NuSIDLE) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI22) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSSCENARIO_READY) )) )) & (( (active_interaction) = (NuI24) )) ) |
+		( (( (( (Nuplace) = (NuSSCENARIO_READY) )) & (( (next(Nuplace)) = (NuSSCENARIO_READY) )) )) & (( (active_interaction) = (NuI12) )) ) |
+		( (( (( (Nuplace) = (NuSSCENARIO_READY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI31) )) ) |
+		( (( (( (Nuplace) = (NuSSCENARIO_READY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI41) )) ) |
+		( (( (( (Nuplace) = (NuSSCENARIO_READY) )) & (( (next(Nuplace)) = (NuSSTARTED) )) )) & (( (active_interaction) = (NuI14) )) ) |
+		( (( (( (Nuplace) = (NuSSCENARIO_READY) )) & (( (next(Nuplace)) = (NuSSTARTED) )) )) & (( (active_interaction) = (NuI51) )) ) |
+		( (( (( (Nuplace) = (NuSSCENARIO_READY) )) & (( (next(Nuplace)) = (NuSSTARTED) )) )) & (( (active_interaction) = (NuI52) )) ) |
+		( (( (( (Nuplace) = (NuSSTARTED) )) & (( (next(Nuplace)) = (NuSSTARTED) )) )) & (( (active_interaction) = (NuI37) )) ) |
+		( (( (( (Nuplace) = (NuSSTARTED) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI31) )) ) |
+		( (( (( (Nuplace) = (NuSSTARTED) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI41) )) ) |
+		( (( (( (Nuplace) = (NuSSTARTED) )) & (( (next(Nuplace)) = (NuSRESULT_READY) )) )) & (( (active_interaction) = (NuI39) )) ) |
+		( (( (( (Nuplace) = (NuSRESULT_READY) )) & (( (next(Nuplace)) = (NuSSTARTED) )) )) & (( (active_interaction) = (NuI14) )) ) |
+		( (( (( (Nuplace) = (NuSRESULT_READY) )) & (( (next(Nuplace)) = (NuSSTARTED) )) )) & (( (active_interaction) = (NuI51) )) ) |
+		( (( (( (Nuplace) = (NuSRESULT_READY) )) & (( (next(Nuplace)) = (NuSSTARTED) )) )) & (( (active_interaction) = (NuI52) )) ) |
+		( (( (( (Nuplace) = (NuSRESULT_READY) )) & (( (next(Nuplace)) = (NuSRESULT_READY) )) )) & (( (active_interaction) = (NuI46) )) ) |
+		( (( (( (Nuplace) = (NuSRESULT_READY) )) & (( (next(Nuplace)) = (NuSRESULT_READY) )) )) & (( (active_interaction) = (NuI47) )) ) |
+		( (( (( (Nuplace) = (NuSRESULT_READY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI31) )) ) |
+		( (( (( (Nuplace) = (NuSRESULT_READY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI41) )) ) |
+		( (( (active_interaction) != (NuI47) )) & (( (( (active_interaction) != (NuI46) )) & (( (( (active_interaction) != (NuI39) )) & (( (( (active_interaction) != (NuI37) )) & (( (( (active_interaction) != (NuI52) )) & (( (( (active_interaction) != (NuI51) )) & (( (( (active_interaction) != (NuI14) )) & (( (( (active_interaction) != (NuI41) )) & (( (( (active_interaction) != (NuI31) )) & (( (( (active_interaction) != (NuI12) )) & (( (( (active_interaction) != (NuI24) )) & (( (( (active_interaction) != (NuI22) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) )) )) )) )) )) )) )) );
+
+
+MODULE I2C_SAT_ACTFLAB(active_interaction)
+
+	VAR
+		NuPrequest		:		boolean;
+		NuPsend		:		boolean;
+		NuPerror3		:		boolean;
+		NuPreturn		:		boolean;
+		NuPerror2		:		boolean;
+		NuVmax_poll		:		unsigned word[3];
+		NuVcount_poll		:		unsigned word[3];
+		NuVmax_write		:		unsigned word[3];
+		NuVcount_write		:		unsigned word[3];
+		Nuplace		:		{NuSREAD, NuSIDLE, NuSWRITE};
+
+
+	INIT
+		( (Nuplace) = (NuSIDLE) ) &
+		( (NuVmax_write) = (0ud3_2) ) &
+		( (NuVmax_poll) = (0ud3_2) ) &
+		( (NuVcount_poll) = (0ud3_0) ) &
+		( (NuVcount_write) = (0ud3_0) );
+
+	INVAR
+		( (NuPsend) <-> (( (( (Nuplace) = (NuSWRITE) )) & (( (( (NuVmax_write) = (( -(0ud3_1) )) )) | (( (NuVcount_write) < (NuVmax_write) )) )) )) ) &
+		( (NuPreturn) <-> (( (( (Nuplace) = (NuSREAD) )) & (( (( (NuVmax_poll) = (( -(0ud3_1) )) )) | (( (NuVcount_poll) < (NuVmax_poll) )) )) )) ) &
+		( (NuPrequest) <-> (( (Nuplace) = (NuSIDLE) )) ) &
+		( (NuPerror2) <-> (( (( (Nuplace) = (NuSREAD) )) & (( (( (NuVmax_poll) = (( -(0ud3_1) )) )) | (( (NuVcount_poll) = (NuVmax_poll) )) )) )) ) &
+		( (NuPerror3) <-> (( (( (Nuplace) = (NuSWRITE) )) & (( (( (NuVmax_write) = (( -(0ud3_1) )) )) | (( (NuVcount_write) = (NuVmax_write) )) )) )) );
+
+	TRANS
+		( (( (( (( (( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSWRITE) )) )) & (( (active_interaction) = (NuI7) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVcount_poll)) = (NuVcount_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) )) & (( (next(NuVcount_write)) = (NuVcount_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSWRITE) )) )) & (( (active_interaction) = (NuI15) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVcount_poll)) = (NuVcount_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) )) & (( (next(NuVcount_write)) = (NuVcount_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSWRITE) )) )) & (( (active_interaction) = (NuI25) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVcount_poll)) = (NuVcount_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) )) & (( (next(NuVcount_write)) = (NuVcount_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSWRITE) )) )) & (( (active_interaction) = (NuI33) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVcount_poll)) = (NuVcount_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) )) & (( (next(NuVcount_write)) = (NuVcount_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSWRITE) )) )) & (( (active_interaction) = (NuI42) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVcount_poll)) = (NuVcount_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) )) & (( (next(NuVcount_write)) = (NuVcount_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSWRITE) )) )) & (( (active_interaction) = (NuI53) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVcount_poll)) = (NuVcount_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) )) & (( (next(NuVcount_write)) = (NuVcount_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSWRITE) )) )) & (( (active_interaction) = (NuI82) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVcount_poll)) = (NuVcount_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) )) & (( (next(NuVcount_write)) = (NuVcount_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSWRITE) )) )) & (( (active_interaction) = (NuI87) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVcount_poll)) = (NuVcount_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) )) & (( (next(NuVcount_write)) = (NuVcount_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSWRITE) )) )) & (( (active_interaction) = (NuI109) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVcount_poll)) = (NuVcount_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) )) & (( (next(NuVcount_write)) = (NuVcount_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSWRITE) )) )) & (( (active_interaction) = (NuI114) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVcount_poll)) = (NuVcount_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) )) & (( (next(NuVcount_write)) = (NuVcount_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSWRITE) )) )) & (( (active_interaction) = (NuI136) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVcount_poll)) = (NuVcount_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) )) & (( (next(NuVcount_write)) = (NuVcount_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSWRITE) )) )) & (( (active_interaction) = (NuI141) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVcount_poll)) = (NuVcount_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) )) & (( (next(NuVcount_write)) = (NuVcount_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSWRITE) )) & (( (next(Nuplace)) = (NuSREAD) )) )) & (( (active_interaction) = (NuI62) )) )) & (( (next(NuVcount_write)) = (( (NuVcount_write) + (0ud3_1) )) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVcount_poll)) = (NuVcount_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSWRITE) )) & (( (next(Nuplace)) = (NuSREAD) )) )) & (( (active_interaction) = (NuI63) )) )) & (( (next(NuVcount_write)) = (( (NuVcount_write) + (0ud3_1) )) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVcount_poll)) = (NuVcount_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSWRITE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI6) )) )) & (( (next(NuVcount_write)) = (0ud3_0) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVcount_poll)) = (NuVcount_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSWRITE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI18) )) )) & (( (next(NuVcount_write)) = (0ud3_0) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVcount_poll)) = (NuVcount_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSWRITE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI28) )) )) & (( (next(NuVcount_write)) = (0ud3_0) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVcount_poll)) = (NuVcount_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSWRITE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI36) )) )) & (( (next(NuVcount_write)) = (0ud3_0) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVcount_poll)) = (NuVcount_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSWRITE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI45) )) )) & (( (next(NuVcount_write)) = (0ud3_0) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVcount_poll)) = (NuVcount_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSWRITE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI56) )) )) & (( (next(NuVcount_write)) = (0ud3_0) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVcount_poll)) = (NuVcount_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSWRITE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI86) )) )) & (( (next(NuVcount_write)) = (0ud3_0) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVcount_poll)) = (NuVcount_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSWRITE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI91) )) )) & (( (next(NuVcount_write)) = (0ud3_0) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVcount_poll)) = (NuVcount_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSWRITE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI113) )) )) & (( (next(NuVcount_write)) = (0ud3_0) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVcount_poll)) = (NuVcount_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSWRITE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI118) )) )) & (( (next(NuVcount_write)) = (0ud3_0) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVcount_poll)) = (NuVcount_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSWRITE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI140) )) )) & (( (next(NuVcount_write)) = (0ud3_0) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVcount_poll)) = (NuVcount_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSWRITE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI145) )) )) & (( (next(NuVcount_write)) = (0ud3_0) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVcount_poll)) = (NuVcount_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSREAD) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI3) )) )) & (( (next(NuVcount_poll)) = (( (NuVcount_poll) + (0ud3_1) )) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) )) & (( (next(NuVcount_write)) = (NuVcount_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSREAD) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI4) )) )) & (( (next(NuVcount_poll)) = (( (NuVcount_poll) + (0ud3_1) )) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) )) & (( (next(NuVcount_write)) = (NuVcount_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSREAD) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI83) )) )) & (( (next(NuVcount_poll)) = (( (NuVcount_poll) + (0ud3_1) )) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) )) & (( (next(NuVcount_write)) = (NuVcount_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSREAD) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI84) )) )) & (( (next(NuVcount_poll)) = (( (NuVcount_poll) + (0ud3_1) )) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) )) & (( (next(NuVcount_write)) = (NuVcount_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSREAD) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI88) )) )) & (( (next(NuVcount_poll)) = (( (NuVcount_poll) + (0ud3_1) )) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) )) & (( (next(NuVcount_write)) = (NuVcount_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSREAD) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI89) )) )) & (( (next(NuVcount_poll)) = (( (NuVcount_poll) + (0ud3_1) )) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) )) & (( (next(NuVcount_write)) = (NuVcount_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSREAD) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI110) )) )) & (( (next(NuVcount_poll)) = (( (NuVcount_poll) + (0ud3_1) )) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) )) & (( (next(NuVcount_write)) = (NuVcount_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSREAD) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI111) )) )) & (( (next(NuVcount_poll)) = (( (NuVcount_poll) + (0ud3_1) )) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) )) & (( (next(NuVcount_write)) = (NuVcount_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSREAD) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI115) )) )) & (( (next(NuVcount_poll)) = (( (NuVcount_poll) + (0ud3_1) )) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) )) & (( (next(NuVcount_write)) = (NuVcount_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSREAD) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI116) )) )) & (( (next(NuVcount_poll)) = (( (NuVcount_poll) + (0ud3_1) )) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) )) & (( (next(NuVcount_write)) = (NuVcount_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSREAD) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI137) )) )) & (( (next(NuVcount_poll)) = (( (NuVcount_poll) + (0ud3_1) )) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) )) & (( (next(NuVcount_write)) = (NuVcount_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSREAD) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI138) )) )) & (( (next(NuVcount_poll)) = (( (NuVcount_poll) + (0ud3_1) )) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) )) & (( (next(NuVcount_write)) = (NuVcount_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSREAD) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI142) )) )) & (( (next(NuVcount_poll)) = (( (NuVcount_poll) + (0ud3_1) )) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) )) & (( (next(NuVcount_write)) = (NuVcount_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSREAD) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI143) )) )) & (( (next(NuVcount_poll)) = (( (NuVcount_poll) + (0ud3_1) )) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) )) & (( (next(NuVcount_write)) = (NuVcount_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSREAD) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI5) )) )) & (( (next(NuVcount_poll)) = (0ud3_0) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) )) & (( (next(NuVcount_write)) = (NuVcount_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSREAD) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI17) )) )) & (( (next(NuVcount_poll)) = (0ud3_0) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) )) & (( (next(NuVcount_write)) = (NuVcount_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSREAD) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI27) )) )) & (( (next(NuVcount_poll)) = (0ud3_0) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) )) & (( (next(NuVcount_write)) = (NuVcount_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSREAD) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI35) )) )) & (( (next(NuVcount_poll)) = (0ud3_0) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) )) & (( (next(NuVcount_write)) = (NuVcount_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSREAD) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI44) )) )) & (( (next(NuVcount_poll)) = (0ud3_0) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) )) & (( (next(NuVcount_write)) = (NuVcount_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSREAD) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI55) )) )) & (( (next(NuVcount_poll)) = (0ud3_0) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) )) & (( (next(NuVcount_write)) = (NuVcount_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSREAD) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI85) )) )) & (( (next(NuVcount_poll)) = (0ud3_0) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) )) & (( (next(NuVcount_write)) = (NuVcount_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSREAD) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI90) )) )) & (( (next(NuVcount_poll)) = (0ud3_0) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) )) & (( (next(NuVcount_write)) = (NuVcount_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSREAD) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI112) )) )) & (( (next(NuVcount_poll)) = (0ud3_0) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) )) & (( (next(NuVcount_write)) = (NuVcount_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSREAD) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI117) )) )) & (( (next(NuVcount_poll)) = (0ud3_0) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) )) & (( (next(NuVcount_write)) = (NuVcount_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSREAD) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI139) )) )) & (( (next(NuVcount_poll)) = (0ud3_0) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) )) & (( (next(NuVcount_write)) = (NuVcount_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSREAD) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI144) )) )) & (( (next(NuVcount_poll)) = (0ud3_0) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) )) & (( (next(NuVcount_write)) = (NuVcount_write) )) ) |
+		( (( (active_interaction) != (NuI144) )) & (( (( (active_interaction) != (NuI139) )) & (( (( (active_interaction) != (NuI117) )) & (( (( (active_interaction) != (NuI112) )) & (( (( (active_interaction) != (NuI90) )) & (( (( (active_interaction) != (NuI85) )) & (( (( (active_interaction) != (NuI55) )) & (( (( (active_interaction) != (NuI44) )) & (( (( (active_interaction) != (NuI35) )) & (( (( (active_interaction) != (NuI27) )) & (( (( (active_interaction) != (NuI17) )) & (( (( (active_interaction) != (NuI5) )) & (( (( (active_interaction) != (NuI143) )) & (( (( (active_interaction) != (NuI142) )) & (( (( (active_interaction) != (NuI138) )) & (( (( (active_interaction) != (NuI137) )) & (( (( (active_interaction) != (NuI116) )) & (( (( (active_interaction) != (NuI115) )) & (( (( (active_interaction) != (NuI111) )) & (( (( (active_interaction) != (NuI110) )) & (( (( (active_interaction) != (NuI89) )) & (( (( (active_interaction) != (NuI88) )) & (( (( (active_interaction) != (NuI84) )) & (( (( (active_interaction) != (NuI83) )) & (( (( (active_interaction) != (NuI4) )) & (( (( (active_interaction) != (NuI3) )) & (( (( (active_interaction) != (NuI145) )) & (( (( (active_interaction) != (NuI140) )) & (( (( (active_interaction) != (NuI118) )) & (( (( (active_interaction) != (NuI113) )) & (( (( (active_interaction) != (NuI91) )) & (( (( (active_interaction) != (NuI86) )) & (( (( (active_interaction) != (NuI56) )) & (( (( (active_interaction) != (NuI45) )) & (( (( (active_interaction) != (NuI36) )) & (( (( (active_interaction) != (NuI28) )) & (( (( (active_interaction) != (NuI18) )) & (( (( (active_interaction) != (NuI6) )) & (( (( (active_interaction) != (NuI63) )) & (( (( (active_interaction) != (NuI62) )) & (( (( (active_interaction) != (NuI141) )) & (( (( (active_interaction) != (NuI136) )) & (( (( (active_interaction) != (NuI114) )) & (( (( (active_interaction) != (NuI109) )) & (( (( (active_interaction) != (NuI87) )) & (( (( (active_interaction) != (NuI82) )) & (( (( (active_interaction) != (NuI53) )) & (( (( (active_interaction) != (NuI42) )) & (( (( (active_interaction) != (NuI33) )) & (( (( (active_interaction) != (NuI25) )) & (( (( (active_interaction) != (NuI15) )) & (( (( (active_interaction) != (NuI7) )) & (( (( (( (( (( (next(Nuplace)) = (Nuplace) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVcount_poll)) = (NuVcount_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) )) & (( (next(NuVcount_write)) = (NuVcount_write) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) );
+
+
+MODULE DATRANS_ACTFLAB(active_interaction)
+
+	VAR
+		NuPI2C_ask		:		boolean;
+		NuPask_mem		:		boolean;
+		NuPstart		:		boolean;
+		NuPmem_res		:		boolean;
+		NuPI2C_res		:		boolean;
+		NuPdone		:		boolean;
+		NuPnot_done		:		boolean;
+		NuPI2C_fail		:		boolean;
+		NuVfinish		:		unsigned word[3];
+		Nuplace		:		{NuSACQUIRE, NuSMEM, NuSIDLE, NuSEND, NuSI2C, NuSSAVE};
+
+
+	INIT
+		( (Nuplace) = (NuSIDLE) ) &
+		( (NuVfinish) = (0ud3_0) );
+
+	INVAR
+		( (NuPI2C_fail) <-> (( (Nuplace) = (NuSI2C) )) ) &
+		( (NuPstart) <-> (( (Nuplace) = (NuSIDLE) )) ) &
+		( (NuPask_mem) <-> (( (Nuplace) = (NuSSAVE) )) ) &
+		( (NuPnot_done) <-> (( (( (Nuplace) = (NuSEND) )) & (( (( (NuVfinish) = (( -(0ud3_1) )) )) | (( (NuVfinish) = (0ud3_0) )) )) )) ) &
+		( (NuPI2C_res) <-> (( (Nuplace) = (NuSI2C) )) ) &
+		( (NuPI2C_ask) <-> (( (Nuplace) = (NuSACQUIRE) )) ) &
+		( (NuPdone) <-> (( (( (Nuplace) = (NuSEND) )) & (( (( (NuVfinish) = (( -(0ud3_1) )) )) | (( (NuVfinish) = (0ud3_1) )) )) )) ) &
+		( (NuPmem_res) <-> (( (Nuplace) = (NuSMEM) )) );
+
+	TRANS
+		( (( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSACQUIRE) )) )) & (( (active_interaction) = (NuI48) )) )) & (( (next(NuVfinish)) = (NuVfinish) )) ) |
+		( (( (( (( (Nuplace) = (NuSACQUIRE) )) & (( (next(Nuplace)) = (NuSI2C) )) )) & (( (active_interaction) = (NuI53) )) )) & (( (next(NuVfinish)) = (NuVfinish) )) ) |
+		( (( (( (( (Nuplace) = (NuSI2C) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI55) )) )) & (( (next(NuVfinish)) = (NuVfinish) )) ) |
+		( (( (( (( (Nuplace) = (NuSI2C) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI56) )) )) & (( (next(NuVfinish)) = (NuVfinish) )) ) |
+		( (( (( (( (Nuplace) = (NuSI2C) )) & (( (next(Nuplace)) = (NuSSAVE) )) )) & (( (active_interaction) = (NuI54) )) )) & (( (next(NuVfinish)) = (NuVfinish) )) ) |
+		( (( (( (( (Nuplace) = (NuSSAVE) )) & (( (next(Nuplace)) = (NuSMEM) )) )) & (( (active_interaction) = (NuI57) )) )) & (( (next(NuVfinish)) = (NuVfinish) )) ) |
+		( (( (( (( (Nuplace) = (NuSSAVE) )) & (( (next(Nuplace)) = (NuSMEM) )) )) & (( (active_interaction) = (NuI58) )) )) & (( (next(NuVfinish)) = (NuVfinish) )) ) |
+		( (( (( (( (Nuplace) = (NuSMEM) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI59) )) )) & (( (next(NuVfinish)) = (( -(0ud3_1) )) )) ) |
+		( (( (( (( (Nuplace) = (NuSMEM) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI60) )) )) & (( (next(NuVfinish)) = (( -(0ud3_1) )) )) ) |
+		( (( (( (( (Nuplace) = (NuSEND) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI49) )) )) & (( (next(NuVfinish)) = (NuVfinish) )) ) |
+		( (( (( (( (Nuplace) = (NuSEND) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI50) )) )) & (( (next(NuVfinish)) = (NuVfinish) )) ) |
+		( (( (( (( (Nuplace) = (NuSEND) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI51) )) )) & (( (next(NuVfinish)) = (NuVfinish) )) ) |
+		( (( (( (( (Nuplace) = (NuSEND) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI52) )) )) & (( (next(NuVfinish)) = (NuVfinish) )) ) |
+		( (( (( (( (Nuplace) = (NuSEND) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI178) )) )) & (( (next(NuVfinish)) = (NuVfinish) )) ) |
+		( (( (active_interaction) != (NuI178) )) & (( (( (active_interaction) != (NuI52) )) & (( (( (active_interaction) != (NuI51) )) & (( (( (active_interaction) != (NuI50) )) & (( (( (active_interaction) != (NuI49) )) & (( (( (active_interaction) != (NuI60) )) & (( (( (active_interaction) != (NuI59) )) & (( (( (active_interaction) != (NuI58) )) & (( (( (active_interaction) != (NuI57) )) & (( (( (active_interaction) != (NuI54) )) & (( (( (active_interaction) != (NuI56) )) & (( (( (active_interaction) != (NuI55) )) & (( (( (active_interaction) != (NuI53) )) & (( (( (active_interaction) != (NuI48) )) & (( (( (next(Nuplace)) = (Nuplace) )) & (( (next(NuVfinish)) = (NuVfinish) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) );
+
+
+MODULE HKEPS_MUX(active_interaction)
+
+	VAR
+		NuPtake		:		boolean;
+		NuPrelease		:		boolean;
+		Nuplace		:		{NuSIDLE, NuSBUSY};
+
+
+	INIT
+		( (Nuplace) = (NuSIDLE) );
+
+	INVAR
+		( (NuPtake) <-> (( (Nuplace) = (NuSIDLE) )) ) &
+		( (NuPrelease) <-> (( (Nuplace) = (NuSBUSY) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI103) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI104) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI105) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI106) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI107) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI108) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI112) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI113) )) ) |
+		( (( (active_interaction) != (NuI113) )) & (( (( (active_interaction) != (NuI112) )) & (( (( (active_interaction) != (NuI108) )) & (( (( (active_interaction) != (NuI107) )) & (( (( (active_interaction) != (NuI106) )) & (( (( (active_interaction) != (NuI105) )) & (( (( (active_interaction) != (NuI104) )) & (( (( (active_interaction) != (NuI103) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) )) )) )) );
+
+
+MODULE S128_1_ACTFLAB(active_interaction)
+
+	VAR
+		NuPloaded		:		boolean;
+		NuPfail		:		boolean;
+		NuPI2C_ask		:		boolean;
+		NuPload		:		boolean;
+		NuPtc128_1		:		boolean;
+		NuPwrong_state		:		boolean;
+		NuPstart		:		boolean;
+		NuPI2C_res		:		boolean;
+		NuPI2C_fail		:		boolean;
+		Nuplace		:		{NuSIDLE, NuSBUSY, NuSVALIDATE, NuSSTART, NuSEND, NuSI2C};
+
+
+	INIT
+		( (Nuplace) = (NuSIDLE) );
+
+	INVAR
+		( (NuPwrong_state) <-> (( (Nuplace) = (NuSVALIDATE) )) ) &
+		( (NuPI2C_ask) <-> (( (Nuplace) = (NuSSTART) )) ) &
+		( (NuPloaded) <-> (( (Nuplace) = (NuSEND) )) ) &
+		( (NuPI2C_res) <-> (( (Nuplace) = (NuSI2C) )) ) &
+		( (NuPI2C_fail) <-> (( (Nuplace) = (NuSI2C) )) ) &
+		( (NuPfail) <-> (( (Nuplace) = (NuSEND) )) ) &
+		( (NuPload) <-> (( (Nuplace) = (NuSVALIDATE) )) ) &
+		( (NuPstart) <-> (( (Nuplace) = (NuSIDLE) )) ) &
+		( (NuPtc128_1) <-> (( (Nuplace) = (NuSBUSY) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI177) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSVALIDATE) )) )) & (( (active_interaction) = (NuI21) )) ) |
+		( (( (( (Nuplace) = (NuSVALIDATE) )) & (( (next(Nuplace)) = (NuSSTART) )) )) & (( (active_interaction) = (NuI22) )) ) |
+		( (( (( (Nuplace) = (NuSVALIDATE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI20) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSI2C) )) )) & (( (active_interaction) = (NuI25) )) ) |
+		( (( (( (Nuplace) = (NuSI2C) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI27) )) ) |
+		( (( (( (Nuplace) = (NuSI2C) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI28) )) ) |
+		( (( (( (Nuplace) = (NuSI2C) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI26) )) ) |
+		( (( (( (Nuplace) = (NuSEND) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI23) )) ) |
+		( (( (( (Nuplace) = (NuSEND) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI24) )) ) |
+		( (( (( (Nuplace) = (NuSEND) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI19) )) ) |
+		( (( (active_interaction) != (NuI19) )) & (( (( (active_interaction) != (NuI24) )) & (( (( (active_interaction) != (NuI23) )) & (( (( (active_interaction) != (NuI26) )) & (( (( (active_interaction) != (NuI28) )) & (( (( (active_interaction) != (NuI27) )) & (( (( (active_interaction) != (NuI25) )) & (( (( (active_interaction) != (NuI20) )) & (( (( (active_interaction) != (NuI22) )) & (( (( (active_interaction) != (NuI21) )) & (( (( (active_interaction) != (NuI177) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) )) )) )) )) )) )) );
+
+
+MODULE main
+
+	VAR
+		NuInteraction		:		{NuI1, NuI2, NuI3, NuI4, NuI5, NuI6, NuI7, NuI8, NuI9, NuI10, NuI11, NuI12, NuI13, NuI14, NuI15, NuI16, NuI17, NuI18, NuI19, NuI20, NuI21, NuI22, NuI23, NuI24, NuI25, NuI26, NuI27, NuI28, NuI29, NuI30, NuI31, NuI32, NuI33, NuI34, NuI35, NuI36, NuI37, NuI38, NuI39, NuI40, NuI41, NuI42, NuI43, NuI44, NuI45, NuI46, NuI47, NuI48, NuI49, NuI50, NuI51, NuI52, NuI53, NuI54, NuI55, NuI56, NuI57, NuI58, NuI59, NuI60, NuI61, NuI62, NuI63, NuI64, NuI65, NuI66, NuI67, NuI68, NuI69, NuI70, NuI71, NuI72, NuI73, NuI74, NuI75, NuI76, NuI77, NuI78, NuI79, NuI80, NuI81, NuI82, NuI83, NuI84, NuI85, NuI86, NuI87, NuI88, NuI89, NuI90, NuI91, NuI92, NuI93, NuI94, NuI95, NuI96, NuI97, NuI98, NuI99, NuI100, NuI101, NuI102, NuI103, NuI104, NuI105, NuI106, NuI107, NuI108, NuI109, NuI110, NuI111, NuI112, NuI113, NuI114, NuI115, NuI116, NuI117, NuI118, NuI119, NuI120, NuI121, NuI122, NuI123, NuI124, NuI125, NuI126, NuI127, NuI128, NuI129, NuI130, NuI131, NuI132, NuI133, NuI134, NuI135, NuI136, NuI137, NuI138, NuI139, NuI140, NuI141, NuI142, NuI143, NuI144, NuI145, NuI146, NuI147, NuI148, NuI149, NuI150, NuI151, NuI152, NuI153, NuI154, NuI155, NuI156, NuI157, NuI158, NuI159, NuI160, NuI161, NuI162, NuI163, NuI164, NuI165, NuI166, NuI167, NuI168, NuI169, NuI170, NuI171, NuI172, NuI173, NuI174, NuI175, NuI176, NuI177, NuI178, NuI179, NuI180, NuI181, NuI182, NuI183, NuI184, NuI185, NuI186, NuI187, NuI188, NuI189, NuI190, NuI191, NuI192, NuI193, NuI194, NuI195};
+		memrd_modmng	:	MEMRD_MODMNG(NuInteraction);
+		hkcom_mux	:	HKCOM_MUX(NuInteraction);
+		s128_5_actflab	:	S128_5_ACTFLAB(NuInteraction);
+		hkcom_failmon	:	HKCOM_FAILMON(NuInteraction);
+		memwr_actflab	:	MEMWR_ACTFLAB(NuInteraction);
+		hkcom_modmng	:	HKCOM_MODMNG(NuInteraction);
+		watchdog	:	WATCHDOG(NuInteraction);
+		hkpl_failmon	:	HKPL_FAILMON(NuInteraction);
+		hkeps_modmng	:	HKEPS_MODMNG(NuInteraction);
+		s128_5_mux	:	S128_5_MUX(NuInteraction);
+		stat_ver_mux	:	STAT_VER_MUX(NuInteraction);
+		log	:	LOG(NuInteraction);
+		hkpl_mux	:	HKPL_MUX(NuInteraction);
+		cdmsstatactfl	:	CDMSSTATACTFL(NuInteraction);
+		hkcdms_psmodmng	:	HKCDMS_PSMODMNG(NuInteraction);
+		hkcdms_actflab	:	HKCDMS_ACTFLAB(NuInteraction);
+		hkeps_failmon	:	HKEPS_FAILMON(NuInteraction);
+		s15_2	:	S15_2(NuInteraction);
+		msglib	:	MSGLIB(NuInteraction);
+		stat_ver_actflab	:	STAT_VER_ACTFLAB(NuInteraction);
+		hkpl_psmodmng	:	HKPL_PSMODMNG(NuInteraction);
+		s3_5	:	S3_5(NuInteraction);
+		s128_4_mux	:	S128_4_MUX(NuInteraction);
+		hkpl_actflab	:	HKPL_ACTFLAB(NuInteraction);
+		s128_4_actflab	:	S128_4_ACTFLAB(NuInteraction);
+		mem_mux	:	MEM_MUX(NuInteraction);
+		hkcdms_mux	:	HKCDMS_MUX(NuInteraction);
+		memrd_actflab	:	MEMRD_ACTFLAB(NuInteraction);
+		hkcom_actflab	:	HKCOM_ACTFLAB(NuInteraction);
+		hkpl_modmng	:	HKPL_MODMNG(NuInteraction);
+		hkcom_psmodmng	:	HKCOM_PSMODMNG(NuInteraction);
+		datrans_modmng	:	DATRANS_MODMNG(NuInteraction);
+		memlib	:	MEMLIB(NuInteraction);
+		hkeps_actflab	:	HKEPS_ACTFLAB(NuInteraction);
+		hkeps_psmodmng	:	HKEPS_PSMODMNG(NuInteraction);
+		hkcdms_modmng	:	HKCDMS_MODMNG(NuInteraction);
+		i2c_sat_modmng	:	I2C_SAT_MODMNG(NuInteraction);
+		i2c_sat_lib	:	I2C_SAT_LIB(NuInteraction);
+		s3_6	:	S3_6(NuInteraction);
+		i2c_sat_actfl	:	I2C_SAT_ACTFL(NuInteraction);
+		s15_1	:	S15_1(NuInteraction);
+		log_mux	:	LOG_MUX(NuInteraction);
+		memwr_modmng	:	MEMWR_MODMNG(NuInteraction);
+		s128_1_mux	:	S128_1_MUX(NuInteraction);
+		plmodmng	:	PLMODMNG(NuInteraction);
+		i2c_sat_actflab	:	I2C_SAT_ACTFLAB(NuInteraction);
+		datrans_actflab	:	DATRANS_ACTFLAB(NuInteraction);
+		hkeps_mux	:	HKEPS_MUX(NuInteraction);
+		s128_1_actflab	:	S128_1_ACTFLAB(NuInteraction);
+
+	DEFINE
+		HKPL_mem_res_fail2		:=		( (( (( (( (( (( (( (hkpl_mux.NuPrelease) & (hkpl_actflab.NuPmem_res) )) & (hkpl_failmon.NuPsuccess) )) & (memwr_actflab.NuPfail) )) & (log.NuPlog) )) & (log_mux.NuPtake) )) & (mem_mux.NuPrelease) )) & (memwr_modmng.NuPdone) );
+		data_transfer_I2C_fail_error2		:=		( (( (( (( (datrans_actflab.NuPI2C_fail) & (msglib.NuPdecodeMessage) )) & (i2c_sat_actflab.NuPerror2) )) & (log.NuPlog) )) & (log_mux.NuPtake) );
+		s15_2_pl2		:=		( (s15_2.NuPpl) & (hkpl_psmodmng.NuPdisable) );
+		I2C_sat_send1		:=		( (i2c_sat_actflab.NuPsend) & (i2c_sat_lib.NuPmasterWrite) );
+		HKEPS_I2C_res4		:=		( (( (( (( (hkeps_actflab.NuPI2C_res_EPS) & (msglib.NuPdecodeMessage) )) & (i2c_sat_actflab.NuPreturn) )) & (i2c_sat_actfl.NuPreturn) )) & (i2c_sat_modmng.NuPreturn) );
+		HKEPS_I2C_nofail_res4		:=		( (( (( (hkeps_failmon.NuPI2C_res_EPS) & (i2c_sat_actflab.NuPreturn) )) & (i2c_sat_actfl.NuPreturn) )) & (i2c_sat_modmng.NuPreturn) );
+		data_transfer_I2C_res		:=		( (datrans_actflab.NuPI2C_res) & (msglib.NuPdecodeMessage) );
+		s15_2_com2		:=		( (s15_2.NuPcom) & (hkcom_psmodmng.NuPdisable) );
+		flash_memory_setRead2		:=		( (( (mem_mux.NuPtake) & (memlib.NuPsetRead) )) & (memrd_modmng.NuPread) );
+		HKPL_I2C_nofail_ask		:=		( (hkpl_failmon.NuPI2C_ask_PL) & (i2c_sat_actflab.NuPrequest) );
+		s15_2_pl1		:=		s15_2.NuPpl;
+		I2C_sat_poll		:=		( (( (i2c_sat_actfl.NuPpoll) & (i2c_sat_modmng.NuPpoll) )) & (i2c_sat_lib.NuPmasterRead) );
+		S3_5_finish		:=		s3_5.NuPfinish;
+		HKPL_read_HK		:=		( (( (hkpl_mux.NuPtake) & (hkpl_actflab.NuPread_HK) )) & (hkpl_modmng.NuPread_HK) );
+		HKPL_I2C_fail_error2		:=		( (( (( (( (( (( (hkpl_actflab.NuPI2C_fail_PL) & (hkpl_mux.NuPrelease) )) & (hkpl_failmon.NuPfailure) )) & (msglib.NuPdecodeMessage) )) & (i2c_sat_actflab.NuPerror2) )) & (log.NuPlog) )) & (log_mux.NuPtake) );
+		s128_1_I2C_fail_error3		:=		( (( (( (( (( (s128_1_mux.NuPrelease) & (s128_1_actflab.NuPI2C_fail) )) & (msglib.NuPdecodeMessage) )) & (i2c_sat_actflab.NuPerror3) )) & (log.NuPlog) )) & (log_mux.NuPtake) );
+		HKPL_mem_write_req2		:=		( (( (( (( (hkpl_actflab.NuPask) & (hkpl_psmodmng.NuPmem_write_req) )) & (mem_mux.NuPtake) )) & (memlib.NuPsetWrite) )) & (memwr_modmng.NuPwrite) );
+		s3_6_com2		:=		( (s3_6.NuPcom) & (hkcom_modmng.NuPdisable) );
+		HKCDMS_mem_res_return1		:=		( (( (( (( (( (hkcdms_mux.NuPrelease) & (hkcdms_actflab.NuPmem_res) )) & (memwr_actflab.NuPok_write) )) & (log.NuPlog) )) & (log_mux.NuPtake) )) & (mem_mux.NuPrelease) );
+		flash_memory_setRead1		:=		( (mem_mux.NuPtake) & (memlib.NuPsetRead) );
+		s128_1_takeTC		:=		( (s128_1_mux.NuPtake) & (s128_1_actflab.NuPtc128_1) );
+		s128_4_fail		:=		( (s128_4_mux.NuPrelease) & (s128_4_actflab.NuPfail) );
+		data_transfer_done2		:=		( (datrans_actflab.NuPdone) & (datrans_modmng.NuPto_idle) );
+		HKPL_mem_res_return1		:=		( (( (( (( (( (( (hkpl_mux.NuPrelease) & (hkpl_actflab.NuPmem_res) )) & (hkpl_failmon.NuPsuccess) )) & (memwr_actflab.NuPok_write) )) & (log.NuPlog) )) & (log_mux.NuPtake) )) & (mem_mux.NuPrelease) );
+		s3_5_eps1		:=		s3_5.NuPeps;
+		s3_6_com1		:=		s3_6.NuPcom;
+		S3_5_internal		:=		s3_5.NuPinternal;
+		HKEPS_read_HK		:=		( (( (hkeps_mux.NuPtake) & (hkeps_actflab.NuPread_HK) )) & (hkeps_modmng.NuPread_HK) );
+		s128_1_ACTFLAB_start		:=		s128_1_actflab.NuPstart;
+		s3_6_eps2		:=		( (s3_6.NuPeps) & (hkeps_modmng.NuPdisable) );
+		s128_5_I2C_fail_error3		:=		( (( (( (( (( (s128_5_mux.NuPrelease) & (s128_5_actflab.NuPI2C_fail) )) & (msglib.NuPdecodeMessage) )) & (i2c_sat_actflab.NuPerror3) )) & (log.NuPlog) )) & (log_mux.NuPtake) );
+		data_transfer_I2C_ask		:=		( (( (datrans_actflab.NuPI2C_ask) & (msglib.NuPcomposeMessage) )) & (i2c_sat_actflab.NuPrequest) );
+		s128_4_I2C_ask		:=		( (( (s128_4_actflab.NuPI2C_ask) & (msglib.NuPcomposeMessage) )) & (i2c_sat_actflab.NuPrequest) );
+		S15_2_finish		:=		s15_2.NuPfinish;
+		status_verif_started		:=		( (( (stat_ver_mux.NuPtake) & (stat_ver_actflab.NuPstarted) )) & (plmodmng.NuPstarted) );
+		s128_4_exec		:=		( (s128_4_actflab.NuPexec) & (plmodmng.NuPexec) );
+		HKCOM_I2C_nofail_res3		:=		( (( (hkcom_failmon.NuPI2C_res_COM) & (i2c_sat_actflab.NuPreturn) )) & (i2c_sat_actfl.NuPreturn) );
+		s3_5_com1		:=		s3_5.NuPcom;
+		MEMWR_ACTFLAB_contin		:=		memwr_actflab.NuPcontin;
+		s128_1_I2C_fail_error2		:=		( (( (( (( (( (s128_1_mux.NuPrelease) & (s128_1_actflab.NuPI2C_fail) )) & (msglib.NuPdecodeMessage) )) & (i2c_sat_actflab.NuPerror2) )) & (log.NuPlog) )) & (log_mux.NuPtake) );
+		HKPL_mem_res_return2		:=		( (( (( (( (( (( (( (hkpl_mux.NuPrelease) & (hkpl_actflab.NuPmem_res) )) & (hkpl_failmon.NuPsuccess) )) & (memwr_actflab.NuPok_write) )) & (log.NuPlog) )) & (log_mux.NuPtake) )) & (mem_mux.NuPrelease) )) & (memwr_modmng.NuPdone) );
+		HKEPS_I2C_res3		:=		( (( (( (hkeps_actflab.NuPI2C_res_EPS) & (msglib.NuPdecodeMessage) )) & (i2c_sat_actflab.NuPreturn) )) & (i2c_sat_actfl.NuPreturn) );
+		S15_1_internal		:=		s15_1.NuPinternal;
+		s15_1_com2		:=		( (s15_1.NuPcom) & (hkcom_psmodmng.NuPenable) );
+		HKCDMS_mem_write_req1		:=		( (( (( (hkcdms_actflab.NuPask) & (hkcdms_psmodmng.NuPmem_write_req) )) & (mem_mux.NuPtake) )) & (memlib.NuPsetWrite) );
+		HKEPS_I2C_nofail_error2		:=		( (( (( (hkeps_failmon.NuPI2C_res_EPS) & (i2c_sat_actflab.NuPerror2) )) & (log.NuPlog) )) & (log_mux.NuPtake) );
+		status_verif_result1		:=		( (stat_ver_mux.NuPrelease) & (stat_ver_actflab.NuPfull) );
+		HKEPS_I2C_fail_error2		:=		( (( (( (( (( (( (hkeps_actflab.NuPI2C_fail_EPS) & (hkeps_mux.NuPrelease) )) & (hkeps_failmon.NuPfailure) )) & (msglib.NuPdecodeMessage) )) & (i2c_sat_actflab.NuPerror2) )) & (log.NuPlog) )) & (log_mux.NuPtake) );
+		s15_1_eps1		:=		s15_1.NuPeps;
+		data_transfer_ask_mem2		:=		( (( (( (datrans_actflab.NuPask_mem) & (mem_mux.NuPtake) )) & (memlib.NuPsetWrite) )) & (memwr_modmng.NuPwrite) );
+		HKCOM_ask_I2C_TTC		:=		( (hkcom_actflab.NuPask) & (hkcom_psmodmng.NuPask_I2C_TTC) );
+		reset_done		:=		( (cdmsstatactfl.NuPdone_reset) & (watchdog.NuPdone) );
+		s128_5_aborted1		:=		( (s128_5_mux.NuPrelease) & (s128_5_actflab.NuPaborted) );
+		HKPL_mem_write_req1		:=		( (( (( (hkpl_actflab.NuPask) & (hkpl_psmodmng.NuPmem_write_req) )) & (mem_mux.NuPtake) )) & (memlib.NuPsetWrite) );
+		MEMRD_ACTFLAB_finish		:=		memrd_actflab.NuPfinish;
+		HKPL_ask_I2C_TTC		:=		( (hkpl_actflab.NuPask) & (hkpl_psmodmng.NuPask_I2C_TTC) );
+		HKCOM_I2C_res4		:=		( (( (( (( (hkcom_actflab.NuPI2C_res_COM) & (msglib.NuPdecodeMessage) )) & (i2c_sat_actflab.NuPreturn) )) & (i2c_sat_actfl.NuPreturn) )) & (i2c_sat_modmng.NuPreturn) );
+		s128_1_success1		:=		( (s128_1_mux.NuPrelease) & (s128_1_actflab.NuPloaded) );
+		s15_1_pl1		:=		s15_1.NuPpl;
+		s3_6_cdms1		:=		s3_6.NuPcdms;
+		HKCDMS_read_HK		:=		( (( (hkcdms_mux.NuPtake) & (hkcdms_actflab.NuPread_HK) )) & (hkcdms_modmng.NuPread_HK) );
+		flash_memory_write		:=		( (memwr_modmng.NuPcontin) & (memwr_actflab.NuPwrite) );
+		S15_2_internal		:=		s15_2.NuPinternal;
+		HKEPS_I2C_fail_error3		:=		( (( (( (( (( (( (hkeps_actflab.NuPI2C_fail_EPS) & (hkeps_mux.NuPrelease) )) & (hkeps_failmon.NuPfailure) )) & (msglib.NuPdecodeMessage) )) & (i2c_sat_actflab.NuPerror3) )) & (log.NuPlog) )) & (log_mux.NuPtake) );
+		s128_5_fail		:=		( (s128_5_mux.NuPrelease) & (s128_5_actflab.NuPfail) );
+		HKCOM_I2C_nofail_ask		:=		( (hkcom_failmon.NuPI2C_ask_COM) & (i2c_sat_actflab.NuPrequest) );
+		flash_memory_bad_CRC		:=		( (( (memrd_actflab.NuPbad_CRC) & (log.NuPlog) )) & (log_mux.NuPtake) );
+		HKEPS_I2C_ask		:=		( (( (hkeps_actflab.NuPI2C_ask_EPS) & (msglib.NuPcomposeMessage) )) & (i2c_sat_actflab.NuPrequest) );
+		HKCOM_I2C_nofail_res4		:=		( (( (( (hkcom_failmon.NuPI2C_res_COM) & (i2c_sat_actflab.NuPreturn) )) & (i2c_sat_actfl.NuPreturn) )) & (i2c_sat_modmng.NuPreturn) );
+		flash_memory_ok_read2		:=		( (( (( (( (memrd_actflab.NuPok_read) & (log.NuPlog) )) & (log_mux.NuPtake) )) & (mem_mux.NuPrelease) )) & (memrd_modmng.NuPdone) );
+		s128_4_wrong_state		:=		( (s128_4_mux.NuPrelease) & (s128_4_actflab.NuPwrong_state) );
+		HKPL_mem_res_fail1		:=		( (( (( (( (( (( (hkpl_mux.NuPrelease) & (hkpl_actflab.NuPmem_res) )) & (hkpl_failmon.NuPsuccess) )) & (memwr_actflab.NuPfail) )) & (log.NuPlog) )) & (log_mux.NuPtake) )) & (mem_mux.NuPrelease) );
+		data_transfer_I2C_fail_error3		:=		( (( (( (( (datrans_actflab.NuPI2C_fail) & (msglib.NuPdecodeMessage) )) & (i2c_sat_actflab.NuPerror3) )) & (log.NuPlog) )) & (log_mux.NuPtake) );
+		s3_5_cdms1		:=		s3_5.NuPcdms;
+		HKCOM_mem_write_req1		:=		( (( (( (hkcom_actflab.NuPask) & (hkcom_psmodmng.NuPmem_write_req) )) & (mem_mux.NuPtake) )) & (memlib.NuPsetWrite) );
+		s128_4_success1		:=		( (s128_4_mux.NuPrelease) & (s128_4_actflab.NuPexecuted) );
+		data_transfer_mem_res2		:=		( (( (( (( (( (datrans_actflab.NuPmem_res) & (memwr_actflab.NuPok_write) )) & (log.NuPlog) )) & (log_mux.NuPtake) )) & (mem_mux.NuPrelease) )) & (memwr_modmng.NuPdone) );
+		s15_1_cdms2		:=		( (s15_1.NuPcdms) & (hkcdms_psmodmng.NuPenable) );
+		HKCOM_mem_res_return2		:=		( (( (( (( (( (( (( (hkcom_mux.NuPrelease) & (hkcom_actflab.NuPmem_res) )) & (hkcom_failmon.NuPsuccess) )) & (memwr_actflab.NuPok_write) )) & (log.NuPlog) )) & (log_mux.NuPtake) )) & (mem_mux.NuPrelease) )) & (memwr_modmng.NuPdone) );
+		flash_memory_checkCRC		:=		( (memrd_actflab.NuPcheck_CRC) & (memlib.NuPcheckCRC) );
+		HKPL_I2C_res_TTC		:=		( (( (hkpl_mux.NuPrelease) & (hkpl_actflab.NuPI2C_res_TTC) )) & (hkpl_failmon.NuPsuccess) );
+		s3_6_eps1		:=		s3_6.NuPeps;
+		HKCDMS_mem_res_fail2		:=		( (( (( (( (( (( (hkcdms_mux.NuPrelease) & (hkcdms_actflab.NuPmem_res) )) & (memwr_actflab.NuPfail) )) & (log.NuPlog) )) & (log_mux.NuPtake) )) & (mem_mux.NuPrelease) )) & (memwr_modmng.NuPdone) );
+		status_verif_to_idle2		:=		( (( (stat_ver_mux.NuPrelease) & (stat_ver_actflab.NuPcomplete) )) & (plmodmng.NuPto_idle) );
+		s15_1_cdms1		:=		s15_1.NuPcdms;
+		S15_1_finish		:=		s15_1.NuPfinish;
+		HKEPS_mem_res_return2		:=		( (( (( (( (( (( (( (hkeps_mux.NuPrelease) & (hkeps_actflab.NuPmem_res) )) & (hkeps_failmon.NuPsuccess) )) & (memwr_actflab.NuPok_write) )) & (log.NuPlog) )) & (log_mux.NuPtake) )) & (mem_mux.NuPrelease) )) & (memwr_modmng.NuPdone) );
+		HKPL_I2C_res3		:=		( (( (( (hkpl_actflab.NuPI2C_res_PL) & (msglib.NuPdecodeMessage) )) & (i2c_sat_actflab.NuPreturn) )) & (i2c_sat_actfl.NuPreturn) );
+		s15_2_cdms1		:=		s15_2.NuPcdms;
+		s15_1_eps2		:=		( (s15_1.NuPeps) & (hkeps_psmodmng.NuPenable) );
+		flash_memory_read		:=		( (memrd_modmng.NuPcontin) & (memrd_actflab.NuPread) );
+		HKEPS_ask_I2C_TTC		:=		( (hkeps_actflab.NuPask) & (hkeps_psmodmng.NuPask_I2C_TTC) );
+		s15_2_eps1		:=		s15_2.NuPeps;
+		s15_2_com1		:=		s15_2.NuPcom;
+		flash_memory_read_fail1		:=		( (( (( (memrd_actflab.NuPfail) & (log.NuPlog) )) & (log_mux.NuPtake) )) & (mem_mux.NuPrelease) );
+		HKEPS_mem_res_return1		:=		( (( (( (( (( (( (hkeps_mux.NuPrelease) & (hkeps_actflab.NuPmem_res) )) & (hkeps_failmon.NuPsuccess) )) & (memwr_actflab.NuPok_write) )) & (log.NuPlog) )) & (log_mux.NuPtake) )) & (mem_mux.NuPrelease) );
+		HKCOM_I2C_nofail__error2		:=		( (( (( (hkcom_failmon.NuPI2C_res_COM) & (i2c_sat_actflab.NuPerror2) )) & (log.NuPlog) )) & (log_mux.NuPtake) );
+		s128_5_I2C_ask		:=		( (( (s128_5_actflab.NuPI2C_ask) & (msglib.NuPcomposeMessage) )) & (i2c_sat_actflab.NuPrequest) );
+		status_verif_I2C_ask		:=		( (( (stat_ver_actflab.NuPI2C_ask) & (msglib.NuPcomposeMessage) )) & (i2c_sat_actflab.NuPrequest) );
+		data_transfer_start		:=		( (datrans_actflab.NuPstart) & (datrans_modmng.NuPcontin) );
+		HKCDMS_mem_res_fail1		:=		( (( (( (( (( (hkcdms_mux.NuPrelease) & (hkcdms_actflab.NuPmem_res) )) & (memwr_actflab.NuPfail) )) & (log.NuPlog) )) & (log_mux.NuPtake) )) & (mem_mux.NuPrelease) );
+		s3_6_cdms2		:=		( (s3_6.NuPcdms) & (hkcdms_modmng.NuPdisable) );
+		HKCDMS_mem_write_req2		:=		( (( (( (( (hkcdms_actflab.NuPask) & (hkcdms_psmodmng.NuPmem_write_req) )) & (mem_mux.NuPtake) )) & (memlib.NuPsetWrite) )) & (memwr_modmng.NuPwrite) );
+		CDMSSTATACTFL_finish		:=		cdmsstatactfl.NuPfinish;
+		HKPL_I2C_nofail_res3		:=		( (( (hkpl_failmon.NuPI2C_res_PL) & (i2c_sat_actflab.NuPreturn) )) & (i2c_sat_actfl.NuPreturn) );
+		S15_2_disable_PS		:=		s15_2.NuPdisable_PS;
+		s128_4_I2C_res		:=		( (s128_4_actflab.NuPI2C_res) & (msglib.NuPdecodeMessage) );
+		HKCOM_I2C_ask		:=		( (( (hkcom_actflab.NuPI2C_ask_COM) & (msglib.NuPcomposeMessage) )) & (i2c_sat_actflab.NuPrequest) );
+		data_transfer_ask_mem1		:=		( (( (datrans_actflab.NuPask_mem) & (mem_mux.NuPtake) )) & (memlib.NuPsetWrite) );
+		I2C_sat_send2		:=		( (( (i2c_sat_actflab.NuPsend) & (i2c_sat_lib.NuPmasterWrite) )) & (i2c_sat_modmng.NuPsend) );
+		MEMWR_ACTFLAB_finish		:=		memwr_actflab.NuPfinish;
+		HKPL_I2C_ask		:=		( (( (hkpl_actflab.NuPI2C_ask_PL) & (msglib.NuPcomposeMessage) )) & (i2c_sat_actflab.NuPrequest) );
+		s3_5_pl1		:=		s3_5.NuPpl;
+		HKCOM_I2C_res_TTC		:=		( (( (hkcom_mux.NuPrelease) & (hkcom_actflab.NuPI2C_res_TTC) )) & (hkcom_failmon.NuPsuccess) );
+		S15_1_enable_PS		:=		s15_1.NuPenable_PS;
+		done		:=		( (cdmsstatactfl.NuPdone_reset) & (watchdog.NuPdone) );
+		s15_1_com1		:=		s15_1.NuPcom;
+		s128_5_aborted2		:=		( (( (s128_5_mux.NuPrelease) & (s128_5_actflab.NuPaborted) )) & (plmodmng.NuPto_idle) );
+		s15_1_pl2		:=		( (s15_1.NuPpl) & (hkpl_psmodmng.NuPenable) );
+		flash_memory_ok_read1		:=		( (( (( (memrd_actflab.NuPok_read) & (log.NuPlog) )) & (log_mux.NuPtake) )) & (mem_mux.NuPrelease) );
+		HKCOM_I2C_res3		:=		( (( (( (hkcom_actflab.NuPI2C_res_COM) & (msglib.NuPdecodeMessage) )) & (i2c_sat_actflab.NuPreturn) )) & (i2c_sat_actfl.NuPreturn) );
+		s128_1_wrong_state		:=		( (s128_1_mux.NuPrelease) & (s128_1_actflab.NuPwrong_state) );
+		status_verif_to_idle1		:=		( (stat_ver_mux.NuPrelease) & (stat_ver_actflab.NuPcomplete) );
+		HKEPS_I2C_nofail_ask		:=		( (hkeps_failmon.NuPI2C_ask_EPS) & (i2c_sat_actflab.NuPrequest) );
+		data_transfer_mem_res1		:=		( (( (( (( (datrans_actflab.NuPmem_res) & (memwr_actflab.NuPok_write) )) & (log.NuPlog) )) & (log_mux.NuPtake) )) & (mem_mux.NuPrelease) );
+		payload_ready2		:=		( (plmodmng.NuPready) & (datrans_modmng.NuPto_busy) );
+		cdms_I2C_res_error2		:=		( (( (( (( (cdmsstatactfl.NuPI2C_res) & (msglib.NuPdecodeMessage) )) & (i2c_sat_actflab.NuPerror2) )) & (log.NuPlog) )) & (log_mux.NuPtake) );
+		cdms_I2C_res_error3		:=		( (( (( (( (cdmsstatactfl.NuPI2C_res) & (msglib.NuPdecodeMessage) )) & (i2c_sat_actflab.NuPerror3) )) & (log.NuPlog) )) & (log_mux.NuPtake) );
+		cdms_I2C_res4		:=		( (( (( (( (cdmsstatactfl.NuPI2C_res) & (msglib.NuPdecodeMessage) )) & (i2c_sat_actfl.NuPreturn) )) & (i2c_sat_actflab.NuPreturn) )) & (i2c_sat_modmng.NuPreturn) );
+		HKCDMS_ask_sat		:=		( (( (hkcdms_actflab.NuPask) & (hkcdms_psmodmng.NuPI2C_ask_sat) )) & (msglib.NuPcomposeMessage) );
+		status_verif_I2C_fail_error2		:=		( (( (( (( (stat_ver_actflab.NuPI2C_fail) & (msglib.NuPdecodeMessage) )) & (i2c_sat_actflab.NuPerror2) )) & (log.NuPlog) )) & (log_mux.NuPtake) );
+		internal_watchdog		:=		( (watchdog.NuPinternal_watchdog) & (cdmsstatactfl.NuPstart_reset) );
+		status_verif_I2C_res		:=		( (stat_ver_actflab.NuPI2C_res) & (msglib.NuPdecodeMessage) );
+		HKEPS_I2C_nofail_error3		:=		( (( (( (hkeps_failmon.NuPI2C_res_EPS) & (i2c_sat_actflab.NuPerror3) )) & (log.NuPlog) )) & (log_mux.NuPtake) );
+		HKPL_I2C_nofail_res4		:=		( (( (( (hkpl_failmon.NuPI2C_res_PL) & (i2c_sat_actflab.NuPreturn) )) & (i2c_sat_actfl.NuPreturn) )) & (i2c_sat_modmng.NuPreturn) );
+		s128_4_takeTC		:=		( (s128_4_mux.NuPtake) & (s128_4_actflab.NuPtc128_4) );
+		HKCOM_I2C_nofail__error3		:=		( (( (( (hkcom_failmon.NuPI2C_res_COM) & (i2c_sat_actflab.NuPerror3) )) & (log.NuPlog) )) & (log_mux.NuPtake) );
+		flash_memory_read_fail2		:=		( (( (( (( (memrd_actflab.NuPfail) & (log.NuPlog) )) & (log_mux.NuPtake) )) & (mem_mux.NuPrelease) )) & (memrd_modmng.NuPdone) );
+		HKCOM_mem_res_fail2		:=		( (( (( (( (( (( (( (hkcom_mux.NuPrelease) & (hkcom_actflab.NuPmem_res) )) & (hkcom_failmon.NuPsuccess) )) & (memwr_actflab.NuPfail) )) & (log.NuPlog) )) & (log_mux.NuPtake) )) & (mem_mux.NuPrelease) )) & (memwr_modmng.NuPdone) );
+		cdms_I2C_ask		:=		( (( (cdmsstatactfl.NuPI2C_ask) & (msglib.NuPcomposeMessage) )) & (i2c_sat_actflab.NuPrequest) );
+		data_transfer_done4		:=		( (( (datrans_actflab.NuPdone) & (datrans_modmng.NuPto_idle) )) & (plmodmng.NuPto_started) );
+		data_transfer_done3		:=		( (datrans_actflab.NuPdone) & (plmodmng.NuPto_started) );
+		s128_5_takeTC		:=		( (s128_5_mux.NuPtake) & (s128_5_actflab.NuPtc128_5) );
+		status_verif_result2		:=		( (( (stat_ver_mux.NuPrelease) & (stat_ver_actflab.NuPfull) )) & (plmodmng.NuPto_result_ready) );
+		S3_6_disable_HK		:=		s3_6.NuPdisable_HK;
+		HKPL_I2C_res4		:=		( (( (( (( (hkpl_actflab.NuPI2C_res_PL) & (msglib.NuPdecodeMessage) )) & (i2c_sat_actflab.NuPreturn) )) & (i2c_sat_actfl.NuPreturn) )) & (i2c_sat_modmng.NuPreturn) );
+		HKCOM_mem_res_return1		:=		( (( (( (( (( (( (hkcom_mux.NuPrelease) & (hkcom_actflab.NuPmem_res) )) & (hkcom_failmon.NuPsuccess) )) & (memwr_actflab.NuPok_write) )) & (log.NuPlog) )) & (log_mux.NuPtake) )) & (mem_mux.NuPrelease) );
+		data_transfer_done1		:=		datrans_actflab.NuPdone;
+		s3_6_pl2		:=		( (s3_6.NuPpl) & (hkpl_modmng.NuPdisable) );
+		I2C_sat_error1		:=		( (( (i2c_sat_actfl.NuPerror1) & (log.NuPlog) )) & (log_mux.NuPtake) );
+		CDMSSTATACTFL_start		:=		cdmsstatactfl.NuPstart;
+		s15_2_eps2		:=		( (s15_2.NuPeps) & (hkeps_psmodmng.NuPdisable) );
+		s128_4_I2C_fail_error2		:=		( (( (( (( (( (s128_4_mux.NuPrelease) & (s128_4_actflab.NuPI2C_fail) )) & (msglib.NuPdecodeMessage) )) & (i2c_sat_actflab.NuPerror2) )) & (log.NuPlog) )) & (log_mux.NuPtake) );
+		s128_1_load		:=		( (s128_1_actflab.NuPload) & (plmodmng.NuPload) );
+		HKEPS_mem_res_fail2		:=		( (( (( (( (( (( (( (hkeps_mux.NuPrelease) & (hkeps_actflab.NuPmem_res) )) & (hkeps_failmon.NuPsuccess) )) & (memwr_actflab.NuPfail) )) & (log.NuPlog) )) & (log_mux.NuPtake) )) & (mem_mux.NuPrelease) )) & (memwr_modmng.NuPdone) );
+		HKCDMS_I2C_res		:=		( (( (hkcdms_mux.NuPrelease) & (hkcdms_actflab.NuPI2C_res) )) & (msglib.NuPdecodeMessage) );
+		HKEPS_I2C_res_TTC		:=		( (( (hkeps_mux.NuPrelease) & (hkeps_actflab.NuPI2C_res_TTC) )) & (hkeps_failmon.NuPsuccess) );
+		log_release		:=		( (log_mux.NuPrelease) & (log.NuPdone) );
+		HKCDMS_mem_res_return2		:=		( (( (( (( (( (( (hkcdms_mux.NuPrelease) & (hkcdms_actflab.NuPmem_res) )) & (memwr_actflab.NuPok_write) )) & (log.NuPlog) )) & (log_mux.NuPtake) )) & (mem_mux.NuPrelease) )) & (memwr_modmng.NuPdone) );
+		S3_6_internal		:=		s3_6.NuPinternal;
+		s128_1_I2C_res		:=		( (s128_1_actflab.NuPI2C_res) & (msglib.NuPdecodeMessage) );
+		HKPL_I2C_fail_error3		:=		( (( (( (( (( (( (hkpl_actflab.NuPI2C_fail_PL) & (hkpl_mux.NuPrelease) )) & (hkpl_failmon.NuPfailure) )) & (msglib.NuPdecodeMessage) )) & (i2c_sat_actflab.NuPerror3) )) & (log.NuPlog) )) & (log_mux.NuPtake) );
+		HKEPS_mem_write_req2		:=		( (( (( (( (hkeps_actflab.NuPask) & (hkeps_psmodmng.NuPmem_write_req) )) & (mem_mux.NuPtake) )) & (memlib.NuPsetWrite) )) & (memwr_modmng.NuPwrite) );
+		s128_5_I2C_res		:=		( (s128_5_actflab.NuPI2C_res) & (msglib.NuPdecodeMessage) );
+		HKEPS_I2C_nofail_res3		:=		( (( (hkeps_failmon.NuPI2C_res_EPS) & (i2c_sat_actflab.NuPreturn) )) & (i2c_sat_actfl.NuPreturn) );
+		s128_5_I2C_fail_error2		:=		( (( (( (( (( (s128_5_mux.NuPrelease) & (s128_5_actflab.NuPI2C_fail) )) & (msglib.NuPdecodeMessage) )) & (i2c_sat_actflab.NuPerror2) )) & (log.NuPlog) )) & (log_mux.NuPtake) );
+		HKPL_I2C_nofail__error2		:=		( (( (( (hkpl_failmon.NuPI2C_res_PL) & (i2c_sat_actflab.NuPerror2) )) & (log.NuPlog) )) & (log_mux.NuPtake) );
+		s128_1_I2C_ask		:=		( (( (s128_1_actflab.NuPI2C_ask) & (msglib.NuPcomposeMessage) )) & (i2c_sat_actflab.NuPrequest) );
+		s128_4_success2		:=		( (( (s128_4_mux.NuPrelease) & (s128_4_actflab.NuPexecuted) )) & (plmodmng.NuPto_started) );
+		payload_ready1		:=		plmodmng.NuPready;
+		HKEPS_mem_res_fail1		:=		( (( (( (( (( (( (hkeps_mux.NuPrelease) & (hkeps_actflab.NuPmem_res) )) & (hkeps_failmon.NuPsuccess) )) & (memwr_actflab.NuPfail) )) & (log.NuPlog) )) & (log_mux.NuPtake) )) & (mem_mux.NuPrelease) );
+		s128_1_fail		:=		( (s128_1_mux.NuPrelease) & (s128_1_actflab.NuPfail) );
+		s3_5_cdms2		:=		( (s3_5.NuPcdms) & (hkcdms_modmng.NuPenable) );
+		s3_6_pl1		:=		s3_6.NuPpl;
+		DATRANS_ACTFLAB_not_done		:=		datrans_actflab.NuPnot_done;
+		s15_2_cdms2		:=		( (s15_2.NuPcdms) & (hkcdms_psmodmng.NuPdisable) );
+		s128_1_success2		:=		( (( (s128_1_mux.NuPrelease) & (s128_1_actflab.NuPloaded) )) & (plmodmng.NuPto_scenario_ready) );
+		HKCOM_I2C_fail_error2		:=		( (( (( (( (( (( (hkcom_actflab.NuPI2C_fail_COM) & (hkcom_mux.NuPrelease) )) & (hkcom_failmon.NuPfailure) )) & (msglib.NuPdecodeMessage) )) & (i2c_sat_actflab.NuPerror2) )) & (log.NuPlog) )) & (log_mux.NuPtake) );
+		cdms_I2C_res3		:=		( (( (( (cdmsstatactfl.NuPI2C_res) & (msglib.NuPdecodeMessage) )) & (i2c_sat_actfl.NuPreturn) )) & (i2c_sat_actflab.NuPreturn) );
+		HKCOM_mem_res_fail1		:=		( (( (( (( (( (( (hkcom_mux.NuPrelease) & (hkcom_actflab.NuPmem_res) )) & (hkcom_failmon.NuPsuccess) )) & (memwr_actflab.NuPfail) )) & (log.NuPlog) )) & (log_mux.NuPtake) )) & (mem_mux.NuPrelease) );
+		s128_4_ACTFLAB_start		:=		s128_4_actflab.NuPstart;
+		HKEPS_mem_write_req1		:=		( (( (( (hkeps_actflab.NuPask) & (hkeps_psmodmng.NuPmem_write_req) )) & (mem_mux.NuPtake) )) & (memlib.NuPsetWrite) );
+		HKCOM_read_HK		:=		( (( (hkcom_mux.NuPtake) & (hkcom_actflab.NuPread_HK) )) & (hkcom_modmng.NuPread_HK) );
+		MEMWR_ACTFLAB_wait		:=		memwr_actflab.NuPwait;
+		I2C_SAT_ACTFL_no_message		:=		i2c_sat_actfl.NuPno_message;
+		s3_5_pl2		:=		( (s3_5.NuPpl) & (hkpl_modmng.NuPenable) );
+		s3_5_com2		:=		( (s3_5.NuPcom) & (hkcom_modmng.NuPenable) );
+		S3_6_finish		:=		s3_6.NuPfinish;
+		s128_4_I2C_fail_error3		:=		( (( (( (( (( (s128_4_mux.NuPrelease) & (s128_4_actflab.NuPI2C_fail) )) & (msglib.NuPdecodeMessage) )) & (i2c_sat_actflab.NuPerror3) )) & (log.NuPlog) )) & (log_mux.NuPtake) );
+		HKCOM_I2C_fail_error3		:=		( (( (( (( (( (( (hkcom_actflab.NuPI2C_fail_COM) & (hkcom_mux.NuPrelease) )) & (hkcom_failmon.NuPfailure) )) & (msglib.NuPdecodeMessage) )) & (i2c_sat_actflab.NuPerror3) )) & (log.NuPlog) )) & (log_mux.NuPtake) );
+		HKCOM_mem_write_req2		:=		( (( (( (( (hkcom_actflab.NuPask) & (hkcom_psmodmng.NuPmem_write_req) )) & (mem_mux.NuPtake) )) & (memlib.NuPsetWrite) )) & (memwr_modmng.NuPwrite) );
+		S3_5_enable_HK		:=		s3_5.NuPenable_HK;
+		HKPL_I2C_nofail__error3		:=		( (( (( (hkpl_failmon.NuPI2C_res_PL) & (i2c_sat_actflab.NuPerror3) )) & (log.NuPlog) )) & (log_mux.NuPtake) );
+		s3_5_eps2		:=		( (s3_5.NuPeps) & (hkeps_modmng.NuPenable) );
+		status_verif_I2C_fail_error3		:=		( (( (( (( (stat_ver_actflab.NuPI2C_fail) & (msglib.NuPdecodeMessage) )) & (i2c_sat_actflab.NuPerror3) )) & (log.NuPlog) )) & (log_mux.NuPtake) );
+
+
+	INVAR
+		( (( (NuInteraction) = (NuI77) )) -> (HKPL_mem_res_fail2) ) &
+		( (( (NuInteraction) = (NuI55) )) -> (data_transfer_I2C_fail_error2) ) &
+		( (( (NuInteraction) = (NuI102) )) -> (s15_2_pl2) ) &
+		( (( (NuInteraction) = (NuI63) )) -> (I2C_sat_send1)  & !(I2C_sat_send2)) &
+		( (( (NuInteraction) = (NuI110) )) -> (HKEPS_I2C_res4) ) &
+		( (( (NuInteraction) = (NuI115) )) -> (HKEPS_I2C_nofail_res4) ) &
+		( (( (NuInteraction) = (NuI54) )) -> (data_transfer_I2C_res) ) &
+		( (( (NuInteraction) = (NuI156) )) -> (s15_2_com2) ) &
+		( (( (NuInteraction) = (NuI66) )) -> (flash_memory_setRead2) ) &
+		( (( (NuInteraction) = (NuI87) )) -> (HKPL_I2C_nofail_ask) ) &
+		( (( (NuInteraction) = (NuI101) )) -> (s15_2_pl1)  & !(s15_2_pl2)) &
+		( (( (NuInteraction) = (NuI61) )) -> (I2C_sat_poll) ) &
+		( (( (NuInteraction) = (NuI186) )) -> (S3_5_finish) ) &
+		( (( (NuInteraction) = (NuI76) )) -> (HKPL_read_HK) ) &
+		( (( (NuInteraction) = (NuI85) )) -> (HKPL_I2C_fail_error2) ) &
+		( (( (NuInteraction) = (NuI28) )) -> (s128_1_I2C_fail_error3) ) &
+		( (( (NuInteraction) = (NuI93) )) -> (HKPL_mem_write_req2) ) &
+		( (( (NuInteraction) = (NuI152) )) -> (s3_6_com2) ) &
+		( (( (NuInteraction) = (NuI161) )) -> (HKCDMS_mem_res_return1)  & !(HKCDMS_mem_res_return2)) &
+		( (( (NuInteraction) = (NuI67) )) -> (flash_memory_setRead1)  & !(flash_memory_setRead2)) &
+		( (( (NuInteraction) = (NuI21) )) -> (s128_1_takeTC) ) &
+		( (( (NuInteraction) = (NuI9) )) -> (s128_4_fail) ) &
+		( (( (NuInteraction) = (NuI50) )) -> (data_transfer_done2)  & !(data_transfer_done4)) &
+		( (( (NuInteraction) = (NuI80) )) -> (HKPL_mem_res_return1)  & !(HKPL_mem_res_return2)) &
+		( (( (NuInteraction) = (NuI122) )) -> (s3_5_eps1)  & !(s3_5_eps2)) &
+		( (( (NuInteraction) = (NuI151) )) -> (s3_6_com1)  & !(s3_6_com2)) &
+		( (( (NuInteraction) = (NuI184) )) -> (S3_5_internal) ) &
+		( (( (NuInteraction) = (NuI103) )) -> (HKEPS_read_HK) ) &
+		( (( (NuInteraction) = (NuI177) )) -> (s128_1_ACTFLAB_start) ) &
+		( (( (NuInteraction) = (NuI125) )) -> (s3_6_eps2) ) &
+		( (( (NuInteraction) = (NuI36) )) -> (s128_5_I2C_fail_error3) ) &
+		( (( (NuInteraction) = (NuI53) )) -> (data_transfer_I2C_ask) ) &
+		( (( (NuInteraction) = (NuI15) )) -> (s128_4_I2C_ask) ) &
+		( (( (NuInteraction) = (NuI194) )) -> (S15_2_finish) ) &
+		( (( (NuInteraction) = (NuI37) )) -> (status_verif_started) ) &
+		( (( (NuInteraction) = (NuI12) )) -> (s128_4_exec) ) &
+		( (( (NuInteraction) = (NuI143) )) -> (HKCOM_I2C_nofail_res3)  & !(HKCOM_I2C_nofail_res4)) &
+		( (( (NuInteraction) = (NuI149) )) -> (s3_5_com1)  & !(s3_5_com2)) &
+		( (( (NuInteraction) = (NuI182) )) -> (MEMWR_ACTFLAB_contin) ) &
+		( (( (NuInteraction) = (NuI27) )) -> (s128_1_I2C_fail_error2) ) &
+		( (( (NuInteraction) = (NuI79) )) -> (HKPL_mem_res_return2) ) &
+		( (( (NuInteraction) = (NuI111) )) -> (HKEPS_I2C_res3)  & !(HKEPS_I2C_res4)) &
+		( (( (NuInteraction) = (NuI190) )) -> (S15_1_internal) ) &
+		( (( (NuInteraction) = (NuI154) )) -> (s15_1_com2) ) &
+		( (( (NuInteraction) = (NuI165) )) -> (HKCDMS_mem_write_req1)  & !(HKCDMS_mem_write_req2)) &
+		( (( (NuInteraction) = (NuI117) )) -> (HKEPS_I2C_nofail_error2) ) &
+		( (( (NuInteraction) = (NuI38) )) -> (status_verif_result1)  & !(status_verif_result2)) &
+		( (( (NuInteraction) = (NuI112) )) -> (HKEPS_I2C_fail_error2) ) &
+		( (( (NuInteraction) = (NuI126) )) -> (s15_1_eps1)  & !(s15_1_eps2)) &
+		( (( (NuInteraction) = (NuI57) )) -> (data_transfer_ask_mem2) ) &
+		( (( (NuInteraction) = (NuI146) )) -> (HKCOM_ask_I2C_TTC) ) &
+		( (( (NuInteraction) = (NuI2) )) -> (reset_done) ) &
+		( (( (NuInteraction) = (NuI30) )) -> (s128_5_aborted1)  & !(s128_5_aborted2)) &
+		( (( (NuInteraction) = (NuI94) )) -> (HKPL_mem_write_req1)  & !(HKPL_mem_write_req2)) &
+		( (( (NuInteraction) = (NuI180) )) -> (MEMRD_ACTFLAB_finish) ) &
+		( (( (NuInteraction) = (NuI92) )) -> (HKPL_ask_I2C_TTC) ) &
+		( (( (NuInteraction) = (NuI137) )) -> (HKCOM_I2C_res4) ) &
+		( (( (NuInteraction) = (NuI23) )) -> (s128_1_success1)  & !(s128_1_success2)) &
+		( (( (NuInteraction) = (NuI99) )) -> (s15_1_pl1)  & !(s15_1_pl2)) &
+		( (( (NuInteraction) = (NuI168) )) -> (s3_6_cdms1)  & !(s3_6_cdms2)) &
+		( (( (NuInteraction) = (NuI157) )) -> (HKCDMS_read_HK) ) &
+		( (( (NuInteraction) = (NuI75) )) -> (flash_memory_write) ) &
+		( (( (NuInteraction) = (NuI193) )) -> (S15_2_internal) ) &
+		( (( (NuInteraction) = (NuI113) )) -> (HKEPS_I2C_fail_error3) ) &
+		( (( (NuInteraction) = (NuI29) )) -> (s128_5_fail) ) &
+		( (( (NuInteraction) = (NuI141) )) -> (HKCOM_I2C_nofail_ask) ) &
+		( (( (NuInteraction) = (NuI74) )) -> (flash_memory_bad_CRC) ) &
+		( (( (NuInteraction) = (NuI109) )) -> (HKEPS_I2C_ask) ) &
+		( (( (NuInteraction) = (NuI142) )) -> (HKCOM_I2C_nofail_res4) ) &
+		( (( (NuInteraction) = (NuI71) )) -> (flash_memory_ok_read2) ) &
+		( (( (NuInteraction) = (NuI10) )) -> (s128_4_wrong_state) ) &
+		( (( (NuInteraction) = (NuI78) )) -> (HKPL_mem_res_fail1)  & !(HKPL_mem_res_fail2)) &
+		( (( (NuInteraction) = (NuI56) )) -> (data_transfer_I2C_fail_error3) ) &
+		( (( (NuInteraction) = (NuI166) )) -> (s3_5_cdms1)  & !(s3_5_cdms2)) &
+		( (( (NuInteraction) = (NuI148) )) -> (HKCOM_mem_write_req1)  & !(HKCOM_mem_write_req2)) &
+		( (( (NuInteraction) = (NuI13) )) -> (s128_4_success1)  & !(s128_4_success2)) &
+		( (( (NuInteraction) = (NuI59) )) -> (data_transfer_mem_res2) ) &
+		( (( (NuInteraction) = (NuI171) )) -> (s15_1_cdms2) ) &
+		( (( (NuInteraction) = (NuI133) )) -> (HKCOM_mem_res_return2) ) &
+		( (( (NuInteraction) = (NuI73) )) -> (flash_memory_checkCRC) ) &
+		( (( (NuInteraction) = (NuI81) )) -> (HKPL_I2C_res_TTC) ) &
+		( (( (NuInteraction) = (NuI124) )) -> (s3_6_eps1)  & !(s3_6_eps2)) &
+		( (( (NuInteraction) = (NuI158) )) -> (HKCDMS_mem_res_fail2) ) &
+		( (( (NuInteraction) = (NuI41) )) -> (status_verif_to_idle2) ) &
+		( (( (NuInteraction) = (NuI170) )) -> (s15_1_cdms1)  & !(s15_1_cdms2)) &
+		( (( (NuInteraction) = (NuI192) )) -> (S15_1_finish) ) &
+		( (( (NuInteraction) = (NuI106) )) -> (HKEPS_mem_res_return2) ) &
+		( (( (NuInteraction) = (NuI84) )) -> (HKPL_I2C_res3)  & !(HKPL_I2C_res4)) &
+		( (( (NuInteraction) = (NuI172) )) -> (s15_2_cdms1)  & !(s15_2_cdms2)) &
+		( (( (NuInteraction) = (NuI127) )) -> (s15_1_eps2) ) &
+		( (( (NuInteraction) = (NuI68) )) -> (flash_memory_read) ) &
+		( (( (NuInteraction) = (NuI119) )) -> (HKEPS_ask_I2C_TTC) ) &
+		( (( (NuInteraction) = (NuI128) )) -> (s15_2_eps1)  & !(s15_2_eps2)) &
+		( (( (NuInteraction) = (NuI155) )) -> (s15_2_com1)  & !(s15_2_com2)) &
+		( (( (NuInteraction) = (NuI70) )) -> (flash_memory_read_fail1)  & !(flash_memory_read_fail2)) &
+		( (( (NuInteraction) = (NuI107) )) -> (HKEPS_mem_res_return1)  & !(HKEPS_mem_res_return2)) &
+		( (( (NuInteraction) = (NuI144) )) -> (HKCOM_I2C_nofail__error2) ) &
+		( (( (NuInteraction) = (NuI33) )) -> (s128_5_I2C_ask) ) &
+		( (( (NuInteraction) = (NuI42) )) -> (status_verif_I2C_ask) ) &
+		( (( (NuInteraction) = (NuI48) )) -> (data_transfer_start) ) &
+		( (( (NuInteraction) = (NuI159) )) -> (HKCDMS_mem_res_fail1)  & !(HKCDMS_mem_res_fail2)) &
+		( (( (NuInteraction) = (NuI169) )) -> (s3_6_cdms2) ) &
+		( (( (NuInteraction) = (NuI164) )) -> (HKCDMS_mem_write_req2) ) &
+		( (( (NuInteraction) = (NuI175) )) -> (CDMSSTATACTFL_finish) ) &
+		( (( (NuInteraction) = (NuI89) )) -> (HKPL_I2C_nofail_res3)  & !(HKPL_I2C_nofail_res4)) &
+		( (( (NuInteraction) = (NuI195) )) -> (S15_2_disable_PS) ) &
+		( (( (NuInteraction) = (NuI16) )) -> (s128_4_I2C_res) ) &
+		( (( (NuInteraction) = (NuI136) )) -> (HKCOM_I2C_ask) ) &
+		( (( (NuInteraction) = (NuI58) )) -> (data_transfer_ask_mem1)  & !(data_transfer_ask_mem2)) &
+		( (( (NuInteraction) = (NuI62) )) -> (I2C_sat_send2) ) &
+		( (( (NuInteraction) = (NuI183) )) -> (MEMWR_ACTFLAB_finish) ) &
+		( (( (NuInteraction) = (NuI82) )) -> (HKPL_I2C_ask) ) &
+		( (( (NuInteraction) = (NuI95) )) -> (s3_5_pl1)  & !(s3_5_pl2)) &
+		( (( (NuInteraction) = (NuI135) )) -> (HKCOM_I2C_res_TTC) ) &
+		( (( (NuInteraction) = (NuI191) )) -> (S15_1_enable_PS) ) &
+		( (( (NuInteraction) = (NuI8) )) -> (done) ) &
+		( (( (NuInteraction) = (NuI153) )) -> (s15_1_com1)  & !(s15_1_com2)) &
+		( (( (NuInteraction) = (NuI31) )) -> (s128_5_aborted2) ) &
+		( (( (NuInteraction) = (NuI100) )) -> (s15_1_pl2) ) &
+		( (( (NuInteraction) = (NuI72) )) -> (flash_memory_ok_read1)  & !(flash_memory_ok_read2)) &
+		( (( (NuInteraction) = (NuI138) )) -> (HKCOM_I2C_res3)  & !(HKCOM_I2C_res4)) &
+		( (( (NuInteraction) = (NuI20) )) -> (s128_1_wrong_state) ) &
+		( (( (NuInteraction) = (NuI40) )) -> (status_verif_to_idle1)  & !(status_verif_to_idle2)) &
+		( (( (NuInteraction) = (NuI114) )) -> (HKEPS_I2C_nofail_ask) ) &
+		( (( (NuInteraction) = (NuI60) )) -> (data_transfer_mem_res1)  & !(data_transfer_mem_res2)) &
+		( (( (NuInteraction) = (NuI47) )) -> (payload_ready2) ) &
+		( (( (NuInteraction) = (NuI5) )) -> (cdms_I2C_res_error2) ) &
+		( (( (NuInteraction) = (NuI6) )) -> (cdms_I2C_res_error3) ) &
+		( (( (NuInteraction) = (NuI3) )) -> (cdms_I2C_res4) ) &
+		( (( (NuInteraction) = (NuI163) )) -> (HKCDMS_ask_sat) ) &
+		( (( (NuInteraction) = (NuI44) )) -> (status_verif_I2C_fail_error2) ) &
+		( (( (NuInteraction) = (NuI1) )) -> (internal_watchdog) ) &
+		( (( (NuInteraction) = (NuI43) )) -> (status_verif_I2C_res) ) &
+		( (( (NuInteraction) = (NuI118) )) -> (HKEPS_I2C_nofail_error3) ) &
+		( (( (NuInteraction) = (NuI88) )) -> (HKPL_I2C_nofail_res4) ) &
+		( (( (NuInteraction) = (NuI11) )) -> (s128_4_takeTC) ) &
+		( (( (NuInteraction) = (NuI145) )) -> (HKCOM_I2C_nofail__error3) ) &
+		( (( (NuInteraction) = (NuI69) )) -> (flash_memory_read_fail2) ) &
+		( (( (NuInteraction) = (NuI131) )) -> (HKCOM_mem_res_fail2) ) &
+		( (( (NuInteraction) = (NuI7) )) -> (cdms_I2C_ask) ) &
+		( (( (NuInteraction) = (NuI52) )) -> (data_transfer_done4) ) &
+		( (( (NuInteraction) = (NuI51) )) -> (data_transfer_done3)  & !(data_transfer_done4)) &
+		( (( (NuInteraction) = (NuI32) )) -> (s128_5_takeTC) ) &
+		( (( (NuInteraction) = (NuI39) )) -> (status_verif_result2) ) &
+		( (( (NuInteraction) = (NuI189) )) -> (S3_6_disable_HK) ) &
+		( (( (NuInteraction) = (NuI83) )) -> (HKPL_I2C_res4) ) &
+		( (( (NuInteraction) = (NuI134) )) -> (HKCOM_mem_res_return1)  & !(HKCOM_mem_res_return2)) &
+		( (( (NuInteraction) = (NuI49) )) -> (data_transfer_done1)  & !(data_transfer_done2) & !(data_transfer_done3) & !(data_transfer_done4)) &
+		( (( (NuInteraction) = (NuI98) )) -> (s3_6_pl2) ) &
+		( (( (NuInteraction) = (NuI64) )) -> (I2C_sat_error1) ) &
+		( (( (NuInteraction) = (NuI174) )) -> (CDMSSTATACTFL_start) ) &
+		( (( (NuInteraction) = (NuI129) )) -> (s15_2_eps2) ) &
+		( (( (NuInteraction) = (NuI17) )) -> (s128_4_I2C_fail_error2) ) &
+		( (( (NuInteraction) = (NuI22) )) -> (s128_1_load) ) &
+		( (( (NuInteraction) = (NuI104) )) -> (HKEPS_mem_res_fail2) ) &
+		( (( (NuInteraction) = (NuI162) )) -> (HKCDMS_I2C_res) ) &
+		( (( (NuInteraction) = (NuI108) )) -> (HKEPS_I2C_res_TTC) ) &
+		( (( (NuInteraction) = (NuI65) )) -> (log_release) ) &
+		( (( (NuInteraction) = (NuI160) )) -> (HKCDMS_mem_res_return2) ) &
+		( (( (NuInteraction) = (NuI187) )) -> (S3_6_internal) ) &
+		( (( (NuInteraction) = (NuI26) )) -> (s128_1_I2C_res) ) &
+		( (( (NuInteraction) = (NuI86) )) -> (HKPL_I2C_fail_error3) ) &
+		( (( (NuInteraction) = (NuI120) )) -> (HKEPS_mem_write_req2) ) &
+		( (( (NuInteraction) = (NuI34) )) -> (s128_5_I2C_res) ) &
+		( (( (NuInteraction) = (NuI116) )) -> (HKEPS_I2C_nofail_res3)  & !(HKEPS_I2C_nofail_res4)) &
+		( (( (NuInteraction) = (NuI35) )) -> (s128_5_I2C_fail_error2) ) &
+		( (( (NuInteraction) = (NuI90) )) -> (HKPL_I2C_nofail__error2) ) &
+		( (( (NuInteraction) = (NuI25) )) -> (s128_1_I2C_ask) ) &
+		( (( (NuInteraction) = (NuI14) )) -> (s128_4_success2) ) &
+		( (( (NuInteraction) = (NuI46) )) -> (payload_ready1)  & !(payload_ready2)) &
+		( (( (NuInteraction) = (NuI105) )) -> (HKEPS_mem_res_fail1)  & !(HKEPS_mem_res_fail2)) &
+		( (( (NuInteraction) = (NuI19) )) -> (s128_1_fail) ) &
+		( (( (NuInteraction) = (NuI167) )) -> (s3_5_cdms2) ) &
+		( (( (NuInteraction) = (NuI97) )) -> (s3_6_pl1)  & !(s3_6_pl2)) &
+		( (( (NuInteraction) = (NuI178) )) -> (DATRANS_ACTFLAB_not_done) ) &
+		( (( (NuInteraction) = (NuI173) )) -> (s15_2_cdms2) ) &
+		( (( (NuInteraction) = (NuI24) )) -> (s128_1_success2) ) &
+		( (( (NuInteraction) = (NuI139) )) -> (HKCOM_I2C_fail_error2) ) &
+		( (( (NuInteraction) = (NuI4) )) -> (cdms_I2C_res3)  & !(cdms_I2C_res4)) &
+		( (( (NuInteraction) = (NuI132) )) -> (HKCOM_mem_res_fail1)  & !(HKCOM_mem_res_fail2)) &
+		( (( (NuInteraction) = (NuI176) )) -> (s128_4_ACTFLAB_start) ) &
+		( (( (NuInteraction) = (NuI121) )) -> (HKEPS_mem_write_req1)  & !(HKEPS_mem_write_req2)) &
+		( (( (NuInteraction) = (NuI130) )) -> (HKCOM_read_HK) ) &
+		( (( (NuInteraction) = (NuI181) )) -> (MEMWR_ACTFLAB_wait) ) &
+		( (( (NuInteraction) = (NuI179) )) -> (I2C_SAT_ACTFL_no_message) ) &
+		( (( (NuInteraction) = (NuI96) )) -> (s3_5_pl2) ) &
+		( (( (NuInteraction) = (NuI150) )) -> (s3_5_com2) ) &
+		( (( (NuInteraction) = (NuI188) )) -> (S3_6_finish) ) &
+		( (( (NuInteraction) = (NuI18) )) -> (s128_4_I2C_fail_error3) ) &
+		( (( (NuInteraction) = (NuI140) )) -> (HKCOM_I2C_fail_error3) ) &
+		( (( (NuInteraction) = (NuI147) )) -> (HKCOM_mem_write_req2) ) &
+		( (( (NuInteraction) = (NuI185) )) -> (S3_5_enable_HK) ) &
+		( (( (NuInteraction) = (NuI91) )) -> (HKPL_I2C_nofail__error3) ) &
+		( (( (NuInteraction) = (NuI123) )) -> (s3_5_eps2) ) &
+		( (( (NuInteraction) = (NuI45) )) -> (status_verif_I2C_fail_error3) );
+
+
+

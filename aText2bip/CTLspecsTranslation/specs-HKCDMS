@@ -1,0 +1,16 @@
+Architecture: MD
+coordinator: Packet Store Mode Manager
+mode-act: hkcdms_psmodmng.Nuplace = NuSMEMORY , HKCDMS_mem_write_req
+mode-act: hkcdms_psmodmng.Nuplace = NuSSAT , HKCDMS_ask_sat
+end
+
+Architecture: MD
+coordinator: HKCDMS Mode Manager
+mode-act: hkcdms_modmng.Nuplace = NuSENABLED , HKCDMS_read_HK
+end
+
+Architecture: MX
+coordinator: HKCDMS MUTEX
+take: HKCDMS_read_HK
+release: HKCDMS_I2C_res, HKCDMS_mem_res
+end

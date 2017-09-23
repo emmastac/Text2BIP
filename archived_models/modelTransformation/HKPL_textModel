@@ -1,0 +1,175 @@
+
+
+$!-------------------------MessageLibrary---------------------------------------!$
+atom: MessageLibrary
+init: S0
+ports: 
+S0,S0,decodeMessage
+S0,S0,composeMessage
+end
+
+ $!-------------------------sMutex---------------------------------------!$
+atom: sMutex
+init: IDLE
+ports: 
+IDLE,BUSY,take
+BUSY,IDLE,release
+end
+
+
+$!-------------------------memory_library---------------------------------------!$
+atom: memory_library
+init: S0
+ports: 
+S0, S0, setWrite
+S0, S0, setRead
+S0, S0, checkCRC
+end
+
+$!-------------------------HK_PL_processActionFlowWithAbort---------------------------------------!$
+atom: HK_PL_processActionFlowWithAbort
+data: timer, period
+init: WAIT
+initAct: timer=0; period = -1;
+ports: 
+WAIT, START, read_HK, (period==-1 || timer == period ) /* to increase the timer we need timer ports */
+START, I2C, I2C_ask_PL
+I2C, SEND_HK_REPORT, I2C_res_PL
+I2C, WAIT, I2C_fail_PL
+SEND_HK_REPORT, ASK, ask
+ASK, WAIT, mem_res
+ASK, WAIT, I2C_res_TTC
+end
+
+$!-------------------------HK_PL_FailureMonitoring---------------------------------------!$
+atom: HK_PL_FailureMonitoring
+data: timer, max_timer
+init: NOMINAL
+initAct: timer=0; max_timer = -1;
+ports: 
+NOMINAL, ANOMALY, failure
+ANOMALY, CRITICAL_FAILURE, I2C_ask_PL, (max_timer==-1 || timer > max_timer )
+ANOMALY, NOMINAL, success, (max_timer==-1 || timer > max_timer )
+CRITICAL_FAILURE, NOMINAL, I2C_res_PL
+end
+
+$!-------------------------HK_PL_PacketStoreModeManager---------------------------------------!$
+atom: HK_PL_PacketStoreModeManager
+init: MEMORY
+ports: 
+MEMORY, TTC, disable
+MEMORY, MEMORY, mem_write_req
+TTC, TTC, ask_I2C_TTC
+TTC, MEMORY, enable
+end
+
+$!-------------------------HK_PL_ModeManager---------------------------------------!$
+atom: HK_PL_ModeManager
+init: ENABLED
+ports: 
+ENABLED, DISABLED, disable
+ENABLED, ENABLED, read_HK
+DISABLED, ENABLED, enable
+end
+
+$!-------------------------s3_5---------------------------------------!$
+atom: s3_5
+init: IDLE
+ports: 
+IDLE, START, enable_HK
+START, END, cdms
+START, END, pl
+START, END, eps
+START, END, com
+END, START, internal
+START, IDLE, finish
+end
+
+$!-------------------------s3_6---------------------------------------!$
+atom: s3_6
+init: IDLE
+ports: 
+IDLE, START, disable_HK
+START, END, cdms
+START, END, pl
+START, END, eps
+START, END, com
+END, START, internal
+START, IDLE, finish
+end
+
+$!-------------------------s15_1---------------------------------------!$
+atom: s15_1
+init: IDLE
+ports: 
+IDLE, START, enable_PS
+START, END, cdms
+START, END, pl
+START, END, eps
+START, END, com
+END, START, internal
+START, IDLE, finish
+end
+
+$!-------------------------s15_2---------------------------------------!$
+atom: s15_2
+init: IDLE
+ports: 
+IDLE, START, disable_PS
+START, END, cdms
+START, END, pl
+START, END, eps
+START, END, com
+END, START, internal
+START, IDLE, finish
+end
+
+
+$!-------------------------------mainModel---------------------------------!$
+compound: CubETH
+component: MessageLibrary, MSGLIB
+component: memory_library, MEMLIB
+component: HK_PL_processActionFlowWithAbort, HKPL_ACTFLAB
+component: sMutex, HKPL_MUX
+component: HK_PL_FailureMonitoring, HKPL_FAILMON
+component: HK_PL_PacketStoreModeManager, HKPL_PSMODMNG
+component: HK_PL_ModeManager, HKPL_MODMNG
+component: s3_5, S3_5
+component: s3_6, S3_6
+component: s15_1, S15_1
+component: s15_2, S15_2
+connectors: 
+
+/******** HK_PL ***********/
+RDV3, HKPL_read_HK, , HKPL_MUX.take, HKPL_ACTFLAB.read_HK, HKPL_MODMNG.read_HK
+$! mem_res -> return, fail (flash Memory) !$
+RDV3, HKPL_mem_res_fail, , HKPL_MUX.release, HKPL_ACTFLAB.mem_res, HKPL_FAILMON.success
+RDV3, HKPL_mem_res_return, , HKPL_MUX.release, HKPL_ACTFLAB.mem_res, HKPL_FAILMON.success
+
+/* start: HK_to_I2C, MSG_LIB, I2C_SAT */
+RDV2, HKPL_I2C_ask, , HKPL_ACTFLAB.I2C_ask_PL, MSGLIB.composeMessage
+RDV2, HKPL_I2C_res, , HKPL_ACTFLAB.I2C_res_PL, MSGLIB.decodeMessage
+
+RDV4, HKPL_I2C_fail_error, , HKPL_ACTFLAB.I2C_fail_PL, HKPL_MUX.release ,HKPL_FAILMON.failure ,MSGLIB.decodeMessage
+
+SINGLE, HKPL_I2C_nofail_ask, , HKPL_FAILMON.I2C_ask_PL
+SINGLE, HKPL_I2C_nofail_res, , HKPL_FAILMON.I2C_res_PL
+
+SINGLE, HKPL_I2C_nofail_error, , HKPL_FAILMON.I2C_res_PL
+
+RDV2, HKPL_ask_I2C_TTC , , HKPL_ACTFLAB.ask, HKPL_PSMODMNG.ask_I2C_TTC
+RDV3, HKPL_mem_write_req, , HKPL_ACTFLAB.ask, HKPL_PSMODMNG.mem_write_req, MEMLIB.setWrite
+
+
+/* TODO for all: add in .smv file : ...pl2 > 1 */
+SINGLE, s3_5_pl1, , S3_5.pl
+RDV2, s3_5_pl2, , S3_5.pl, HKPL_MODMNG.enable
+SINGLE, s3_6_pl1, , S3_6.pl
+RDV2, s3_6_pl2, , S3_6.pl, HKPL_MODMNG.disable
+SINGLE, s15_1_pl1, , S15_1.pl
+RDV2, s15_1_pl2, , S15_1.pl, HKPL_PSMODMNG.enable
+SINGLE, s15_2_pl1, , S15_2.pl
+RDV2, s15_2_pl2, , S15_2.pl, HKPL_PSMODMNG.disable
+
+end
+

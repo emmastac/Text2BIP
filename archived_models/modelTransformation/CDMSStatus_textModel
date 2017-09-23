@@ -1,0 +1,58 @@
+$!-------------------------WatchdogReset---------------------------------------!$
+atom: WatchdogReset
+documentation: Part of the CDMS_status. There is an implementation for the CDSM_STATUS component and there are timing ports there.
+data: timer
+init: S0
+initAct: timer=0;
+ports: 
+S0,S1,internal_watchdog, ,timer = 0;
+$! 
+S1,S2,*external_watchdog
+S2,S0,done 
+!$
+S1,S0,done 
+end
+
+$!-------------------------CdmsStatusActionFlow---------------------------------------!$
+atom: CdmsStatusActionFlow
+init: NOMINAL
+ports: 
+NOMINAL,START,start
+START,RESET,start_reset
+RESET,HEARTBEAT,done_reset
+HEARTBEAT,ASKED,I2C_ask
+ASKED,RESULT,I2C_res
+RESULT,NOMINAL,finish
+end
+
+
+$!-------------------------MessageLibrary---------------------------------------!$
+atom: MessageLibrary
+init: S0
+ports: 
+S0,S0,decodeMessage
+S0,S0,composeMessage
+end
+
+
+$!-------------------------------mainModel---------------------------------!$
+compound: CdmsStatus
+component: WatchdogReset, WATCHDOG
+component: CdmsStatusActionFlow, CDMSSTATACTFL
+component: MessageLibrary, MSGLIB
+connectors: 
+
+/******** cdms_status ***********/
+RDV2,internal_watchdog,, WATCHDOG.internal_watchdog,CDMSSTATACTFL.start_reset
+RDV2,reset_done,, CDMSSTATACTFL.done_reset, WATCHDOG.done
+$! RDV2,I2C_res,, CDMSSTATACTFL.I2C_res, MSGLIB.decodeMessage !$
+RDV2, cdms_I2C_res,, CDMSSTATACTFL.I2C_res, MSGLIB.decodeMessage
+
+RDV2, cdms_I2C_res_error , ,CDMSSTATACTFL.I2C_res, MSGLIB.decodeMessage
+RDV2, cdms_I2C_ask ,, CDMSSTATACTFL.I2C_ask, MSGLIB.composeMessage
+
+RDV2,done,, CDMSSTATACTFL.done_reset, WATCHDOG.done
+
+
+end
+

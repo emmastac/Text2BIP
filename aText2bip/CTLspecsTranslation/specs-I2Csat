@@ -1,0 +1,4 @@
+Architecture: MD
+coordinator: I2Csat Mode Manager
+mode-act: i2c_sat_modmng.Nuplace = NuSS1 , I2C_sat_poll
+end

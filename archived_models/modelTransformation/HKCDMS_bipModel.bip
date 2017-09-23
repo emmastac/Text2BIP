@@ -1,0 +1,333 @@
+model HKCDMS_bipModel
+
+	port type syncPort
+	
+
+
+connector type SINGLE(syncPort p1)
+define p1
+end
+
+
+connector type RDV2(syncPort p1, syncPort p2)
+define p1 p2
+end	
+
+connector type RDV3(syncPort p1, syncPort p2, syncPort p3)
+define p1 p2 p3
+end	
+
+connector type RDV4(syncPort p1, syncPort p2, syncPort p3, syncPort p4)
+define p1 p2 p3 p4
+end	
+
+connector type RDV5(syncPort p1, syncPort p2, syncPort p3, syncPort p4, syncPort p5)
+define p1 p2 p3 p4 p5
+end	
+
+connector type RDV6(syncPort p1, syncPort p2, syncPort p3, syncPort p4, syncPort p5, syncPort p6)
+define p1 p2 p3 p4 p5 p6
+end	
+
+connector type RDV7(syncPort p1, syncPort p2, syncPort p3, syncPort p4, syncPort p5, syncPort p6, syncPort p7)
+define p1 p2 p3 p4 p5 p6 p7
+end	
+
+connector type RDV8(syncPort p1, syncPort p2, syncPort p3, syncPort p4, syncPort p5, syncPort p6, syncPort p7, syncPort p8)
+define p1 p2 p3 p4 p5 p6 p7 p8
+end	
+
+ 
+atomic type MessageLibrary
+
+   
+	export port  syncPort  composeMessage     
+	export port  syncPort  decodeMessage   
+ 
+	place S0 
+
+initial to  S0 do{  }
+
+ on decodeMessage from S0 to S0   
+ on composeMessage from S0 to S0   
+
+
+end
+
+ 
+atomic type sMutex
+
+   
+	export port  syncPort  take     
+	export port  syncPort  release   
+ 
+	place IDLE ,BUSY 
+
+initial to  IDLE do{  }
+
+ on take from IDLE to BUSY   
+ on release from BUSY to IDLE   
+
+
+end
+
+ 
+atomic type memory_library
+
+   
+	export port  syncPort  setWrite     
+	export port  syncPort  checkCRC     
+	export port  syncPort  setRead   
+ 
+	place S0 
+
+initial to  S0 do{  }
+
+ on setWrite from S0 to S0   
+ on setRead from S0 to S0   
+ on checkCRC from S0 to S0   
+
+
+end
+
+ 
+atomic type HK_CDMS_processActionFlowWithAbort
+
+   
+	export port  syncPort  ask     
+	export port  syncPort  read_HK     
+	export port  syncPort  mem_res     
+	export port  syncPort  I2C_res   
+ 
+	place SEND_HK_REPORT ,ASK ,WAIT 
+
+initial to  WAIT do{  }
+
+ on read_HK from WAIT to SEND_HK_REPORT   
+ on ask from SEND_HK_REPORT to ASK   
+ on mem_res from ASK to WAIT   
+ on I2C_res from ASK to WAIT   
+
+
+end
+
+ 
+atomic type HK_CDMS_PacketStoreModeManager
+
+   
+	export port  syncPort  disable     
+	export port  syncPort  enable     
+	export port  syncPort  mem_write_req     
+	export port  syncPort  I2C_ask_sat   
+ 
+	place MEMORY ,SAT 
+
+initial to  MEMORY do{  }
+
+ on disable from MEMORY to SAT   
+ on mem_write_req from MEMORY to MEMORY   
+ on I2C_ask_sat from SAT to SAT   
+ on enable from SAT to MEMORY   
+
+
+end
+
+ 
+atomic type HK_CDMS_ModeManager
+
+   
+	export port  syncPort  disable     
+	export port  syncPort  enable     
+	export port  syncPort  read_HK   
+ 
+	place DISABLED ,ENABLED 
+
+initial to  ENABLED do{  }
+
+ on disable from ENABLED to DISABLED   
+ on read_HK from ENABLED to ENABLED   
+ on enable from DISABLED to ENABLED   
+
+
+end
+
+ 
+atomic type s3_5
+
+   
+	export port  syncPort  com     
+	export port  syncPort  internal     
+	export port  syncPort  enable_HK     
+	export port  syncPort  cdms     
+	export port  syncPort  eps     
+	export port  syncPort  finish     
+	export port  syncPort  pl   
+ 
+	place IDLE ,START ,END 
+
+initial to  IDLE do{  }
+
+ on enable_HK from IDLE to START   
+ on cdms from START to END   
+ on pl from START to END   
+ on eps from START to END   
+ on com from START to END   
+ on internal from END to START   
+ on finish from START to IDLE   
+
+
+end
+
+ 
+atomic type s3_6
+
+   
+	export port  syncPort  com     
+	export port  syncPort  internal     
+	export port  syncPort  cdms     
+	export port  syncPort  eps     
+	export port  syncPort  finish     
+	export port  syncPort  disable_HK     
+	export port  syncPort  pl   
+ 
+	place IDLE ,START ,END 
+
+initial to  IDLE do{  }
+
+ on disable_HK from IDLE to START   
+ on cdms from START to END   
+ on pl from START to END   
+ on eps from START to END   
+ on com from START to END   
+ on internal from END to START   
+ on finish from START to IDLE   
+
+
+end
+
+ 
+atomic type s15_1
+
+   
+	export port  syncPort  com     
+	export port  syncPort  internal     
+	export port  syncPort  enable_PS     
+	export port  syncPort  cdms     
+	export port  syncPort  eps     
+	export port  syncPort  finish     
+	export port  syncPort  pl   
+ 
+	place IDLE ,START ,END 
+
+initial to  IDLE do{  }
+
+ on enable_PS from IDLE to START   
+ on cdms from START to END   
+ on pl from START to END   
+ on eps from START to END   
+ on com from START to END   
+ on internal from END to START   
+ on finish from START to IDLE   
+
+
+end
+
+ 
+atomic type s15_2
+
+   
+	export port  syncPort  com     
+	export port  syncPort  internal     
+	export port  syncPort  cdms     
+	export port  syncPort  eps     
+	export port  syncPort  finish     
+	export port  syncPort  disable_PS     
+	export port  syncPort  pl   
+ 
+	place IDLE ,START ,END 
+
+initial to  IDLE do{  }
+
+ on disable_PS from IDLE to START   
+ on cdms from START to END   
+ on pl from START to END   
+ on eps from START to END   
+ on com from START to END   
+ on internal from END to START   
+ on finish from START to IDLE   
+
+
+end
+
+
+
+compound type CubETH
+
+
+	component MessageLibrary MSGLIB 
+	component memory_library MEMLIB 
+	component HK_CDMS_processActionFlowWithAbort HKCDMS_ACTFLAB 
+	component sMutex HKCDMS_MUX 
+	component HK_CDMS_PacketStoreModeManager HKCDMS_PSMODMNG 
+	component HK_CDMS_ModeManager HKCDMS_MODMNG 
+	component s3_5 S3_5 
+	component s3_6 S3_6 
+	component s15_1 S15_1 
+	component s15_2 S15_2 
+
+ 
+	/******** HK_CDMS ***********/
+	connector RDV3 HKCDMS_read_HK ( HKCDMS_MUX.take ,HKCDMS_ACTFLAB.read_HK ,HKCDMS_MODMNG.read_HK   )  
+	connector RDV2 HKCDMS_mem_res ( HKCDMS_MUX.release ,HKCDMS_ACTFLAB.mem_res   )  
+	connector RDV3 HKCDMS_I2C_res ( HKCDMS_MUX.release ,HKCDMS_ACTFLAB.I2C_res ,MSGLIB.decodeMessage   )  
+	connector RDV3 HKCDMS_ask_sat ( HKCDMS_ACTFLAB.ask ,HKCDMS_PSMODMNG.I2C_ask_sat ,MSGLIB.composeMessage   )  
+	/* HKCDMS_mem_write_req2> HKCDMS_mem_write_req1  */
+	connector RDV3 HKCDMS_mem_write_req ( HKCDMS_ACTFLAB.ask ,HKCDMS_PSMODMNG.mem_write_req ,MEMLIB.setWrite   )  
+	/* TODO for all: add in .smv file : ...cdms2 > 1 */
+	connector SINGLE s3_5_cdms1 ( S3_5.cdms   )  
+	connector RDV2 s3_5_cdms2 ( S3_5.cdms ,HKCDMS_MODMNG.enable   )  
+	connector SINGLE s3_6_cdms1 ( S3_6.cdms   )  
+	connector RDV2 s3_6_cdms2 ( S3_6.cdms ,HKCDMS_MODMNG.disable   )  
+	connector SINGLE s15_1_cdms1 ( S15_1.cdms   )  
+	connector RDV2 s15_1_cdms2 ( S15_1.cdms ,HKCDMS_PSMODMNG.enable   )  
+	connector SINGLE s15_2_cdms1 ( S15_2.cdms   )  
+	connector RDV2 s15_2_cdms2 ( S15_2.cdms ,HKCDMS_PSMODMNG.disable   )  
+	connector SINGLE MEMLIB_checkCRC ( MEMLIB.checkCRC   )  
+	connector SINGLE MEMLIB_setRead ( MEMLIB.setRead   )  
+	connector SINGLE S3_5_com ( S3_5.com   )  
+	connector SINGLE S3_5_internal ( S3_5.internal   )  
+	connector SINGLE S3_5_enable_HK ( S3_5.enable_HK   )  
+	connector SINGLE S3_5_eps ( S3_5.eps   )  
+	connector SINGLE S3_5_finish ( S3_5.finish   )  
+	connector SINGLE S3_5_pl ( S3_5.pl   )  
+	connector SINGLE S3_6_com ( S3_6.com   )  
+	connector SINGLE S3_6_internal ( S3_6.internal   )  
+	connector SINGLE S3_6_eps ( S3_6.eps   )  
+	connector SINGLE S3_6_finish ( S3_6.finish   )  
+	connector SINGLE S3_6_disable_HK ( S3_6.disable_HK   )  
+	connector SINGLE S3_6_pl ( S3_6.pl   )  
+	connector SINGLE S15_1_com ( S15_1.com   )  
+	connector SINGLE S15_1_internal ( S15_1.internal   )  
+	connector SINGLE S15_1_enable_PS ( S15_1.enable_PS   )  
+	connector SINGLE S15_1_eps ( S15_1.eps   )  
+	connector SINGLE S15_1_finish ( S15_1.finish   )  
+	connector SINGLE S15_1_pl ( S15_1.pl   )  
+	connector SINGLE S15_2_com ( S15_2.com   )  
+	connector SINGLE S15_2_internal ( S15_2.internal   )  
+	connector SINGLE S15_2_eps ( S15_2.eps   )  
+	connector SINGLE S15_2_finish ( S15_2.finish   )  
+	connector SINGLE S15_2_disable_PS ( S15_2.disable_PS   )  
+	connector SINGLE S15_2_pl ( S15_2.pl   ) 
+
+	
+ 
+	priority s3_5_cdms1_after_s3_5_cdms2 		s3_5_cdms1 < s3_5_cdms2 
+	priority s3_6_cdms1_after_s3_6_cdms2 		s3_6_cdms1 < s3_6_cdms2 
+	priority s15_1_cdms1_after_s15_1_cdms2 		s15_1_cdms1 < s15_1_cdms2 
+	priority s15_2_cdms1_after_s15_2_cdms2 		s15_2_cdms1 < s15_2_cdms2
+
+end
+
+component CubETH Root
+
+end

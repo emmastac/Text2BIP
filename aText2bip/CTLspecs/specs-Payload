@@ -1,0 +1,37 @@
+
+Architecture: MD
+coordinator: PL Mode Manager
+mode-act: plmodmng.Nuplace = NuSSCENARIO_READY , s128_4_exec
+mode-act: plmodmng.Nuplace = NuSIDLE , s128_1_load
+mode-act: plmodmng.Nuplace = NuSRESULT_READY , payload_ready1, payload_ready2
+mode-act: plmodmng.Nuplace = NuSSTARTED , status_verif_started
+end
+
+Architecture: MD
+coordinator: Data transfer Mode Manager
+mode-act: datrans_modmng.Nuplace = NuSBUSY , data_transfer_start
+end
+
+Architecture: MX
+coordinator: s128_4 MUTEX
+take: s128_4_takeTC
+release: s128_4_I2C_fail, s128_4_wrong_state, s128_4_fail, (s128_4_success1 | s128_4_success2)
+end
+
+Architecture: MX
+coordinator: s128_1 MUTEX
+take: s128_1_takeTC
+release:  s128_1_fail, (s128_1_success1 | s128_1_success2), s128_1_I2C_fail, s128_1_wrong_state
+end
+
+Architecture: MX
+coordinator: s128_5 MUTEX
+take: s128_5_takeTC
+release: ( s128_5_aborted2 | s128_5_aborted1) , s128_5_fail,  s128_5_I2C_fail
+end
+
+Architecture: MX
+coordinator: Status Verification MUTEX
+take: status_verif_started
+release: ( status_verif_to_idle1 | status_verif_to_idle2 ), (status_verif_result1 | status_verif_result2)
+end

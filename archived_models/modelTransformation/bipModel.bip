@@ -1,0 +1,540 @@
+@cpp(src="src-ext/Standard.cpp", include="Standard.hpp,stdio.h")
+
+package bipModel
+
+const data int SBAND_CAP = 2
+const data int TC_CAP = 2
+
+
+const data int EVENT_REPORTING_SID = 5
+const data int NORMAL_REPORT_SSID = 1
+const data int LOW_ANOMALY_REPORT_SSID = 2
+const data int MEDIUM_ANOMALY_REPORT_SSID = 3
+const data int HIGH_ANOMALY_REPORT_SSID = 4
+
+	port type aPort()
+	port type int1Port(int msg1)
+	port type int2Port(int msg1, int msg2)
+	port type int3Port(int msg1, int msg2, int msg3)
+	port type int4Port(int msg1, int msg2, int msg3, int msg4)
+ 
+	
+	
+connector type RDV2(aPort p1, aPort p2)
+define p1 p2
+end	
+
+connector type RDV2E(aPort p1, aPort p2)
+export port aPort exp()
+define p1 p2
+end	
+
+connector type BRD2(aPort p1, aPort p2)
+define p1' p2
+end	
+
+connector type BRD2E(aPort p1, aPort p2)
+export port aPort exp()
+define p1' p2
+end	
+
+connector type SINGLE(aPort p1)
+define p1
+end	
+
+connector type RETS2(int1Port p1, int1Port p2)
+define p1 p2
+on p1 p2
+down{ p2.msg1=p1.msg1; }
+end	
+
+
+connector type CPTC2(int3Port p1, int3Port p2)
+define p1 p2
+on p1 p2
+down{ p2.msg1=p1.msg1; p2.msg2=p1.msg2; p2.msg3=p1.msg3;  }
+end	
+
+connector type CPTC1(int3Port p1)
+define p1
+end	
+
+
+connector type CPTCIF2(int3Port p1, int3Port p2)
+define p1 p2
+on p1 p2
+provided(p1.msg1==-1 || p2.msg1==p1.msg1 )
+down{ p2.msg1=p1.msg1; p2.msg2=p1.msg2; p2.msg3=p1.msg3;  }
+end	
+
+connector type CPSG2(int4Port p1, int4Port p2)
+define p1 p2
+on p1 p2
+down{ p2.msg1=p1.msg1; p2.msg2=p1.msg2; p2.msg3=p1.msg3; p2.msg4=p1.msg4;  }
+end	
+
+
+connector type SINGLE1(int1Port p1)
+define p1
+end	
+
+connector type SINGLE2(int2Port p1)
+define p1
+end	
+
+connector type SINGLE3(int3Port p1)
+define p1
+end	
+
+connector type SINGLE4(int4Port p1)
+define p1
+end	
+
+ 
+atom type  svc228()
+
+  data int  SID ,SSID ,accReq  
+   
+	export port  aPort  set_off( )    
+	export port  aPort  set_restr( )    
+	export port  aPort  set_nom( )    
+	export port  aPort  fin( )    
+	export port  int3Port  tcComm(SID ,SSID ,accReq  )    
+	export port  aPort  set_on( )  
+ 
+	place S0 ,S1 ,S2 
+
+initial to  S0 do{ SID=228; SSID=-1; accReq=-1; }
+
+ on tcComm  from S0 to S1   
+ on set_nom  from S1 to S2  provided( (SSID==-1 || SSID==1) )   do{
+  SSID=1;  }  
+ on set_restr  from S1 to S2  provided( (SSID==-1 || SSID==2) )   do{
+  SSID=2;  }  
+ on set_on  from S1 to S2  provided( (SSID==-1 || SSID==3) )   do{
+  SSID=3;  }  
+ on set_off  from S1 to S2  provided( (SSID==-1 || SSID==4) )   do{
+  SSID=4;  }  
+ on fin  from S2 to S0   
+
+
+end
+
+ 
+atom type  Sband()
+
+  data int  occup ,sid ,ssid ,accReq ,complete  
+   
+	export port  aPort  nFull( )    
+	export port  int4Port  get(sid ,ssid ,accReq ,complete  )    
+	export port  aPort  nEmpty( )    
+	export port  int3Port  put(sid ,ssid ,accReq  )    
+	export port  aPort  empty( )    
+	export port  aPort  full( )  
+ 
+	place S0 ,S1 ,S2 
+
+initial to  S0 do{ occup=0; sid=-1; ssid=-1; accReq=-1; }
+
+ on empty  from S0 to S0   
+ on nFull  from S0 to S0   
+ on put  from S0 to S0   do{
+  occup=occup+1;  }  
+ internal  from S0 to S1  provided( (occup==1) )   
+ on put  from S1 to S1   do{
+  occup=occup+1;  }  
+ on get  from S1 to S1   do{
+  occup=occup-1;  }  
+ internal  from S1 to S0  provided( (occup==0) )   
+ internal  from S1 to S2  provided( (occup==SBAND_CAP) )   
+ on nFull  from S1 to S1   
+ on nEmpty  from S1 to S1   
+ on full  from S2 to S2   
+ on nEmpty  from S2 to S2   
+ on get  from S2 to S2   do{
+  occup=occup-1;  }  
+ internal  from S2 to S1  provided( (occup<SBAND_CAP) )   
+
+
+end
+
+ 
+atom type  TCFifo()
+
+  data int  occup ,sid ,ssid ,accReq  
+   
+	export port  aPort  nFull( )    
+	export port  int3Port  get(sid ,ssid ,accReq  )    
+	export port  aPort  nEmpty( )    
+	export port  int3Port  put(sid ,ssid ,accReq  )    
+	export port  aPort  empty( )    
+	export port  aPort  full( )  
+ 
+	place S0 ,S1 ,S2 
+
+initial to  S0 do{ occup=0; sid=-1; ssid=-1; accReq=-1; }
+
+ on empty  from S0 to S0   
+ on nFull  from S0 to S0   
+ on put  from S0 to S0   do{
+  occup=occup+1;  }  
+ internal  from S0 to S1  provided( (occup==1) )   
+ on put  from S1 to S1   do{
+  occup=occup+1;  }  
+ on get  from S1 to S1   do{
+  occup=occup-1;  }  
+ internal  from S1 to S0  provided( (occup==0) )   
+ internal  from S1 to S2  provided( (occup==TC_CAP) )   
+ on nFull  from S1 to S1   
+ on nEmpty  from S1 to S1   
+ on full  from S2 to S2   
+ on nEmpty  from S2 to S2   
+ on get  from S2 to S2   do{
+  occup=occup-1;  }  
+ internal  from S2 to S1  provided( (occup<TC_CAP) )   
+
+
+end
+
+ 
+atom type  SegmRcpt()
+
+  data int  complete ,sid ,ssid ,accReq  
+   
+	export port  int3Port  storeTC(sid ,ssid ,accReq  )    
+	export port  aPort  rcvSgBg( )    
+	export port  aPort  nEmptySg( )    
+	export port  aPort  rcvSgNd( )    
+	export port  aPort  fullFifo( )    
+	export port  int4Port  acqSg(sid ,ssid ,accReq ,complete  )    
+	export port  aPort  emptySg( )    
+	export port  aPort  nFullFifo( )    
+	export port  aPort  acqFail( )  
+ 
+	place S3 ,S4 ,S6 ,S7 ,S0 ,S1 ,S2 
+
+initial to  S0 do{ sid=-1; ssid=-1; accReq=-1; complete=-1; }
+
+ on rcvSgBg  from S0 to S1   
+ on emptySg  from S1 to S7   
+ on nEmptySg  from S1 to S2   
+ on fullFifo  from S2 to S6   
+ on nFullFifo  from S2 to S3   
+ on acqSg  from S3 to S4   do{
+  complete=-1;  }  
+ on acqFail  from S6 to S7   
+ on storeTC  from S4 to S1  provided( (complete==-1 || complete==1) )   do{
+  complete=1;  }  
+ internal  from S4 to S3  provided( (complete==-1 || complete==0) )   do{
+  complete=0;  }  
+ on rcvSgNd  from S7 to S0   
+
+
+end
+
+ 
+atom type  AcqFailMonit()
+
+  data int  sid ,ssid ,errorMsg  
+   
+	export port  int3Port  genTM(sid ,ssid ,errorMsg  )    
+	export port  aPort  acqFail( )  
+ 
+	place S0 ,S1 
+
+initial to  S0 do{ sid=-1; ssid=-1; errorMsg=-1; }
+
+ on acqFail  from S0 to S1   do{
+  sid=EVENT_REPORTING_SID; ssid=MEDIUM_ANOMALY_REPORT_SSID;  }  
+ on genTM  from S1 to S0   do{
+  sid=-1; ssid=-1; errorMsg=-1;  }  
+
+
+end
+
+ 
+atom type  SndrMng()
+
+  data int  acc ,sid ,ssid ,accReq  
+   
+	export port  aPort  chkMode( )    
+	export port  aPort  sndrTC( )    
+	export port  aPort  noTCs( )    
+	export port  int3Port  retTC(sid ,ssid ,accReq  )    
+	export port  aPort  retVerif( )    
+	export port  aPort  fin( )    
+	export port  aPort  lckRej( )    
+	export port  aPort  modAcc( )    
+	export port  aPort  chkLock( )    
+	export port  aPort  lckAcc( )    
+	export port  aPort  getTC( )    
+	export port  aPort  modRej( )    
+	export port  int3Port  verifTC(sid ,ssid ,accReq  )  
+ 
+	place S3 ,S4 ,S5 ,S6 ,S7 ,S8 ,S9 ,S0 ,S1 ,S2 
+
+initial to  S0 do{ acc=-1; sid=-1; ssid=-1; accReq=-1; }
+
+ on sndrTC  from S0 to S1   
+ on getTC  from S1 to S2   
+ on retTC  from S2 to S3   
+ on noTCs  from S2 to S9   
+ on chkMode  from S3 to S4   
+ on modRej  from S4 to S9   
+ on modAcc  from S4 to S5   
+ on chkLock  from S5 to S6   
+ on lckAcc  from S6 to S7   
+ on lckRej  from S6 to S9   
+ on verifTC  from S7 to S8   
+ on retVerif  from S8 to S9   
+ on fin  from S9 to S0   
+
+
+end
+
+ 
+atom type  SndrPrior()
+
+  data int  MTLvsOPS ,sid ,ssid ,accReq  
+   
+	export port  aPort  noTCs( )    
+	export port  int3Port  retTC(sid ,ssid ,accReq  )    
+	export port  int3Port  getMTL(sid ,ssid ,accReq  )    
+	export port  int3Port  getEcAc(sid ,ssid ,accReq  )    
+	export port  aPort  emptyGr( )    
+	export port  aPort  emptyMTL( )    
+	export port  aPort  emptyACSEQ( )    
+	export port  aPort  emptyOPS( )    
+	export port  int3Port  getACSEQ(sid ,ssid ,accReq  )    
+	export port  int3Port  getOPS(sid ,ssid ,accReq  )    
+	export port  int3Port  getOBCP(sid ,ssid ,accReq  )    
+	export port  aPort  emptyOBCP( )    
+	export port  aPort  emptyEcAc( )    
+	export port  int3Port  getGr(sid ,ssid ,accReq  )    
+	export port  aPort  getTC( )  
+ 
+	place S3 ,S4 ,S5 ,S6 ,S7 ,S0 ,S1 ,S2 
+
+initial to  S0 do{ MTLvsOPS=-1; sid=-1; ssid=-1; accReq=-1; }
+
+ on getTC  from S0 to S1   
+ on getACSEQ  from S1 to S6   
+ on getEcAc  from S2 to S6   
+ on getMTL  from S3 to S6  provided( (MTLvsOPS==-1 || MTLvsOPS==1 ) )   do{
+  MTLvsOPS=1;  }  
+ on getOPS  from S3 to S6  provided( (MTLvsOPS==-1 || MTLvsOPS==0 ) )   do{
+  MTLvsOPS=0;  }  
+ on getGr  from S4 to S6   
+ on getOBCP  from S5 to S6   
+ on retTC  from S6 to S0   
+ on emptyACSEQ  from S1 to S2   
+ on emptyEcAc  from S2 to S3   
+ on emptyMTL  from S3 to S4  provided( (MTLvsOPS==-1 || MTLvsOPS==1 ) )   do{
+  MTLvsOPS=1;  }  
+ on emptyOPS  from S3 to S4  provided( (MTLvsOPS==-1 || MTLvsOPS==0 ) )   do{
+  MTLvsOPS=0;  }  
+ on emptyGr  from S4 to S5   
+ on emptyOBCP  from S5 to S7   
+ on noTCs  from S7 to S0   
+
+
+end
+
+ 
+atom type  PUS_1()
+
+  data int  acc ,sid ,ssid ,accReq  
+   
+	export port  aPort  genTM( )    
+	export port  int3Port  dispTC(sid ,ssid ,accReq  )    
+	export port  aPort  dispRet( )    
+	export port  int3Port  PUSver(sid ,ssid ,accReq  )    
+	export port  aPort  tcEnd( )    
+	export port  int1Port  verRet(acc  )    
+	export port  int3Port  PUSdisp(sid ,ssid ,accReq  )  
+   
+	port  aPort  accSucc( )    
+	port  aPort  skipReqAcc( )    
+	port  aPort  accFail( )  
+	place S3 ,S4 ,S5 ,S6 ,S0 ,S1 ,S2 
+
+initial to  S0 do{ accReq=-1; acc=-1; sid=-1; ssid=-1; }
+
+ on PUSver  from S0 to S1   do{
+  accReq=-1; /* accReq=get(tc,1,4); */ acc=-1; /* acc=PUSverifTC(tc); */  }  
+ on accFail  from S1 to S2  provided( ( acc==-1 || acc==0 ) )   do{
+  acc=0;  }  
+ on accSucc  from S1 to S2  provided( ( acc==-1 || acc==1 ) )   do{
+  acc=1;  }  
+ on skipReqAcc  from S2 to S3  provided( ( accReq==-1 || accReq==0) )   do{
+  accReq=0;  }  
+ on genTM  from S2 to S3  provided( ( accReq==-1 || accReq==1) )   do{
+  accReq=1;  }  
+ on verRet  from S3 to S0   
+ on PUSdisp  from S0 to S4   
+ on dispTC  from S4 to S5   
+ on tcEnd  from S5 to S6   
+ on dispRet  from S6 to S0   
+
+
+end
+
+ 
+atom type  TcDisptch()
+
+  data int  sid ,ssid ,accReq  
+   
+	export port  int3Port  dispTC(sid ,ssid ,accReq  )    
+	export port  aPort  dispRet( )    
+	export port  aPort  return( )    
+	export port  int3Port  PUSdisp(sid ,ssid ,accReq  )  
+ 
+	place S3 ,S0 ,S1 ,S2 
+
+initial to  S0 do{ sid=-1; ssid=-1; accReq=-1; }
+
+ on dispTC  from S0 to S1   
+ on PUSdisp  from S1 to S2   
+ on dispRet  from S2 to S3   
+ on return  from S3 to S0   
+
+
+end
+
+ 
+atom type  TcVerif()
+
+  data int  acc ,sid ,ssid ,accReq  
+   
+	export port  aPort  genTM( )    
+	export port  aPort  dispRet( )    
+	export port  int3Port  PUSver(sid ,ssid ,accReq  )    
+	export port  int3Port  disp(sid ,ssid ,accReq  )    
+	export port  int1Port  verRet(acc  )    
+	export port  aPort  return( )    
+	export port  int3Port  verifTC(sid ,ssid ,accReq  )  
+   
+	port  aPort  accepted( )  
+	place S3 ,S4 ,S5 ,S6 ,S7 ,S8 ,S0 ,S1 ,S2 
+
+initial to  S0 do{ sid=-1; ssid=-1; accReq=-1; acc=-1; }
+
+ on verifTC  from S0 to S1   
+ internal  from S1 to S2   do{
+  acc=-1; /* acc=verifTC(tc) */  }  
+ on accepted  from S2 to S7  provided( (acc==-1 || acc==0) )   do{
+  acc=0;  }  
+ on PUSver  from S2 to S3  provided( ( acc==-1 || acc==1) )   do{
+  acc=1;  }  
+ on verRet  from S3 to S4   
+ on disp  from S4 to S5  provided( acc==1 )   
+ internal  from S4 to S8  provided( acc==0 )   
+ on dispRet  from S5 to S6   
+ on return  from S6 to S0   
+ on genTM  from S7 to S8   
+ on return  from S8 to S0   
+
+
+end
+
+ /* TcCtrl is invoking segment acquisition (once) and TC processing (i.e. sndrMng, verif and dispatch) (once) in a loop */ 
+ 
+atom type  TcCtrl()
+
+   
+	export port  aPort  startAcq( )    
+	export port  aPort  acqEnd( )    
+	export port  aPort  processTCsEnd( )    
+	export port  aPort  processTCs( )  
+ 
+	place S3 ,S0 ,S1 ,S2 
+
+initial to  S0 do{  }
+
+ on startAcq  from S0 to S1   
+ on acqEnd  from S1 to S2   
+ on processTCs  from S2 to S3   
+ on processTCsEnd  from S3 to S0   
+
+
+end
+
+
+
+compound type  mainModel()
+
+
+	component  SndrMng SNDRMNG() 
+	component  TcVerif TCVERIF() 
+	component  TcDisptch TCDISP() 
+	component  PUS_1 PUS1() 
+	component  svc228 SVC228() 
+	component  SndrPrior SNDRPRIOR() 
+	component  SegmRcpt SEGMRCPT() 
+	component  TcCtrl TCCTRL() 
+	component  Sband SBAND() 
+	component  TCFifo TCFIFO() 
+	component  AcqFailMonit ACKFAIL_MONIT() 
+
+ 
+	connector CPTC2 dispTC ( TCDISP.dispTC ,TCVERIF.disp   )  
+	connector RDV2 dispRet ( TCDISP.return ,TCVERIF.dispRet   )  
+	connector CPTC2 PUSver ( TCVERIF.PUSver ,PUS1.PUSver   )  
+	connector RETS2 verRet ( PUS1.verRet ,TCVERIF.verRet   )  
+	connector CPTC2 PUSdisp ( TCDISP.PUSdisp ,PUS1.PUSdisp   )  
+	connector RDV2 pusDispRet ( PUS1.dispRet ,TCDISP.dispRet   )  
+	connector CPTC2 verifTC ( SNDRMNG.verifTC ,TCVERIF.verifTC   )  
+	connector RDV2 return ( TCVERIF.return ,SNDRMNG.retVerif   )  
+	connector RDV2 SNDRMNGgetTC ( SNDRMNG.getTC ,SNDRPRIOR.getTC   )  
+	connector CPTC2 SNDRMNGretTC ( SNDRPRIOR.retTC ,SNDRMNG.retTC   )  
+	connector RDV2 SNDRMNGnoTCs ( SNDRPRIOR.noTCs ,SNDRMNG.noTCs   )  
+	connector CPTCIF2 SVC228tcComm ( PUS1.dispTC ,SVC228.tcComm   )  
+	connector RDV2 SVC228tcEnd ( SVC228.fin ,PUS1.tcEnd   )  
+	connector RDV2 startAcq ( TCCTRL.startAcq ,SEGMRCPT.rcvSgBg   )  
+	connector RDV2 acqEnd ( TCCTRL.acqEnd ,SEGMRCPT.rcvSgNd   )  
+	connector RDV2 processTCs ( TCCTRL.processTCs ,SNDRMNG.sndrTC   )  
+	connector RDV2 processTCsEnd ( TCCTRL.processTCsEnd ,SNDRMNG.fin   )  
+	connector CPSG2 acqSg ( SBAND.get ,SEGMRCPT.acqSg   )  
+	connector RDV2 emptySg ( SBAND.empty ,SEGMRCPT.emptySg   )  
+	connector RDV2 nEmptySg ( SBAND.nEmpty ,SEGMRCPT.nEmptySg   )  
+	connector CPTC2 storeTC ( SEGMRCPT.storeTC ,TCFIFO.put   )  
+	connector RDV2 fullFifo ( TCFIFO.full ,SEGMRCPT.fullFifo   )  
+	connector RDV2 nFullFifo ( TCFIFO.nFull ,SEGMRCPT.nFullFifo   )  
+	connector BRD2 ackFailMonit ( SEGMRCPT.acqFail ,ACKFAIL_MONIT.acqFail   )  
+	connector SINGLE SNDRMNG_chkMode ( SNDRMNG.chkMode   )  
+	connector SINGLE SNDRMNG_lckRej ( SNDRMNG.lckRej   )  
+	connector SINGLE SNDRMNG_modAcc ( SNDRMNG.modAcc   )  
+	connector SINGLE SNDRMNG_chkLock ( SNDRMNG.chkLock   )  
+	connector SINGLE SNDRMNG_lckAcc ( SNDRMNG.lckAcc   )  
+	connector SINGLE SNDRMNG_modRej ( SNDRMNG.modRej   )  
+	connector SINGLE TCVERIF_genTM ( TCVERIF.genTM   )  
+	connector SINGLE PUS1_genTM ( PUS1.genTM   )  
+	connector SINGLE SVC228_set_off ( SVC228.set_off   )  
+	connector SINGLE SVC228_set_restr ( SVC228.set_restr   )  
+	connector SINGLE SVC228_set_nom ( SVC228.set_nom   )  
+	connector SINGLE SVC228_set_on ( SVC228.set_on   )  
+	connector SINGLE3 SNDRPRIOR_getMTL ( SNDRPRIOR.getMTL   )  
+	connector SINGLE3 SNDRPRIOR_getEcAc ( SNDRPRIOR.getEcAc   )  
+	connector SINGLE SNDRPRIOR_emptyGr ( SNDRPRIOR.emptyGr   )  
+	connector SINGLE SNDRPRIOR_emptyMTL ( SNDRPRIOR.emptyMTL   )  
+	connector SINGLE SNDRPRIOR_emptyACSEQ ( SNDRPRIOR.emptyACSEQ   )  
+	connector SINGLE SNDRPRIOR_emptyOPS ( SNDRPRIOR.emptyOPS   )  
+	connector SINGLE3 SNDRPRIOR_getACSEQ ( SNDRPRIOR.getACSEQ   )  
+	connector SINGLE3 SNDRPRIOR_getOPS ( SNDRPRIOR.getOPS   )  
+	connector SINGLE3 SNDRPRIOR_getOBCP ( SNDRPRIOR.getOBCP   )  
+	connector SINGLE SNDRPRIOR_emptyOBCP ( SNDRPRIOR.emptyOBCP   )  
+	connector SINGLE SNDRPRIOR_emptyEcAc ( SNDRPRIOR.emptyEcAc   )  
+	connector SINGLE3 SNDRPRIOR_getGr ( SNDRPRIOR.getGr   )  
+	connector SINGLE SBAND_nFull ( SBAND.nFull   )  
+	connector SINGLE3 SBAND_put ( SBAND.put   )  
+	connector SINGLE SBAND_full ( SBAND.full   )  
+	connector SINGLE3 TCFIFO_get ( TCFIFO.get   )  
+	connector SINGLE TCFIFO_nEmpty ( TCFIFO.nEmpty   )  
+	connector SINGLE TCFIFO_empty ( TCFIFO.empty   )  
+	connector SINGLE3 ACKFAIL_MONIT_genTM ( ACKFAIL_MONIT.genTM   ) 
+
+
+end
+
+
+end

@@ -1,0 +1,283 @@
+
+$!----------------------------TCFifoManager------------------------------------!$
+atom: TC_FifoManager
+data: occup,sid,ssid,ackReq, TC_CAP
+init: S0
+initAct:  occup=0; sid=-1; ssid=-1; ackReq=-1; TC_CAP=2;
+ports: 
+S0,S0,empty
+S0,S0,put(sid,ssid,ackReq),,occup=occup+1;
+S0,S1,*internal3,(occup==1)
+
+S1,S1,put(sid,ssid,ackReq), !(occup==0) && !(occup==TC_CAP),occup=occup+1;
+S1,S1,get(sid,ssid,ackReq),!(occup==0) && !(occup==TC_CAP),occup=occup-1;
+S1,S0,*internal1,(occup==0)
+S1,S2,*internal2,(occup==TC_CAP)
+
+S2,S2,full, !(occup<TC_CAP)
+S2,S2,get(sid,ssid,ackReq),!(occup<TC_CAP),occup=occup-1;
+S2,S1,*internal3,(occup<TC_CAP)
+end
+
+$!----------------------------Sndr_PriorityManager------------------------------------!$
+atom: Sndr_PriorityManager
+data: sid,ssid,ackReq,src
+init: S0
+initAct: sid=-1; ssid=-1; ackReq=-1; src=-1;
+ports: 
+S0,S1,getTC
+
+S1,S2,empty1
+S1,S3,get1(sid,ssid,ackReq), , src=1;
+S3,S0,retTC(sid,ssid,ackReq,src)
+
+S2,S4,empty2
+S2,S5,get2(sid,ssid,ackReq), , src=2;
+S5, S0,retTC(sid,ssid,ackReq,src)
+
+S4,S6,empty3
+S4,S7,get3(sid,ssid,ackReq), , src=3;
+S7,S0,retTC(sid,ssid,ackReq,src)
+
+S6,S8,empty4
+S6,S9,get4(sid,ssid,ackReq), , src=4;
+S9,S0,retTC(sid,ssid,ackReq,src)
+
+S8,S10,empty5
+S8,S11,get5(sid,ssid,ackReq), , src=5;
+S11,S0,retTC(sid,ssid,ackReq,src)
+
+S10,S12,empty6
+S10,S13,get6(sid,ssid,ackReq), , src=6;
+S13,S0,retTC(sid,ssid,ackReq,src)
+
+S12,S0,noTC
+
+end
+
+$!----------------------------SndrMng_ActFlowAbort------------------------------------!$
+atom: SndrMng_ActFlowAbort
+data: sid,ssid,ackReq, src
+init: S0
+initAct: sid=-1; ssid=-1; ackReq=-1; src=-1;
+ports: 
+S0,S1,start
+
+S1,S2,getTC
+S2,S3,retTC(sid,ssid,ackReq,src)
+S2,S0,noTC
+
+S3,S4,askLck
+S4,S5,lckAccX
+S4,S5,lckAcc
+S4,S0,lckRej
+
+S5,S6,askMod
+S6,S7,modAccX
+S6,S7,modAcc
+S6,S0,modRej
+
+S7,S8,verif(sid, ssid, ackReq, src)
+S8,S9,verifRet
+S9,S0,done
+end
+
+$!----------------------------ModeController------------------------------------!$
+atom: ModeController
+init: S0
+ports: 
+S0,S1,askMod
+S1,S0,modAcc
+S1,S0,modAccX
+S1,S0,modRej
+end
+
+$!----------------------------TcProc_ModeManager------------------------------------!$
+atom: TcProc_ModeManager
+init: RES
+ports: 
+RES,RES,restr
+RES,NOM,setNom
+NOM,RES,setRestr
+NOM,NOM,nomin
+end
+
+$!----------------------------ModeReject_Monitor------------------------------------!$
+atom: ModeReject_Monitor
+init: S0
+ports: 
+S0,S1,fail
+S1,S0,tm1_4
+end
+
+$!----------------------------PUSsvc1------------------------------------!$
+atom: PUSsvc1
+init: S0
+ports: 
+S0,S0,tm1_4
+S0,S0,tm1_2
+S0,S0,tm1_8
+S0,S0,tm1_7
+S0,S0,tm1_1
+end
+
+$!----------------------------LockController------------------------------------!$
+atom: LockController
+init: S0
+ports: 
+S0,S1,askLck
+S1,S0,lckAcc
+S1,S0,lckAccX
+S1,S0,lckRej
+end
+
+$!----------------------------TcProc_LockManager------------------------------------!$
+atom: TcProc_LockManager
+init: ULOCK
+ports: 
+ULOCK,ULOCK,ulock
+ULOCK,LOCK,setLock
+LOCK,ULOCK,setUlock
+LOCK,LOCK,lock
+end
+
+$!----------------------------LockReject_Monitor------------------------------------!$
+atom: LockReject_Monitor
+init: S0
+ports: 
+S0,S1,fail
+S1,S0,tm1_2
+end
+
+$!----------------------------PUSsvc228------------------------------------!$
+atom: PUSsvc228
+init: S0
+ports: 
+S0,S0,exec228_1
+S0,S0,exec228_2
+S0,S0,exec228_3
+S0,S0,exec228_4
+end
+
+$!----------------------------SndrPrior0_ActFlowAbort------------------------------------!$
+atom: SndrPrior0_ActFlowAbort
+init: S0
+ports: 
+S0,S1,start
+S1,S2,ask0
+S2,S0,getMTL
+S2,S3,emptyMTL
+S3,S0,getOPS
+S3,S0,emptyOPS
+end
+
+$!----------------------------SndrPrior1_ActFlowAbort------------------------------------!$
+atom: SndrPrior1_ActFlowAbort
+init: S0
+ports: 
+S0,S1,start
+S1,S2,ask1
+S2,S0,getOPS
+S2,S3,emptyOPS
+S3,S0,getMTL
+S3,S0,emptyMTL
+end
+
+$!----------------------------SndrPrior_ModeManager------------------------------------!$
+atom: SndrPrior_ModeManager
+init: S0
+ports: 
+S0,S0,start0
+S0,S1,set1
+S1,S0,set0
+S1,S1,start1
+end
+
+$!-------------------------------mainModel---------------------------------!$
+
+
+compound: TCFunction
+component: TC_FifoManager,TCFIFO
+
+component: Sndr_PriorityManager, SNDRPRIOR
+component: SndrMng_ActFlowAbort, SNDRACTFLAB
+component: ModeController, MODCTRL
+component: LockController, LCKCTRL
+component: TcProc_ModeManager, TCPROCMOD
+component: ModeReject_Monitor, MODREJMON
+component: TcProc_LockManager, TCLOCKMOD
+component: LockReject_Monitor, LOCKREJMON
+component: SndrPrior0_ActFlowAbort,PRIORACTFLAB0
+component: SndrPrior1_ActFlowAbort,PRIORACTFLAB1
+component: SndrPrior_ModeManager,PRIORMOD
+component: PUSsvc1, PUS1
+component: PUSsvc228, PUS228
+
+
+connectors: 
+
+$! TCM-F2 sender management function !$
+
+CPTC2,nfullFifo,,TCFIFO.get,SNDRPRIOR.get5
+RDV2,empty5,,TCFIFO.empty,SNDRPRIOR.empty5
+
+RDV2,SNDRMNGgetTC,,SNDRACTFLAB.getTC,SNDRPRIOR.getTC
+CPTCXT2,SNDRMNGretTC,,SNDRPRIOR.retTC,SNDRACTFLAB.retTC
+RDV2,SNDRMNGnoTCs,,SNDRPRIOR.noTC,SNDRACTFLAB.noTC
+
+RDV2, askMod, , SNDRACTFLAB.askMod, MODCTRL.askMod
+RDV3, modAcc, , SNDRACTFLAB.modAcc, MODCTRL.modAcc, TCPROCMOD.nomin
+RDV3, modAccX, , SNDRACTFLAB.modAccX, MODCTRL.modAccX, TCPROCMOD.restr
+RDV4, modRej, , SNDRACTFLAB.modRej, MODCTRL.modRej, TCPROCMOD.restr, MODREJMON.fail
+
+RDV2, askLck, , SNDRACTFLAB.askLck, LCKCTRL.askLck
+RDV3, lckAcc, , SNDRACTFLAB.lckAcc, LCKCTRL.lckAcc, TCLOCKMOD.ulock
+RDV3, lckAccX, , SNDRACTFLAB.lckAccX, LCKCTRL.lckAccX, TCLOCKMOD.lock
+RDV4, lckRej, , SNDRACTFLAB.lckRej, LCKCTRL.lckRej, TCLOCKMOD.lock, LOCKREJMON.fail
+
+RDV2, MODREJMON_tm1_4, , MODREJMON.tm1_4, PUS1.tm1_4 
+RDV2, LOCKREJMON_tm1_2, , LOCKREJMON.tm1_2, PUS1.tm1_2
+
+RDV2, start0, , PRIORMOD.start0, PRIORACTFLAB0.ask0
+RDV2, start1, , PRIORMOD.start1, PRIORACTFLAB1.ask1
+
+CPTC1obs, getMTLget3, , SNDRPRIOR.get3, PRIORACTFLAB0.getMTL
+RDV2, getMTLempty3, , SNDRPRIOR.empty3, PRIORACTFLAB0.emptyMTL
+CPTC1obs, getOPSget4, , SNDRPRIOR.get4, PRIORACTFLAB0.getOPS
+RDV2, getOPSempty4, , SNDRPRIOR.empty4, PRIORACTFLAB0.emptyOPS
+
+CPTC1obs, getOPSget3, , SNDRPRIOR.get3, PRIORACTFLAB1.getOPS
+RDV2, getOPSempty3, , SNDRPRIOR.empty3, PRIORACTFLAB1.emptyOPS
+CPTC1obs, getMTLget4, , SNDRPRIOR.get4, PRIORACTFLAB1.getMTL
+RDV2, getMTLempty4, , SNDRPRIOR.empty4, PRIORACTFLAB1.emptyMTL
+
+SINGLE, SNDRACTFLAB_verifRet, , SNDRACTFLAB.verifRet
+SINGLE, PUS1_tm1_2, , PUS1.tm1_2
+
+/* execOK_ack_228_12 > execOK_ack_228_11 */
+RDV2, execOK_ack_228_12 , , PUS228.exec228_1, TCPROCMOD.setNom
+SINGLE, execOK_ack_228_11 , , PUS228.exec228_1
+/* execOK_ack_228_2 > execOK_ack_228_21 */
+RDV2, execOK_ack_228_22 , , PUS228.exec228_2, TCPROCMOD.setRestr
+SINGLE, execOK_ack_228_21 , , PUS228.exec228_2
+/* execOK_ack_228_3 > execOK_ack_228_31 */
+RDV2, execOK_ack_228_32 , , PUS228.exec228_3, TCLOCKMOD.setUlock
+SINGLE, execOK_ack_228_31 , , PUS228.exec228_3
+/* execOK_ack_228_4 > execOK_ack_228_41 */
+RDV2, execOK_ack_228_42 , , PUS228.exec228_4, TCLOCKMOD.setUlock
+SINGLE, execOK_ack_228_41 , , PUS228.exec228_4
+
+SINGLE, tm1_7, , PUS1.tm1_7
+SINGLE, tm1_8, , PUS1.tm1_8
+SINGLE, tm1_2, , PUS1.tm1_2
+
+
+SINGLE, verif, , SNDRACTFLAB.verif
+SINGLE, verifRet, , SNDRACTFLAB.verifRet
+
+end
+
+
+
+
+

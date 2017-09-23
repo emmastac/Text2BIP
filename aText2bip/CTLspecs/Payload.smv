@@ -1,0 +1,553 @@
+MODULE PLMODMNG(active_interaction)
+
+	VAR
+		NuPto_idle		:		boolean;
+		NuPto_result_ready		:		boolean;
+		NuPto_scenario_ready		:		boolean;
+		NuPto_started		:		boolean;
+		NuPload		:		boolean;
+		NuPready		:		boolean;
+		NuPstarted		:		boolean;
+		NuPexec		:		boolean;
+		Nuplace		:		{NuSSCENARIO_READY, NuSIDLE, NuSSTARTED, NuSRESULT_READY};
+
+
+	INIT
+		( (Nuplace) = (NuSIDLE) );
+
+	INVAR
+		( (NuPto_started) <-> (( (( (Nuplace) = (NuSSCENARIO_READY) )) | (( (Nuplace) = (NuSRESULT_READY) )) )) ) &
+		( (NuPready) <-> (( (Nuplace) = (NuSRESULT_READY) )) ) &
+		( (NuPload) <-> (( (Nuplace) = (NuSIDLE) )) ) &
+		( (NuPstarted) <-> (( (Nuplace) = (NuSSTARTED) )) ) &
+		( (NuPexec) <-> (( (Nuplace) = (NuSSCENARIO_READY) )) ) &
+		( (NuPto_result_ready) <-> (( (Nuplace) = (NuSSTARTED) )) ) &
+		( (NuPto_idle) <-> (( (( (( (Nuplace) = (NuSSCENARIO_READY) )) | (( (Nuplace) = (NuSSTARTED) )) )) | (( (Nuplace) = (NuSRESULT_READY) )) )) ) &
+		( (NuPto_scenario_ready) <-> (( (Nuplace) = (NuSIDLE) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI13) )) ) |
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSSCENARIO_READY) )) )) & (( (active_interaction) = (NuI15) )) ) |
+		( (( (( (Nuplace) = (NuSSCENARIO_READY) )) & (( (next(Nuplace)) = (NuSSCENARIO_READY) )) )) & (( (active_interaction) = (NuI4) )) ) |
+		( (( (( (Nuplace) = (NuSSCENARIO_READY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI21) )) ) |
+		( (( (( (Nuplace) = (NuSSCENARIO_READY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI30) )) ) |
+		( (( (( (Nuplace) = (NuSSCENARIO_READY) )) & (( (next(Nuplace)) = (NuSSTARTED) )) )) & (( (active_interaction) = (NuI6) )) ) |
+		( (( (( (Nuplace) = (NuSSCENARIO_READY) )) & (( (next(Nuplace)) = (NuSSTARTED) )) )) & (( (active_interaction) = (NuI39) )) ) |
+		( (( (( (Nuplace) = (NuSSCENARIO_READY) )) & (( (next(Nuplace)) = (NuSSTARTED) )) )) & (( (active_interaction) = (NuI40) )) ) |
+		( (( (( (Nuplace) = (NuSSTARTED) )) & (( (next(Nuplace)) = (NuSSTARTED) )) )) & (( (active_interaction) = (NuI26) )) ) |
+		( (( (( (Nuplace) = (NuSSTARTED) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI21) )) ) |
+		( (( (( (Nuplace) = (NuSSTARTED) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI30) )) ) |
+		( (( (( (Nuplace) = (NuSSTARTED) )) & (( (next(Nuplace)) = (NuSRESULT_READY) )) )) & (( (active_interaction) = (NuI28) )) ) |
+		( (( (( (Nuplace) = (NuSRESULT_READY) )) & (( (next(Nuplace)) = (NuSSTARTED) )) )) & (( (active_interaction) = (NuI6) )) ) |
+		( (( (( (Nuplace) = (NuSRESULT_READY) )) & (( (next(Nuplace)) = (NuSSTARTED) )) )) & (( (active_interaction) = (NuI39) )) ) |
+		( (( (( (Nuplace) = (NuSRESULT_READY) )) & (( (next(Nuplace)) = (NuSSTARTED) )) )) & (( (active_interaction) = (NuI40) )) ) |
+		( (( (( (Nuplace) = (NuSRESULT_READY) )) & (( (next(Nuplace)) = (NuSRESULT_READY) )) )) & (( (active_interaction) = (NuI34) )) ) |
+		( (( (( (Nuplace) = (NuSRESULT_READY) )) & (( (next(Nuplace)) = (NuSRESULT_READY) )) )) & (( (active_interaction) = (NuI35) )) ) |
+		( (( (( (Nuplace) = (NuSRESULT_READY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI21) )) ) |
+		( (( (( (Nuplace) = (NuSRESULT_READY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI30) )) ) |
+		( (( (active_interaction) != (NuI35) )) & (( (( (active_interaction) != (NuI34) )) & (( (( (active_interaction) != (NuI28) )) & (( (( (active_interaction) != (NuI26) )) & (( (( (active_interaction) != (NuI40) )) & (( (( (active_interaction) != (NuI39) )) & (( (( (active_interaction) != (NuI6) )) & (( (( (active_interaction) != (NuI30) )) & (( (( (active_interaction) != (NuI21) )) & (( (( (active_interaction) != (NuI4) )) & (( (( (active_interaction) != (NuI15) )) & (( (( (active_interaction) != (NuI13) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) )) )) )) )) )) )) )) );
+
+
+MODULE DATRANS_ACTFLAB(active_interaction)
+
+	VAR
+		NuPI2C_ask		:		boolean;
+		NuPask_mem		:		boolean;
+		NuPstart		:		boolean;
+		NuPmem_res		:		boolean;
+		NuPI2C_res		:		boolean;
+		NuPdone		:		boolean;
+		NuPnot_done		:		boolean;
+		NuPI2C_fail		:		boolean;
+		NuVfinish		:		unsigned word[3];
+		Nuplace		:		{NuSACQUIRE, NuSMEM, NuSIDLE, NuSEND, NuSI2C, NuSSAVE};
+
+
+	INIT
+		( (Nuplace) = (NuSIDLE) ) &
+		( (NuVfinish) = (0ud3_0) );
+
+	INVAR
+		( (NuPask_mem) <-> (( (Nuplace) = (NuSSAVE) )) ) &
+		( (NuPnot_done) <-> (( (( (Nuplace) = (NuSEND) )) & (( (( (NuVfinish) = (( -(0ud3_1) )) )) | (( (NuVfinish) = (0ud3_0) )) )) )) ) &
+		( (NuPI2C_fail) <-> (( (Nuplace) = (NuSI2C) )) ) &
+		( (NuPI2C_res) <-> (( (Nuplace) = (NuSI2C) )) ) &
+		( (NuPI2C_ask) <-> (( (Nuplace) = (NuSACQUIRE) )) ) &
+		( (NuPdone) <-> (( (( (Nuplace) = (NuSEND) )) & (( (( (NuVfinish) = (( -(0ud3_1) )) )) | (( (NuVfinish) = (0ud3_1) )) )) )) ) &
+		( (NuPstart) <-> (( (Nuplace) = (NuSIDLE) )) ) &
+		( (NuPmem_res) <-> (( (Nuplace) = (NuSMEM) )) );
+
+	TRANS
+		( (( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSACQUIRE) )) )) & (( (active_interaction) = (NuI36) )) )) & (( (next(NuVfinish)) = (NuVfinish) )) ) |
+		( (( (( (( (Nuplace) = (NuSACQUIRE) )) & (( (next(Nuplace)) = (NuSI2C) )) )) & (( (active_interaction) = (NuI41) )) )) & (( (next(NuVfinish)) = (NuVfinish) )) ) |
+		( (( (( (( (Nuplace) = (NuSI2C) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI43) )) )) & (( (next(NuVfinish)) = (NuVfinish) )) ) |
+		( (( (( (( (Nuplace) = (NuSI2C) )) & (( (next(Nuplace)) = (NuSSAVE) )) )) & (( (active_interaction) = (NuI42) )) )) & (( (next(NuVfinish)) = (NuVfinish) )) ) |
+		( (( (( (( (Nuplace) = (NuSSAVE) )) & (( (next(Nuplace)) = (NuSMEM) )) )) & (( (active_interaction) = (NuI44) )) )) & (( (next(NuVfinish)) = (NuVfinish) )) ) |
+		( (( (( (( (Nuplace) = (NuSMEM) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI45) )) )) & (( (next(NuVfinish)) = (( -(0ud3_1) )) )) ) |
+		( (( (( (( (Nuplace) = (NuSEND) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI37) )) )) & (( (next(NuVfinish)) = (NuVfinish) )) ) |
+		( (( (( (( (Nuplace) = (NuSEND) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI38) )) )) & (( (next(NuVfinish)) = (NuVfinish) )) ) |
+		( (( (( (( (Nuplace) = (NuSEND) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI39) )) )) & (( (next(NuVfinish)) = (NuVfinish) )) ) |
+		( (( (( (( (Nuplace) = (NuSEND) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI40) )) )) & (( (next(NuVfinish)) = (NuVfinish) )) ) |
+		( (( (( (( (Nuplace) = (NuSEND) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI48) )) )) & (( (next(NuVfinish)) = (NuVfinish) )) ) |
+		( (( (active_interaction) != (NuI48) )) & (( (( (active_interaction) != (NuI40) )) & (( (( (active_interaction) != (NuI39) )) & (( (( (active_interaction) != (NuI38) )) & (( (( (active_interaction) != (NuI37) )) & (( (( (active_interaction) != (NuI45) )) & (( (( (active_interaction) != (NuI44) )) & (( (( (active_interaction) != (NuI42) )) & (( (( (active_interaction) != (NuI43) )) & (( (( (active_interaction) != (NuI41) )) & (( (( (active_interaction) != (NuI36) )) & (( (( (next(Nuplace)) = (Nuplace) )) & (( (next(NuVfinish)) = (NuVfinish) )) )) )) )) )) )) )) )) )) )) )) )) );
+
+
+MODULE S128_4_ACTFLAB(active_interaction)
+
+	VAR
+		NuPtc128_4		:		boolean;
+		NuPfail		:		boolean;
+		NuPI2C_ask		:		boolean;
+		NuPwrong_state		:		boolean;
+		NuPstart		:		boolean;
+		NuPexecuted		:		boolean;
+		NuPI2C_res		:		boolean;
+		NuPexec		:		boolean;
+		NuPI2C_fail		:		boolean;
+		Nuplace		:		{NuSIDLE, NuSBUSY, NuSVALIDATE, NuSSTART, NuSEND, NuSI2C};
+
+
+	INIT
+		( (Nuplace) = (NuSIDLE) );
+
+	INVAR
+		( (NuPtc128_4) <-> (( (Nuplace) = (NuSBUSY) )) ) &
+		( (NuPI2C_fail) <-> (( (Nuplace) = (NuSI2C) )) ) &
+		( (NuPfail) <-> (( (Nuplace) = (NuSEND) )) ) &
+		( (NuPstart) <-> (( (Nuplace) = (NuSIDLE) )) ) &
+		( (NuPI2C_res) <-> (( (Nuplace) = (NuSI2C) )) ) &
+		( (NuPwrong_state) <-> (( (Nuplace) = (NuSVALIDATE) )) ) &
+		( (NuPexecuted) <-> (( (Nuplace) = (NuSEND) )) ) &
+		( (NuPI2C_ask) <-> (( (Nuplace) = (NuSSTART) )) ) &
+		( (NuPexec) <-> (( (Nuplace) = (NuSVALIDATE) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI46) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSVALIDATE) )) )) & (( (active_interaction) = (NuI3) )) ) |
+		( (( (( (Nuplace) = (NuSVALIDATE) )) & (( (next(Nuplace)) = (NuSSTART) )) )) & (( (active_interaction) = (NuI4) )) ) |
+		( (( (( (Nuplace) = (NuSVALIDATE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI2) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSI2C) )) )) & (( (active_interaction) = (NuI7) )) ) |
+		( (( (( (Nuplace) = (NuSI2C) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI9) )) ) |
+		( (( (( (Nuplace) = (NuSI2C) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI8) )) ) |
+		( (( (( (Nuplace) = (NuSEND) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI5) )) ) |
+		( (( (( (Nuplace) = (NuSEND) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI6) )) ) |
+		( (( (( (Nuplace) = (NuSEND) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI1) )) ) |
+		( (( (active_interaction) != (NuI1) )) & (( (( (active_interaction) != (NuI6) )) & (( (( (active_interaction) != (NuI5) )) & (( (( (active_interaction) != (NuI8) )) & (( (( (active_interaction) != (NuI9) )) & (( (( (active_interaction) != (NuI7) )) & (( (( (active_interaction) != (NuI2) )) & (( (( (active_interaction) != (NuI4) )) & (( (( (active_interaction) != (NuI3) )) & (( (( (active_interaction) != (NuI46) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) )) )) )) )) )) );
+
+
+MODULE MEMLIB(active_interaction)
+
+	VAR
+		NuPsetWrite		:		boolean;
+		NuPcheckCRC		:		boolean;
+		NuPsetRead		:		boolean;
+		Nuplace		:		{NuSS0};
+
+
+	INIT
+		( (Nuplace) = (NuSS0) );
+
+	INVAR
+		( (NuPcheckCRC) <-> (( (Nuplace) = (NuSS0) )) ) &
+		( (NuPsetRead) <-> (( (Nuplace) = (NuSS0) )) ) &
+		( (NuPsetWrite) <-> (( (Nuplace) = (NuSS0) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI44) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI50) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI49) )) ) |
+		( (( (active_interaction) != (NuI49) )) & (( (( (active_interaction) != (NuI50) )) & (( (( (active_interaction) != (NuI44) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) );
+
+
+MODULE STAT_VER_MUX(active_interaction)
+
+	VAR
+		NuPtake		:		boolean;
+		NuPrelease		:		boolean;
+		Nuplace		:		{NuSIDLE, NuSBUSY};
+
+
+	INIT
+		( (Nuplace) = (NuSIDLE) );
+
+	INVAR
+		( (NuPtake) <-> (( (Nuplace) = (NuSIDLE) )) ) &
+		( (NuPrelease) <-> (( (Nuplace) = (NuSBUSY) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI26) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI27) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI28) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI29) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI30) )) ) |
+		( (( (active_interaction) != (NuI30) )) & (( (( (active_interaction) != (NuI29) )) & (( (( (active_interaction) != (NuI28) )) & (( (( (active_interaction) != (NuI27) )) & (( (( (active_interaction) != (NuI26) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) );
+
+
+MODULE DATRANS_MODMNG(active_interaction)
+
+	VAR
+		NuPto_idle		:		boolean;
+		NuPto_busy		:		boolean;
+		NuPcontin		:		boolean;
+		Nuplace		:		{NuSIDLE, NuSBUSY};
+
+
+	INIT
+		( (Nuplace) = (NuSIDLE) );
+
+	INVAR
+		( (NuPto_busy) <-> (( (Nuplace) = (NuSIDLE) )) ) &
+		( (NuPto_idle) <-> (( (Nuplace) = (NuSBUSY) )) ) &
+		( (NuPcontin) <-> (( (Nuplace) = (NuSBUSY) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI35) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI38) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI40) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI36) )) ) |
+		( (( (active_interaction) != (NuI36) )) & (( (( (active_interaction) != (NuI40) )) & (( (( (active_interaction) != (NuI38) )) & (( (( (active_interaction) != (NuI35) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) );
+
+
+MODULE S128_4_MUX(active_interaction)
+
+	VAR
+		NuPtake		:		boolean;
+		NuPrelease		:		boolean;
+		Nuplace		:		{NuSIDLE, NuSBUSY};
+
+
+	INIT
+		( (Nuplace) = (NuSIDLE) );
+
+	INVAR
+		( (NuPtake) <-> (( (Nuplace) = (NuSIDLE) )) ) &
+		( (NuPrelease) <-> (( (Nuplace) = (NuSBUSY) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI3) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI1) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI2) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI5) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI6) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI9) )) ) |
+		( (( (active_interaction) != (NuI9) )) & (( (( (active_interaction) != (NuI6) )) & (( (( (active_interaction) != (NuI5) )) & (( (( (active_interaction) != (NuI2) )) & (( (( (active_interaction) != (NuI1) )) & (( (( (active_interaction) != (NuI3) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) )) );
+
+
+MODULE S128_1_ACTFLAB(active_interaction)
+
+	VAR
+		NuPloaded		:		boolean;
+		NuPfail		:		boolean;
+		NuPI2C_ask		:		boolean;
+		NuPload		:		boolean;
+		NuPtc128_1		:		boolean;
+		NuPwrong_state		:		boolean;
+		NuPstart		:		boolean;
+		NuPI2C_res		:		boolean;
+		NuPI2C_fail		:		boolean;
+		Nuplace		:		{NuSIDLE, NuSBUSY, NuSVALIDATE, NuSSTART, NuSEND, NuSI2C};
+
+
+	INIT
+		( (Nuplace) = (NuSIDLE) );
+
+	INVAR
+		( (NuPI2C_ask) <-> (( (Nuplace) = (NuSSTART) )) ) &
+		( (NuPstart) <-> (( (Nuplace) = (NuSIDLE) )) ) &
+		( (NuPfail) <-> (( (Nuplace) = (NuSEND) )) ) &
+		( (NuPwrong_state) <-> (( (Nuplace) = (NuSVALIDATE) )) ) &
+		( (NuPloaded) <-> (( (Nuplace) = (NuSEND) )) ) &
+		( (NuPI2C_res) <-> (( (Nuplace) = (NuSI2C) )) ) &
+		( (NuPI2C_fail) <-> (( (Nuplace) = (NuSI2C) )) ) &
+		( (NuPtc128_1) <-> (( (Nuplace) = (NuSBUSY) )) ) &
+		( (NuPload) <-> (( (Nuplace) = (NuSVALIDATE) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI47) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSVALIDATE) )) )) & (( (active_interaction) = (NuI12) )) ) |
+		( (( (( (Nuplace) = (NuSVALIDATE) )) & (( (next(Nuplace)) = (NuSSTART) )) )) & (( (active_interaction) = (NuI13) )) ) |
+		( (( (( (Nuplace) = (NuSVALIDATE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI11) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSI2C) )) )) & (( (active_interaction) = (NuI16) )) ) |
+		( (( (( (Nuplace) = (NuSI2C) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI18) )) ) |
+		( (( (( (Nuplace) = (NuSI2C) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI17) )) ) |
+		( (( (( (Nuplace) = (NuSEND) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI14) )) ) |
+		( (( (( (Nuplace) = (NuSEND) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI15) )) ) |
+		( (( (( (Nuplace) = (NuSEND) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI10) )) ) |
+		( (( (active_interaction) != (NuI10) )) & (( (( (active_interaction) != (NuI15) )) & (( (( (active_interaction) != (NuI14) )) & (( (( (active_interaction) != (NuI17) )) & (( (( (active_interaction) != (NuI18) )) & (( (( (active_interaction) != (NuI16) )) & (( (( (active_interaction) != (NuI11) )) & (( (( (active_interaction) != (NuI13) )) & (( (( (active_interaction) != (NuI12) )) & (( (( (active_interaction) != (NuI47) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) )) )) )) )) )) );
+
+
+MODULE S128_1_MUX(active_interaction)
+
+	VAR
+		NuPtake		:		boolean;
+		NuPrelease		:		boolean;
+		Nuplace		:		{NuSIDLE, NuSBUSY};
+
+
+	INIT
+		( (Nuplace) = (NuSIDLE) );
+
+	INVAR
+		( (NuPrelease) <-> (( (Nuplace) = (NuSBUSY) )) ) &
+		( (NuPtake) <-> (( (Nuplace) = (NuSIDLE) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI12) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI10) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI11) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI14) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI15) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI18) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI20) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI21) )) ) |
+		( (( (active_interaction) != (NuI21) )) & (( (( (active_interaction) != (NuI20) )) & (( (( (active_interaction) != (NuI18) )) & (( (( (active_interaction) != (NuI15) )) & (( (( (active_interaction) != (NuI14) )) & (( (( (active_interaction) != (NuI11) )) & (( (( (active_interaction) != (NuI10) )) & (( (( (active_interaction) != (NuI12) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) )) )) )) );
+
+
+MODULE STAT_VER_ACTFLAB(active_interaction)
+
+	VAR
+		NuPI2C_ask		:		boolean;
+		NuPstarted		:		boolean;
+		NuPcomplete		:		boolean;
+		NuPI2C_res		:		boolean;
+		NuPI2C_fail		:		boolean;
+		NuPfull		:		boolean;
+		Nuplace		:		{NuSCHECK_STATUS, NuSIDLE, NuSEND, NuSI2C};
+
+
+	INIT
+		( (Nuplace) = (NuSIDLE) );
+
+	INVAR
+		( (NuPI2C_ask) <-> (( (Nuplace) = (NuSCHECK_STATUS) )) ) &
+		( (NuPfull) <-> (( (Nuplace) = (NuSEND) )) ) &
+		( (NuPI2C_fail) <-> (( (Nuplace) = (NuSI2C) )) ) &
+		( (NuPstarted) <-> (( (Nuplace) = (NuSIDLE) )) ) &
+		( (NuPcomplete) <-> (( (Nuplace) = (NuSEND) )) ) &
+		( (NuPI2C_res) <-> (( (Nuplace) = (NuSI2C) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSCHECK_STATUS) )) )) & (( (active_interaction) = (NuI26) )) ) |
+		( (( (( (Nuplace) = (NuSCHECK_STATUS) )) & (( (next(Nuplace)) = (NuSI2C) )) )) & (( (active_interaction) = (NuI31) )) ) |
+		( (( (( (Nuplace) = (NuSI2C) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI33) )) ) |
+		( (( (( (Nuplace) = (NuSI2C) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI32) )) ) |
+		( (( (( (Nuplace) = (NuSEND) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI29) )) ) |
+		( (( (( (Nuplace) = (NuSEND) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI30) )) ) |
+		( (( (( (Nuplace) = (NuSEND) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI27) )) ) |
+		( (( (( (Nuplace) = (NuSEND) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI28) )) ) |
+		( (( (active_interaction) != (NuI28) )) & (( (( (active_interaction) != (NuI27) )) & (( (( (active_interaction) != (NuI30) )) & (( (( (active_interaction) != (NuI29) )) & (( (( (active_interaction) != (NuI32) )) & (( (( (active_interaction) != (NuI33) )) & (( (( (active_interaction) != (NuI31) )) & (( (( (active_interaction) != (NuI26) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) )) )) )) );
+
+
+MODULE MSGLIB(active_interaction)
+
+	VAR
+		NuPcomposeMessage		:		boolean;
+		NuPdecodeMessage		:		boolean;
+		Nuplace		:		{NuSS0};
+
+
+	INIT
+		( (Nuplace) = (NuSS0) );
+
+	INVAR
+		( (NuPdecodeMessage) <-> (( (Nuplace) = (NuSS0) )) ) &
+		( (NuPcomposeMessage) <-> (( (Nuplace) = (NuSS0) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI8) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI9) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI17) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI18) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI24) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI25) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI32) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI33) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI42) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI43) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI7) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI16) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI23) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI31) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI41) )) ) |
+		( (( (active_interaction) != (NuI41) )) & (( (( (active_interaction) != (NuI31) )) & (( (( (active_interaction) != (NuI23) )) & (( (( (active_interaction) != (NuI16) )) & (( (( (active_interaction) != (NuI7) )) & (( (( (active_interaction) != (NuI43) )) & (( (( (active_interaction) != (NuI42) )) & (( (( (active_interaction) != (NuI33) )) & (( (( (active_interaction) != (NuI32) )) & (( (( (active_interaction) != (NuI25) )) & (( (( (active_interaction) != (NuI24) )) & (( (( (active_interaction) != (NuI18) )) & (( (( (active_interaction) != (NuI17) )) & (( (( (active_interaction) != (NuI9) )) & (( (( (active_interaction) != (NuI8) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) )) )) )) )) )) )) )) )) )) )) );
+
+
+MODULE S128_5_ACTFLAB(active_interaction)
+
+	VAR
+		NuPfail		:		boolean;
+		NuPtc128_5		:		boolean;
+		NuPI2C_ask		:		boolean;
+		NuPaborted		:		boolean;
+		NuPI2C_res		:		boolean;
+		NuPI2C_fail		:		boolean;
+		Nuplace		:		{NuSIDLE, NuSSTART, NuSEND, NuSI2C};
+
+
+	INIT
+		( (Nuplace) = (NuSIDLE) );
+
+	INVAR
+		( (NuPI2C_ask) <-> (( (Nuplace) = (NuSSTART) )) ) &
+		( (NuPI2C_res) <-> (( (Nuplace) = (NuSI2C) )) ) &
+		( (NuPI2C_fail) <-> (( (Nuplace) = (NuSI2C) )) ) &
+		( (NuPtc128_5) <-> (( (Nuplace) = (NuSIDLE) )) ) &
+		( (NuPaborted) <-> (( (Nuplace) = (NuSEND) )) ) &
+		( (NuPfail) <-> (( (Nuplace) = (NuSEND) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSSTART) )) )) & (( (active_interaction) = (NuI22) )) ) |
+		( (( (( (Nuplace) = (NuSSTART) )) & (( (next(Nuplace)) = (NuSI2C) )) )) & (( (active_interaction) = (NuI23) )) ) |
+		( (( (( (Nuplace) = (NuSI2C) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI25) )) ) |
+		( (( (( (Nuplace) = (NuSI2C) )) & (( (next(Nuplace)) = (NuSEND) )) )) & (( (active_interaction) = (NuI24) )) ) |
+		( (( (( (Nuplace) = (NuSEND) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI20) )) ) |
+		( (( (( (Nuplace) = (NuSEND) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI21) )) ) |
+		( (( (( (Nuplace) = (NuSEND) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI19) )) ) |
+		( (( (active_interaction) != (NuI19) )) & (( (( (active_interaction) != (NuI21) )) & (( (( (active_interaction) != (NuI20) )) & (( (( (active_interaction) != (NuI24) )) & (( (( (active_interaction) != (NuI25) )) & (( (( (active_interaction) != (NuI23) )) & (( (( (active_interaction) != (NuI22) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) )) )) );
+
+
+MODULE S128_5_MUX(active_interaction)
+
+	VAR
+		NuPtake		:		boolean;
+		NuPrelease		:		boolean;
+		Nuplace		:		{NuSIDLE, NuSBUSY};
+
+
+	INIT
+		( (Nuplace) = (NuSIDLE) );
+
+	INVAR
+		( (NuPtake) <-> (( (Nuplace) = (NuSIDLE) )) ) &
+		( (NuPrelease) <-> (( (Nuplace) = (NuSBUSY) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSBUSY) )) )) & (( (active_interaction) = (NuI22) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI19) )) ) |
+		( (( (( (Nuplace) = (NuSBUSY) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI25) )) ) |
+		( (( (active_interaction) != (NuI25) )) & (( (( (active_interaction) != (NuI19) )) & (( (( (active_interaction) != (NuI22) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) );
+
+
+MODULE main
+
+	VAR
+		NuInteraction		:		{NuI1, NuI2, NuI3, NuI4, NuI5, NuI6, NuI7, NuI8, NuI9, NuI10, NuI11, NuI12, NuI13, NuI14, NuI15, NuI16, NuI17, NuI18, NuI19, NuI20, NuI21, NuI22, NuI23, NuI24, NuI25, NuI26, NuI27, NuI28, NuI29, NuI30, NuI31, NuI32, NuI33, NuI34, NuI35, NuI36, NuI37, NuI38, NuI39, NuI40, NuI41, NuI42, NuI43, NuI44, NuI45, NuI46, NuI47, NuI48, NuI49, NuI50};
+		plmodmng	:	PLMODMNG(NuInteraction);
+		datrans_actflab	:	DATRANS_ACTFLAB(NuInteraction);
+		s128_4_actflab	:	S128_4_ACTFLAB(NuInteraction);
+		memlib	:	MEMLIB(NuInteraction);
+		stat_ver_mux	:	STAT_VER_MUX(NuInteraction);
+		datrans_modmng	:	DATRANS_MODMNG(NuInteraction);
+		s128_4_mux	:	S128_4_MUX(NuInteraction);
+		s128_1_actflab	:	S128_1_ACTFLAB(NuInteraction);
+		s128_1_mux	:	S128_1_MUX(NuInteraction);
+		stat_ver_actflab	:	STAT_VER_ACTFLAB(NuInteraction);
+		msglib	:	MSGLIB(NuInteraction);
+		s128_5_actflab	:	S128_5_ACTFLAB(NuInteraction);
+		s128_5_mux	:	S128_5_MUX(NuInteraction);
+
+	DEFINE
+		status_verif_I2C_fail		:=		( (stat_ver_actflab.NuPI2C_fail) & (msglib.NuPdecodeMessage) );
+		data_transfer_ask_mem		:=		( (datrans_actflab.NuPask_mem) & (memlib.NuPsetWrite) );
+		s128_4_takeTC		:=		( (s128_4_mux.NuPtake) & (s128_4_actflab.NuPtc128_4) );
+		status_verif_to_idle1		:=		( (stat_ver_mux.NuPrelease) & (stat_ver_actflab.NuPcomplete) );
+		s128_1_load		:=		( (s128_1_actflab.NuPload) & (plmodmng.NuPload) );
+		MEMLIB_setRead		:=		memlib.NuPsetRead;
+		s128_4_ACTFLAB_start		:=		s128_4_actflab.NuPstart;
+		data_transfer_done4		:=		( (( (datrans_actflab.NuPdone) & (datrans_modmng.NuPto_idle) )) & (plmodmng.NuPto_started) );
+		s128_5_I2C_fail		:=		( (( (s128_5_mux.NuPrelease) & (s128_5_actflab.NuPI2C_fail) )) & (msglib.NuPdecodeMessage) );
+		s128_4_I2C_res		:=		( (s128_4_actflab.NuPI2C_res) & (msglib.NuPdecodeMessage) );
+		s128_1_I2C_ask		:=		( (s128_1_actflab.NuPI2C_ask) & (msglib.NuPcomposeMessage) );
+		payload_ready2		:=		( (plmodmng.NuPready) & (datrans_modmng.NuPto_busy) );
+		s128_4_I2C_ask		:=		( (s128_4_actflab.NuPI2C_ask) & (msglib.NuPcomposeMessage) );
+		s128_5_aborted2		:=		( (( (s128_1_mux.NuPrelease) & (s128_5_actflab.NuPaborted) )) & (plmodmng.NuPto_idle) );
+		s128_1_takeTC		:=		( (s128_1_mux.NuPtake) & (s128_1_actflab.NuPtc128_1) );
+		s128_5_I2C_res		:=		( (s128_5_actflab.NuPI2C_res) & (msglib.NuPdecodeMessage) );
+		MEMLIB_checkCRC		:=		memlib.NuPcheckCRC;
+		data_transfer_I2C_res		:=		( (datrans_actflab.NuPI2C_res) & (msglib.NuPdecodeMessage) );
+		data_transfer_start		:=		( (datrans_actflab.NuPstart) & (datrans_modmng.NuPcontin) );
+		s128_5_fail		:=		( (s128_5_mux.NuPrelease) & (s128_5_actflab.NuPfail) );
+		s128_5_aborted1		:=		( (s128_1_mux.NuPrelease) & (s128_5_actflab.NuPaborted) );
+		status_verif_started		:=		( (( (stat_ver_mux.NuPtake) & (stat_ver_actflab.NuPstarted) )) & (plmodmng.NuPstarted) );
+		s128_1_fail		:=		( (s128_1_mux.NuPrelease) & (s128_1_actflab.NuPfail) );
+		data_transfer_I2C_ask		:=		( (datrans_actflab.NuPI2C_ask) & (msglib.NuPcomposeMessage) );
+		status_verif_result1		:=		( (stat_ver_mux.NuPrelease) & (stat_ver_actflab.NuPfull) );
+		s128_5_I2C_ask		:=		( (s128_5_actflab.NuPI2C_ask) & (msglib.NuPcomposeMessage) );
+		s128_1_success2		:=		( (( (s128_1_mux.NuPrelease) & (s128_1_actflab.NuPloaded) )) & (plmodmng.NuPto_scenario_ready) );
+		s128_5_takeTC		:=		( (s128_5_mux.NuPtake) & (s128_5_actflab.NuPtc128_5) );
+		data_transfer_mem_res		:=		datrans_actflab.NuPmem_res;
+		s128_1_ACTFLAB_start		:=		s128_1_actflab.NuPstart;
+		s128_4_I2C_fail		:=		( (( (s128_4_mux.NuPrelease) & (s128_4_actflab.NuPI2C_fail) )) & (msglib.NuPdecodeMessage) );
+		status_verif_I2C_ask		:=		( (stat_ver_actflab.NuPI2C_ask) & (msglib.NuPcomposeMessage) );
+		s128_1_I2C_res		:=		( (s128_1_actflab.NuPI2C_res) & (msglib.NuPdecodeMessage) );
+		data_transfer_done3		:=		( (datrans_actflab.NuPdone) & (plmodmng.NuPto_started) );
+		data_transfer_I2C_fail		:=		( (datrans_actflab.NuPI2C_fail) & (msglib.NuPdecodeMessage) );
+		DATRANS_ACTFLAB_not_done		:=		datrans_actflab.NuPnot_done;
+		data_transfer_done2		:=		( (datrans_actflab.NuPdone) & (datrans_modmng.NuPto_idle) );
+		status_verif_result2		:=		( (( (stat_ver_mux.NuPrelease) & (stat_ver_actflab.NuPfull) )) & (plmodmng.NuPto_result_ready) );
+		s128_1_I2C_fail		:=		( (( (s128_1_mux.NuPrelease) & (s128_1_actflab.NuPI2C_fail) )) & (msglib.NuPdecodeMessage) );
+		status_verif_to_idle2		:=		( (( (stat_ver_mux.NuPrelease) & (stat_ver_actflab.NuPcomplete) )) & (plmodmng.NuPto_idle) );
+		s128_4_success2		:=		( (( (s128_4_mux.NuPrelease) & (s128_4_actflab.NuPexecuted) )) & (plmodmng.NuPto_started) );
+		s128_1_success1		:=		( (s128_1_mux.NuPrelease) & (s128_1_actflab.NuPloaded) );
+		s128_1_wrong_state		:=		( (s128_1_mux.NuPrelease) & (s128_1_actflab.NuPwrong_state) );
+		s128_4_wrong_state		:=		( (s128_4_mux.NuPrelease) & (s128_4_actflab.NuPwrong_state) );
+		s128_4_fail		:=		( (s128_4_mux.NuPrelease) & (s128_4_actflab.NuPfail) );
+		payload_ready1		:=		plmodmng.NuPready;
+		s128_4_success1		:=		( (s128_4_mux.NuPrelease) & (s128_4_actflab.NuPexecuted) );
+		s128_4_exec		:=		( (s128_4_actflab.NuPexec) & (plmodmng.NuPexec) );
+		status_verif_I2C_res		:=		( (stat_ver_actflab.NuPI2C_res) & (msglib.NuPdecodeMessage) );
+		data_transfer_done1		:=		datrans_actflab.NuPdone;
+
+
+	INVAR
+		( (( (NuInteraction) = (NuI33) )) -> (status_verif_I2C_fail) ) &
+		( (( (NuInteraction) = (NuI44) )) -> (data_transfer_ask_mem) ) &
+		( (( (NuInteraction) = (NuI3) )) -> (s128_4_takeTC) ) &
+		( (( (NuInteraction) = (NuI29) )) -> ( (status_verif_to_idle1)  & !(status_verif_to_idle2)) ) &
+		( (( (NuInteraction) = (NuI13) )) -> (s128_1_load) ) &
+		( (( (NuInteraction) = (NuI50) )) -> (MEMLIB_setRead) ) &
+		( (( (NuInteraction) = (NuI46) )) -> (s128_4_ACTFLAB_start) ) &
+		( (( (NuInteraction) = (NuI40) )) -> (data_transfer_done4) ) &
+		( (( (NuInteraction) = (NuI25) )) -> (s128_5_I2C_fail) ) &
+		( (( (NuInteraction) = (NuI8) )) -> (s128_4_I2C_res) ) &
+		( (( (NuInteraction) = (NuI16) )) -> (s128_1_I2C_ask) ) &
+		( (( (NuInteraction) = (NuI35) )) -> (payload_ready2) ) &
+		( (( (NuInteraction) = (NuI7) )) -> (s128_4_I2C_ask) ) &
+		( (( (NuInteraction) = (NuI21) )) -> (s128_5_aborted2) ) &
+		( (( (NuInteraction) = (NuI12) )) -> (s128_1_takeTC) ) &
+		( (( (NuInteraction) = (NuI24) )) -> (s128_5_I2C_res) ) &
+		( (( (NuInteraction) = (NuI49) )) -> (MEMLIB_checkCRC) ) &
+		( (( (NuInteraction) = (NuI42) )) -> (data_transfer_I2C_res) ) &
+		( (( (NuInteraction) = (NuI36) )) -> (data_transfer_start) ) &
+		( (( (NuInteraction) = (NuI19) )) -> (s128_5_fail) ) &
+		( (( (NuInteraction) = (NuI20) )) -> ( (s128_5_aborted1)  & !(s128_5_aborted2)) ) &
+		( (( (NuInteraction) = (NuI26) )) -> (status_verif_started) ) &
+		( (( (NuInteraction) = (NuI10) )) -> (s128_1_fail) ) &
+		( (( (NuInteraction) = (NuI41) )) -> (data_transfer_I2C_ask) ) &
+		( (( (NuInteraction) = (NuI27) )) -> ( (status_verif_result1)  & !(status_verif_result2)) )&
+		( (( (NuInteraction) = (NuI23) )) -> (s128_5_I2C_ask) ) &
+		( (( (NuInteraction) = (NuI15) )) -> (s128_1_success2) ) &
+		( (( (NuInteraction) = (NuI22) )) -> (s128_5_takeTC) ) &
+		( (( (NuInteraction) = (NuI45) )) -> (data_transfer_mem_res) ) &
+		( (( (NuInteraction) = (NuI47) )) -> (s128_1_ACTFLAB_start) ) &
+		( (( (NuInteraction) = (NuI9) )) -> (s128_4_I2C_fail) ) &
+		( (( (NuInteraction) = (NuI31) )) -> (status_verif_I2C_ask) ) &
+		( (( (NuInteraction) = (NuI17) )) -> (s128_1_I2C_res) ) &
+		( (( (NuInteraction) = (NuI39) )) -> ( (data_transfer_done3)  & !(data_transfer_done4)) )&
+		( (( (NuInteraction) = (NuI43) )) -> (data_transfer_I2C_fail) ) &
+		( (( (NuInteraction) = (NuI48) )) -> (DATRANS_ACTFLAB_not_done) ) &
+		( (( (NuInteraction) = (NuI38) )) -> ( (data_transfer_done2)  & !(data_transfer_done4)) ) &
+		( (( (NuInteraction) = (NuI28) )) -> (status_verif_result2) ) &
+		( (( (NuInteraction) = (NuI18) )) -> (s128_1_I2C_fail) ) &
+		( (( (NuInteraction) = (NuI30) )) -> (status_verif_to_idle2) ) &
+		( (( (NuInteraction) = (NuI6) )) -> (s128_4_success2) ) &
+		( (( (NuInteraction) = (NuI14) )) -> ( (s128_1_success1)  & !(s128_1_success2)) ) &
+		( (( (NuInteraction) = (NuI11) )) -> (s128_1_wrong_state) ) &
+		( (( (NuInteraction) = (NuI2) )) -> (s128_4_wrong_state) ) &
+		( (( (NuInteraction) = (NuI1) )) -> (s128_4_fail) ) &
+		( (( (NuInteraction) = (NuI34) )) -> ( (payload_ready1)  & !(payload_ready2)) )&
+		( (( (NuInteraction) = (NuI5) )) -> ( (s128_4_success1)  & !(s128_4_success2)) )&
+		( (( (NuInteraction) = (NuI4) )) -> (s128_4_exec) ) &
+		( (( (NuInteraction) = (NuI32) )) -> (status_verif_I2C_res) ) &
+		( (( (NuInteraction) = (NuI37) )) -> ( (data_transfer_done1) & !(data_transfer_done2) & !(data_transfer_done3) & !(data_transfer_done4) ) );
+

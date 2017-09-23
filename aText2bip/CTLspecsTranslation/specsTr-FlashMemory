@@ -1,0 +1,43 @@
+-- Flash Memory Read Action Flow Abort:
+-- AFΑ2: AG ( flash_memory_checkCRC -> AX A [! (flash_memory_checkCRC) U flash_memory_read ])
+CTLSPEC  AG ( (NuInteraction) = (NuI8) -> AX A [! ((NuInteraction) = (NuI8)) U (NuInteraction) = (NuI3) ])
+-- AFΑ3: AG ( flash_memory_read -> AX A [! (MEMRD_ACTFLAB_finish) U (  (flash_memory_ok_read1 | flash_memory_ok_read2) |  ( flash_memory_read_fail1 | flash_memory_read_fail2 | flash_memory_bad_CRC) ) ])
+CTLSPEC  AG ( (NuInteraction) = (NuI3) -> AX A [! ((NuInteraction) = (NuI17)) U (  ((NuInteraction) = (NuI7) | (NuInteraction) = (NuI6)) |  ( (NuInteraction) = (NuI5) | (NuInteraction) = (NuI4) | (NuInteraction) = (NuI9)) ) ])
+-- AFΑ4: AG ( flash_memory_checkCRC -> AX A [! (flash_memory_checkCRC) U flash_memory_read ])
+CTLSPEC  AG ( (NuInteraction) = (NuI8) -> AX A [! ((NuInteraction) = (NuI8)) U (NuInteraction) = (NuI3) ])
+-- AF5: AG (  ( flash_memory_read_fail1 | flash_memory_read_fail2 | flash_memory_bad_CRC) -> AX A [! ( (flash_memory_ok_read1 | flash_memory_ok_read2)) U flash_memory_checkCRC ])
+CTLSPEC  AG (  ( (NuInteraction) = (NuI5) | (NuInteraction) = (NuI4) | (NuInteraction) = (NuI9)) -> AX A [! ( ((NuInteraction) = (NuI7) | (NuInteraction) = (NuI6))) U (NuInteraction) = (NuI8) ])
+-- AFΑ6: AG (  ( flash_memory_read_fail1 | flash_memory_read_fail2 | flash_memory_bad_CRC) -> AX A [! (flash_memory_checkCRC) U flash_memory_read ])
+CTLSPEC  AG (  ( (NuInteraction) = (NuI5) | (NuInteraction) = (NuI4) | (NuInteraction) = (NuI9)) -> AX A [! ((NuInteraction) = (NuI8)) U (NuInteraction) = (NuI3) ])
+
+-- Flash Memory Write Action Flow Abort:
+-- AFΑ2: AG ( MEMWR_ACTFLAB_wait -> AX A [! (MEMWR_ACTFLAB_wait) U flash_memory_write ])
+CTLSPEC  AG ( (NuInteraction) = (NuI18) -> AX A [! ((NuInteraction) = (NuI18)) U (NuInteraction) = (NuI10) ])
+-- AFΑ3: AG ( flash_memory_write -> AX A [! (MEMWR_ACTFLAB_finish) U (  (flash_memory_ok_write1 | flash_memory_ok_write2) |  ( flash_memory_write_fail1 | flash_memory_write_fail2 | MEMWR_ACTFLAB_contin) ) ])
+CTLSPEC  AG ( (NuInteraction) = (NuI10) -> AX A [! ((NuInteraction) = (NuI20)) U (  ((NuInteraction) = (NuI16) | (NuInteraction) = (NuI15)) |  ( (NuInteraction) = (NuI14) | (NuInteraction) = (NuI13) | (NuInteraction) = (NuI19)) ) ])
+-- AFΑ4: AG ( MEMWR_ACTFLAB_wait -> AX A [! (MEMWR_ACTFLAB_wait) U flash_memory_write ])
+CTLSPEC  AG ( (NuInteraction) = (NuI18) -> AX A [! ((NuInteraction) = (NuI18)) U (NuInteraction) = (NuI10) ])
+-- AF5: AG (  ( flash_memory_write_fail1 | flash_memory_write_fail2 | MEMWR_ACTFLAB_contin) -> AX A [! ( (flash_memory_ok_write1 | flash_memory_ok_write2)) U MEMWR_ACTFLAB_wait ])
+CTLSPEC  AG (  ( (NuInteraction) = (NuI14) | (NuInteraction) = (NuI13) | (NuInteraction) = (NuI19)) -> AX A [! ( ((NuInteraction) = (NuI16) | (NuInteraction) = (NuI15))) U (NuInteraction) = (NuI18) ])
+-- AFΑ6: AG (  ( flash_memory_write_fail1 | flash_memory_write_fail2 | MEMWR_ACTFLAB_contin) -> AX A [! (MEMWR_ACTFLAB_wait) U flash_memory_write ])
+CTLSPEC  AG (  ( (NuInteraction) = (NuI14) | (NuInteraction) = (NuI13) | (NuInteraction) = (NuI19)) -> AX A [! ((NuInteraction) = (NuI18)) U (NuInteraction) = (NuI10) ])
+
+-- Flash Memory Read Mode Manager:
+-- MD1: AG (  flash_memory_read -> memrd_modmng.Nuplace = NuSREAD  )
+CTLSPEC  AG (  (NuInteraction) = (NuI3) -> memrd_modmng.Nuplace = NuSREAD  )
+
+-- Flash Memory Write Mode Manager:
+-- MD1: AG (  flash_memory_write -> memwr_modmng.Nuplace = NuSWRITE  )
+CTLSPEC  AG (  (NuInteraction) = (NuI10) -> memwr_modmng.Nuplace = NuSWRITE  )
+
+-- Flash Memory MUTEX:
+-- MX1: AG ( ( ( flash_memory_setRead1 | flash_memory_setRead2 ) |  ( flash_memory_setWrite1 | flash_memory_setWrite1 ) ) -> AX A [! (( ( flash_memory_setRead1 | flash_memory_setRead2 ) |  ( flash_memory_setWrite1 | flash_memory_setWrite1 ) )) U ( (flash_memory_ok_write1 | flash_memory_ok_write2 | flash_memory_write_fail1 | flash_memory_write_fail2 ) |  (flash_memory_ok_read1 | flash_memory_ok_read2 | flash_memory_read_fail1 | flash_memory_read_fail2 ) ) ])
+CTLSPEC  AG ( ( ( (NuInteraction) = (NuI2) | (NuInteraction) = (NuI1) ) |  ( (NuInteraction) = (NuI12) | (NuInteraction) = (NuI12) ) ) -> AX A [! (( ( (NuInteraction) = (NuI2) | (NuInteraction) = (NuI1) ) |  ( (NuInteraction) = (NuI12) | (NuInteraction) = (NuI12) ) )) U ( ((NuInteraction) = (NuI16) | (NuInteraction) = (NuI15) | (NuInteraction) = (NuI14) | (NuInteraction) = (NuI13) ) |  ((NuInteraction) = (NuI7) | (NuInteraction) = (NuI6) | (NuInteraction) = (NuI5) | (NuInteraction) = (NuI4) ) ) ])
+
+FAIRNESS ( (NuInteraction) = (NuI18) );
+FAIRNESS ( (NuInteraction) = (NuI3) );
+FAIRNESS ( ( ((NuInteraction) = (NuI16) | (NuInteraction) = (NuI15) | (NuInteraction) = (NuI14) | (NuInteraction) = (NuI13) ) |  ((NuInteraction) = (NuI7) | (NuInteraction) = (NuI6) | (NuInteraction) = (NuI5) | (NuInteraction) = (NuI4) ) ) );
+FAIRNESS ( (NuInteraction) = (NuI8) );
+FAIRNESS ( (  ((NuInteraction) = (NuI16) | (NuInteraction) = (NuI15)) |  ( (NuInteraction) = (NuI14) | (NuInteraction) = (NuI13) | (NuInteraction) = (NuI19)) ) );
+FAIRNESS ( (NuInteraction) = (NuI10) );
+FAIRNESS ( (  ((NuInteraction) = (NuI7) | (NuInteraction) = (NuI6)) |  ( (NuInteraction) = (NuI5) | (NuInteraction) = (NuI4) | (NuInteraction) = (NuI9)) ) );

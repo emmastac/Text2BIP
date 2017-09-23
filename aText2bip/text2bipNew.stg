@@ -1,0 +1,391 @@
+group text2bip;
+
+
+portStdName(int)::=<<int$int$Port>>
+
+header(name, functions, portTypes)::=<<
+$!@cpp(src="src-ext/Standard.cpp", include="Standard.hpp,stdio.h")
+!$
+package $name$
+
+$!
+const data int testEXP = 1
+
+/* SRDB TM parameters */
+const data int preHKonModeChange = -1
+const data int MIN_CYCTM_INTERVAL = 125
+const data int MI_STAT_REPORTING_INTERVAL = -1
+
+
+const data int SBAND_CAP = 2
+const data int TC_CAP = 2
+const data int VC0_CAP = 2
+const data int VC1_CAP = 2
+const data int AJ_TM_ENCODER_DEFAULT_RATE_IN_SAFE = -1
+const data int HPTM_DEFAULT_RATE = -1
+const data int TM_ENCODER_DEFAULT_RATE = -1
+const data int MI_HLC_PULSE_DURATION = -1
+const data int MI_ATB_HIGHBITRATE_CMD_OUTPUT = -1
+const data int MI_ATB_LOWBITRATE_CMD_OUTPUT = -1
+
+/*  EVENT REPORTING */
+const data int EVENT_REPORTING_SID = 5
+const data int NORMAL_REPORT_SSID = 1
+const data int LOW_ANOMALY_REPORT_SSID = 2
+const data int MEDIUM_ANOMALY_REPORT_SSID = 3
+const data int HIGH_ANOMALY_REPORT_SSID = 4
+
+/* HK and DIAG reporting */
+const data int HK_DIAG_REPORTING_SID=3
+
+const data int NEW_HK_REPORTING_SSID=1
+const data int NEW_DIAG_REPORTING_SSID=2
+const data int CLEAR_HK_REPORTING_SSID=3
+const data int CLEAR_DIAG_REPORTING_SSID=4
+const data int ENABLE_HK_REPORTING_SSID=5
+const data int DISABLE_HK_REPORTING_SSID=6
+const data int ENABLE_DIAG_REPORTING_SSID=7
+const data int DISABLE_DIAG_REPORTING_SSID=8
+
+
+/*  DOWNLINK FORWARDING */
+const data int  DOWNLINK_FORWARDING_SID = 14
+
+const data int ENABLE_FORWARDING_TM_SOURCE_SSID = 1
+const data int DISABLE_FORWARDING_TM_SOURCE_SSID = 2
+const data int REPORT_ENABLED_TM_SOURCE_SSID = 3
+const data int _RESP_REPORT_ENABLED_TM_SOURCE_SSID = 4
+
+const data int ENABLE_FORWARDING_HK_SSID = 5
+const data int DISABLE_FORWARDING_HK_SSID = 6
+const data int REPORT_ENABLED_HK_SSID = 7
+const data int _RESP_REPORT_ENABLED_HK_SSID = 8
+
+const data int ENABLE_FORWARDING_DIAG_SSID = 9
+const data int DISABLE_FORWARDING_DIAG_SSID = 10
+const data int REPORT_ENABLED_DIAG_SSID = 11
+const data int _RESP_REPORT_ENABLED_DIAG_SSID = 12
+
+const data int ENABLE_FORWARDING_EVENT_REPORT_SSID = 13
+const data int DISABLE_FORWARDING_EVENT_REPORT_SSID = 14
+const data int REPORT_ENABLED_EVENT_REPORT_SSID = 15
+const data int _RESP_REPORT_ENABLED_EVENT_REPORT_SSID = 16
+
+const data int TIME_REPORT_APID = 0
+const data int TIME_REPORT_SID = 9
+const data int TIME_REPORT_SSID = 2
+
+/* PUS 129 */
+const data int SET_DEF_TMENCODER_RATE_SSID = 5
+
+/* only for testing: to be removed if model is properly configured with table of APID, SIDs etc. */
+
+const data int CELT_APID = 1000
+const data int CELT_SID = 100
+const data int CELT_SSID = 200
+const data int CELT_TYPE = 400
+
+const data int APP_APID = 1001
+
+const data int PREDEF_HK_SID = 101
+const data int PREDEF_HK_SSID = 201
+const data int PREDEF_HK_RID = 301
+const data int PREDEF_HK_TYPE = 401
+
+const data int GROUND_HK_SID = 102
+const data int GROUND_HK_SSID = 202
+const data int GROUND_HK_RID = 302
+const data int GROUND_HK_TYPE = 402
+
+const data int PREDEF_DIAG_SID = 103
+const data int PREDEF_DIAG_SSID = 203
+const data int PREDEF_DIAG_RID = 303
+const data int PREDEF_DIAG_TYPE = 403
+
+const data int GROUND_DIAG_SID = 104
+const data int GROUND_DIAG_SSID = 204
+const data int GROUND_DIAG_RID = 304
+const data int GROUND_DIAG_TYPE = 404
+
+const data int ASYN_SID = 106
+const data int ASYN_SSID = 206
+const data int TM_SOURCE_TYPE = 406
+
+const data int EVENT_REPORT_SID = 107
+const data int EVENT_REPORT_SSID = 207
+const data int EVENT_REPORT_RID = 307
+const data int EVENT_REPORT_TYPE = 407
+
+!$
+
+	port type aPort()
+	port type int1Port(int msg1)
+	port type int2Port(int msg1, int msg2)
+	port type int3Port(int msg1, int msg2, int msg3)
+	port type int4Port(int msg1, int msg2, int msg3, int msg4)
+$portTypes:{ 
+	port type $it$ }$
+$functions:{ 
+	extern function $it$ }$ 
+	
+$!
+extern function setFWstatus(int,int,int)
+extern function setFWstatus(int,int,int,int)
+extern function setTMtypeFWstatus(int,int)
+extern function getFWstatus(int,int,int, int)
+
+
+connector type RETS2(int1Port p1, int1Port p2)
+define p1 p2
+on p1 p2
+down{ p2.msg1=p1.msg1; }
+end	
+
+connector type CPTC1(int3Port p1)
+define p1
+end	
+
+connector type CPTCIF2(int3Port p1, int3Port p2)
+define p1 p2
+on p1 p2
+provided(p1.msg1==-1 || p2.msg1==p1.msg1 )
+down{ p2.msg1=p1.msg1; p2.msg2=p1.msg2; p2.msg3=p1.msg3;  }
+end	
+
+connector type CPSG2(int4Port p1, int4Port p2)
+define p1 p2
+on p1 p2
+down{ p2.msg1=p1.msg1; p2.msg2=p1.msg2; p2.msg3=p1.msg3; p2.msg4=p1.msg4;  }
+end
+
+connector type SINGLE2(int2Port p1)
+define p1
+end	
+
+connector type SINGLE4(int4Port p1)
+define p1
+end	
+
+
+connector type SINGLEE(aPort p1)
+export port aPort exp()
+define p1
+end
+
+connector type SINGLE1E(int1Port p1)
+data int msg1
+export port int1Port exp(msg1)
+define p1
+on p1
+up{ msg1=p1.msg1;  }
+end	
+
+
+connector type SINGLE3E(int3Port p1)
+data int msg1,msg2,msg3
+export port int3Port exp(msg1,msg2,msg3)
+define p1
+on p1
+up{ msg1=p1.msg1;  msg2=p1.msg2;  msg3=p1.msg3;   }
+end	
+
+connector type BRD2(aPort p1, aPort p2)
+define p1' p2
+end	
+
+connector type BRD2E(aPort p1, aPort p2)
+export port aPort exp()
+define p1' p2
+end		
+
+connector type RDV2E(aPort p1, aPort p2)
+export port aPort exp()
+define p1 p2
+end	
+
+connector type RDV3E(aPort p1, aPort p2,  aPort p3)
+export port aPort exp()
+define p1 p2 p3
+end
+
+
+connector type RDV4E(aPort p1, aPort p2,  aPort p3, aPort p4)
+export port aPort exp()
+define p1 p2 p3 p4
+end	
+
+connector type CP12(int1Port p1, int1Port p2)
+define p1 p2
+on p1 p2
+down{ p2.msg1=p1.msg1;  }
+end	
+
+connector type CP13(int1Port p1, int1Port p2, int1Port p3)
+define p1 p2 p3
+on p1 p2 p3
+down{ p2.msg1=p1.msg1; p3.msg1=p1.msg1; }
+end	
+
+connector type CPHLC2(int2Port p1, int2Port p2)
+define p1 p2
+on p1 p2
+down{ p2.msg1=p1.msg1; p2.msg2=p1.msg2;  }
+end	
+
+connector type CPHLC3(int2Port p1, int2Port p2, int2Port p3)
+define p1 p2 p3
+on p1 p2 p3
+down{ p2.msg1=p1.msg1; p2.msg2=p1.msg2;  }
+end	
+
+connector type CP12ALLOW(int1Port p1, int1Port p2, aPort p3)
+define p1 p2 p3
+on p1 p2 p3
+down{ p2.msg1=p1.msg1;  }
+end	
+	
+!$
+
+
+
+connector type SINGLE(aPort p1)
+define p1
+end
+
+
+connector type SINGLE1(int1Port p1)
+define p1
+end
+
+connector type SINGLE3(int3Port p1)
+define p1
+end	
+
+connector type SINGLE4(int4Port p1)
+define p1
+end	
+
+connector type RDV2(aPort p1, aPort p2)
+define p1 p2
+end	
+
+connector type RDV3(aPort p1, aPort p2, aPort p3)
+define p1 p2 p3
+end	
+
+
+connector type RDV4(aPort p1, aPort p2, aPort p3, aPort p4)
+define p1 p2 p3 p4
+end	
+
+connector type RDV5(aPort p1, aPort p2, aPort p3, aPort p4, aPort p5)
+define p1 p2 p3 p4 p5
+end	
+
+connector type RDV6(aPort p1, aPort p2, aPort p3, aPort p4, aPort p5, aPort p6)
+define p1 p2 p3 p4 p5 p6
+end	
+
+connector type CPTC2(int3Port p1, int3Port p2)
+define p1 p2
+on p1 p2
+down{ p2.msg1=p1.msg1; p2.msg2=p1.msg2; p2.msg3=p1.msg3;  }
+end	
+
+connector type CPTCXT2(int4Port p1, int4Port p2)
+define p1 p2
+on p1 p2
+down{ p2.msg1=p1.msg1; p2.msg2=p1.msg2; p2.msg3=p1.msg3;  p2.msg4=p1.msg4;  }
+end	
+
+connector type CPTC2obs(int3Port p1, int3Port p2, aPort p3)
+define p1 p2 p3
+on p1 p2 p3
+down{ p2.msg1=p1.msg1; p2.msg2=p1.msg2; p2.msg3=p1.msg3;  }
+end	
+
+connector type CPTC3full(int3Port p1, aPort p2, aPort p3)
+define p1 p2 p3
+end
+
+connector type CPTC4full(int3Port p1, aPort p2, aPort p3, aPort p4)
+define p1 p2 p3 p4
+end
+
+connector type CPTC2full(int3Port p1, aPort p2)
+define p1 p2
+end	
+
+connector type CPTC1obs(int3Port p1, aPort p2)
+define p1 p2
+end	
+
+
+>>
+
+BRD2E_next()::=<<SINGLE>>
+RDV2E_next()::=<<SINGLE>>
+RDV3E_next()::=<<SINGLE>>
+
+
+
+
+atom(name, data, places, init, initAct, ports, portNames, exportNames, documentation )::=<<
+
+$if(documentation)$
+ /* $documentation$ */ $endif$
+ 
+atom type $name$()
+
+$data:{ 
+data int  $it:{ $it$ };separator=","$ }$
+$exportNames:{   
+	export port $if(it.portType)$ $it.portType$ $else$ aPort $endif$ $it.name$($params(items=it.params)$) }$ 
+$portNames:{   
+	port $if(it.portType)$ $it.portType$ $else$ aPort $endif$ $it.name$($params(items=it.params)$) }$ 
+	place $places:{ $it$ };separator=","$
+
+initial to $init$ do{ $initAct:{ 
+	$it$ }$ }
+
+$ports:{ $if(!it.internal)$ on $it.name$ $else$ internal $endif$ from $it.from$ to $it.to$ $if(it.cond)$ provided( $it.cond$ ) $endif$ $if(it.act)$ do{
+  $it.act$  } $endif$ 
+}$
+
+end
+
+>>
+
+params(items)::=<< $items:{ $it$ };separator=","$ >>
+
+compound(name, components, connectors, exportNames, documentation, priorities)::=<<
+
+
+$if(documentation)$
+ /* $documentation$ */ $endif$
+
+compound type $name$()
+
+$components:{
+	component $it.type$ $it.name$() }$
+
+$connectors:{ 
+	connector $it.type$ $it.name$ ( $params(items=it.params)$ ) }$
+
+$exportNames:{ 
+	export port $it.names:{ p | $p.name$.exp };separator=","$ as $it.exportName$ }$
+	
+$priorities:{ 
+	priority $it.name$ 		$it.low$:* < $it.high$:*}$
+
+end
+
+>>
+
+
+footer( rootComponent )::=<<
+
+$! component $rootComponent$ Root !$
+
+end
+>>

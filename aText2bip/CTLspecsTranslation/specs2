@@ -1,0 +1,13 @@
+-- CDMS status Action Flow:
+-- AF1: AG ( CDMSSTATACTFL_start -> AX A [! (cdms_I2C_ask ) U  reset_done ])
+CTLSPEC  AG ( (NuInteraction) = (NuI5) -> AX A [! ((NuInteraction) = (NuI4) ) U  (NuInteraction) = (NuI2) ])
+-- AF2: AG ( internal_watchdog -> AX A [! (internal_watchdog) U CDMSSTATACTFL_start ])
+CTLSPEC  AG ( (NuInteraction) = (NuI1) -> AX A [! ((NuInteraction) = (NuI1)) U (NuInteraction) = (NuI5) ])
+-- AF2: AG ( cdms_I2C_ask  -> AX A [! (cdms_I2C_ask ) U CDMSSTATACTFL_start ])
+CTLSPEC  AG ( (NuInteraction) = (NuI4)  -> AX A [! ((NuInteraction) = (NuI4) ) U (NuInteraction) = (NuI5) ])
+-- AF3: AG ( CDMSSTATACTFL_start -> AX A [! (CDMSSTATACTFL_finish) U  cdms_I2C_res ])
+CTLSPEC  AG ( (NuInteraction) = (NuI5) -> AX A [! ((NuInteraction) = (NuI6)) U  (NuInteraction) = (NuI3) ])
+
+FAIRNESS (  (NuInteraction) = (NuI2) );
+FAIRNESS (  (NuInteraction) = (NuI3) );
+FAIRNESS ( (NuInteraction) = (NuI5) );

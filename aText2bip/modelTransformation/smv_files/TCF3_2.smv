@@ -1,0 +1,218 @@
+MODULE VERACCFAILMON(active_interaction)
+
+	VAR
+		NuPfail		:		boolean;
+		NuPtm1_2		:		boolean;
+		Nuplace		:		{NuSS0, NuSS1};
+
+
+	INIT
+		( (Nuplace) = (NuSS0) );
+
+	INVAR
+		( (NuPtm1_2) <-> (( (Nuplace) = (NuSS1) )) ) &
+		( (NuPfail) <-> (( (Nuplace) = (NuSS0) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS1) )) )) & (( (active_interaction) = (NuI3) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS1) )) )) & (( (active_interaction) = (NuI6) )) ) |
+		( (( (( (Nuplace) = (NuSS1) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI7) )) ) |
+		( (( (active_interaction) != (NuI7) )) & (( (( (active_interaction) != (NuI6) )) & (( (( (active_interaction) != (NuI3) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) );
+
+
+MODULE PUS1_VERIF(active_interaction)
+
+	VAR
+		NuPPUSaccept		:		boolean;
+		NuPPUSreject		:		boolean;
+		NuPPUSver		:		boolean;
+		NuVsid		:		unsigned word[3];
+		NuVssid		:		unsigned word[3];
+		NuVackReq		:		unsigned word[3];
+		NuVsrc		:		unsigned word[3];
+		Nuplace		:		{NuSS0, NuSS1};
+
+
+	INIT
+		( (Nuplace) = (NuSS0) ) &
+		( (NuVsid) = (( -(0ud3_1) )) ) &
+		( (NuVssid) = (( -(0ud3_1) )) ) &
+		( (NuVackReq) = (( -(0ud3_1) )) ) &
+		( (NuVsrc) = (( -(0ud3_1) )) );
+
+	INVAR
+		( (NuPPUSreject) <-> (( (Nuplace) = (NuSS1) )) ) &
+		( (NuPPUSver) <-> (( (Nuplace) = (NuSS0) )) ) &
+		( (NuPPUSaccept) <-> (( (Nuplace) = (NuSS1) )) );
+
+	TRANS
+		( (( (( (( (( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS1) )) )) & (( (active_interaction) = (NuI1) )) )) & (( (next(NuVsid)) = (NuVsid) )) )) & (( (next(NuVssid)) = (NuVssid) )) )) & (( (next(NuVackReq)) = (NuVackReq) )) )) & (( (next(NuVsrc)) = (NuVsrc) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSS1) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI3) )) )) & (( (next(NuVsid)) = (NuVsid) )) )) & (( (next(NuVssid)) = (NuVssid) )) )) & (( (next(NuVackReq)) = (NuVackReq) )) )) & (( (next(NuVsrc)) = (NuVsrc) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSS1) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI2) )) )) & (( (next(NuVsid)) = (NuVsid) )) )) & (( (next(NuVssid)) = (NuVssid) )) )) & (( (next(NuVackReq)) = (NuVackReq) )) )) & (( (next(NuVsrc)) = (NuVsrc) )) ) |
+		( (( (active_interaction) != (NuI2) )) & (( (( (active_interaction) != (NuI3) )) & (( (( (active_interaction) != (NuI1) )) & (( (( (( (( (( (next(Nuplace)) = (Nuplace) )) & (( (next(NuVsid)) = (NuVsid) )) )) & (( (next(NuVssid)) = (NuVssid) )) )) & (( (next(NuVackReq)) = (NuVackReq) )) )) & (( (next(NuVsrc)) = (NuVsrc) )) )) )) )) );
+
+
+MODULE VERIFACTFLAB(active_interaction)
+
+	VAR
+		NuPdisptch		:		boolean;
+		NuPPUSaccept		:		boolean;
+		NuPreject		:		boolean;
+		NuPstart		:		boolean;
+		NuPask		:		boolean;
+		NuPPUSreject		:		boolean;
+		NuPfinish		:		boolean;
+		NuPdispRet		:		boolean;
+		NuPPUSver		:		boolean;
+		NuPaccept		:		boolean;
+		NuVLEGAL_APID		:		unsigned word[3];
+		NuVsid		:		unsigned word[3];
+		NuVssid		:		unsigned word[3];
+		NuVackReq		:		unsigned word[3];
+		NuVsrc		:		unsigned word[3];
+		Nuplace		:		{NuSS3, NuSS4, NuSS5, NuSS6, NuSS7, NuSS0, NuSS1, NuSS2};
+
+
+	INIT
+		( (Nuplace) = (NuSS0) ) &
+		( (NuVLEGAL_APID) = (( -(0ud3_1) )) ) &
+		( (NuVsid) = (( -(0ud3_1) )) ) &
+		( (NuVssid) = (( -(0ud3_1) )) ) &
+		( (NuVackReq) = (( -(0ud3_1) )) ) &
+		( (NuVsrc) = (( -(0ud3_1) )) );
+
+	INVAR
+		( (NuPreject) <-> (( (( (Nuplace) = (NuSS2) )) & (( (( (NuVLEGAL_APID) = (( -(0ud3_1) )) )) | (( (NuVLEGAL_APID) = (0ud3_0) )) )) )) ) &
+		( (NuPPUSver) <-> (( (Nuplace) = (NuSS3) )) ) &
+		( (NuPPUSaccept) <-> (( (Nuplace) = (NuSS4) )) ) &
+		( (NuPaccept) <-> (( (( (Nuplace) = (NuSS2) )) & (( (( (NuVLEGAL_APID) = (( -(0ud3_1) )) )) | (( (NuVLEGAL_APID) = (0ud3_1) )) )) )) ) &
+		( (NuPfinish) <-> (( (Nuplace) = (NuSS7) )) ) &
+		( (NuPdisptch) <-> (( (Nuplace) = (NuSS5) )) ) &
+		( (NuPPUSreject) <-> (( (Nuplace) = (NuSS4) )) ) &
+		( (NuPstart) <-> (( (Nuplace) = (NuSS0) )) ) &
+		( (NuPdispRet) <-> (( (Nuplace) = (NuSS6) )) ) &
+		( (NuPask) <-> (( (Nuplace) = (NuSS1) )) );
+
+	TRANS
+		( (( (( (( (( (( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS1) )) )) & (( (active_interaction) = (NuI13) )) )) & (( (next(NuVLEGAL_APID)) = (NuVLEGAL_APID) )) )) & (( (next(NuVsid)) = (NuVsid) )) )) & (( (next(NuVssid)) = (NuVssid) )) )) & (( (next(NuVackReq)) = (NuVackReq) )) )) & (( (next(NuVsrc)) = (NuVsrc) )) ) |
+		( (( (( (( (( (( (( (( (Nuplace) = (NuSS1) )) & (( (next(Nuplace)) = (NuSS2) )) )) & (( (active_interaction) = (NuI4) )) )) & (( (next(NuVLEGAL_APID)) = (( -(0ud3_1) )) )) )) & (( (next(NuVsid)) = (NuVsid) )) )) & (( (next(NuVssid)) = (NuVssid) )) )) & (( (next(NuVackReq)) = (NuVackReq) )) )) & (( (next(NuVsrc)) = (NuVsrc) )) ) |
+		( (( (( (( (( (( (( (( (Nuplace) = (NuSS2) )) & (( (next(Nuplace)) = (NuSS3) )) )) & (( (active_interaction) = (NuI5) )) )) & (( (next(NuVLEGAL_APID)) = (0ud3_1) )) )) & (( (next(NuVsid)) = (NuVsid) )) )) & (( (next(NuVssid)) = (NuVssid) )) )) & (( (next(NuVackReq)) = (NuVackReq) )) )) & (( (next(NuVsrc)) = (NuVsrc) )) ) |
+		( (( (( (( (( (( (( (( (Nuplace) = (NuSS2) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI6) )) )) & (( (next(NuVLEGAL_APID)) = (0ud3_0) )) )) & (( (next(NuVsid)) = (NuVsid) )) )) & (( (next(NuVssid)) = (NuVssid) )) )) & (( (next(NuVackReq)) = (NuVackReq) )) )) & (( (next(NuVsrc)) = (NuVsrc) )) ) |
+		( (( (( (( (( (( (( (( (Nuplace) = (NuSS3) )) & (( (next(Nuplace)) = (NuSS4) )) )) & (( (active_interaction) = (NuI1) )) )) & (( (next(NuVLEGAL_APID)) = (NuVLEGAL_APID) )) )) & (( (next(NuVsid)) = (NuVsid) )) )) & (( (next(NuVssid)) = (NuVssid) )) )) & (( (next(NuVackReq)) = (NuVackReq) )) )) & (( (next(NuVsrc)) = (NuVsrc) )) ) |
+		( (( (( (( (( (( (( (( (Nuplace) = (NuSS4) )) & (( (next(Nuplace)) = (NuSS5) )) )) & (( (active_interaction) = (NuI2) )) )) & (( (next(NuVLEGAL_APID)) = (NuVLEGAL_APID) )) )) & (( (next(NuVsid)) = (NuVsid) )) )) & (( (next(NuVssid)) = (NuVssid) )) )) & (( (next(NuVackReq)) = (NuVackReq) )) )) & (( (next(NuVsrc)) = (NuVsrc) )) ) |
+		( (( (( (( (( (( (( (( (Nuplace) = (NuSS4) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI3) )) )) & (( (next(NuVLEGAL_APID)) = (NuVLEGAL_APID) )) )) & (( (next(NuVsid)) = (NuVsid) )) )) & (( (next(NuVssid)) = (NuVssid) )) )) & (( (next(NuVackReq)) = (NuVackReq) )) )) & (( (next(NuVsrc)) = (NuVsrc) )) ) |
+		( (( (( (( (( (( (( (( (Nuplace) = (NuSS5) )) & (( (next(Nuplace)) = (NuSS6) )) )) & (( (active_interaction) = (NuI12) )) )) & (( (next(NuVLEGAL_APID)) = (NuVLEGAL_APID) )) )) & (( (next(NuVsid)) = (NuVsid) )) )) & (( (next(NuVssid)) = (NuVssid) )) )) & (( (next(NuVackReq)) = (NuVackReq) )) )) & (( (next(NuVsrc)) = (NuVsrc) )) ) |
+		( (( (( (( (( (( (( (( (Nuplace) = (NuSS6) )) & (( (next(Nuplace)) = (NuSS7) )) )) & (( (active_interaction) = (NuI15) )) )) & (( (next(NuVLEGAL_APID)) = (NuVLEGAL_APID) )) )) & (( (next(NuVsid)) = (NuVsid) )) )) & (( (next(NuVssid)) = (NuVssid) )) )) & (( (next(NuVackReq)) = (NuVackReq) )) )) & (( (next(NuVsrc)) = (NuVsrc) )) ) |
+		( (( (( (( (( (( (( (( (Nuplace) = (NuSS7) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI14) )) )) & (( (next(NuVLEGAL_APID)) = (NuVLEGAL_APID) )) )) & (( (next(NuVsid)) = (NuVsid) )) )) & (( (next(NuVssid)) = (NuVssid) )) )) & (( (next(NuVackReq)) = (NuVackReq) )) )) & (( (next(NuVsrc)) = (NuVsrc) )) ) |
+		( (( (active_interaction) != (NuI14) )) & (( (( (active_interaction) != (NuI15) )) & (( (( (active_interaction) != (NuI12) )) & (( (( (active_interaction) != (NuI3) )) & (( (( (active_interaction) != (NuI2) )) & (( (( (active_interaction) != (NuI1) )) & (( (( (active_interaction) != (NuI6) )) & (( (( (active_interaction) != (NuI5) )) & (( (( (active_interaction) != (NuI4) )) & (( (( (active_interaction) != (NuI13) )) & (( (( (( (( (( (( (next(Nuplace)) = (Nuplace) )) & (( (next(NuVLEGAL_APID)) = (NuVLEGAL_APID) )) )) & (( (next(NuVsid)) = (NuVsid) )) )) & (( (next(NuVssid)) = (NuVssid) )) )) & (( (next(NuVackReq)) = (NuVackReq) )) )) & (( (next(NuVsrc)) = (NuVsrc) )) )) )) )) )) )) )) )) )) )) )) );
+
+
+MODULE TCVERIF(active_interaction)
+
+	VAR
+		NuPreject		:		boolean;
+		NuPask		:		boolean;
+		NuPaccept		:		boolean;
+		NuVsid		:		unsigned word[3];
+		NuVssid		:		unsigned word[3];
+		NuVackReq		:		unsigned word[3];
+		NuVsrc		:		unsigned word[3];
+		Nuplace		:		{NuSS0, NuSS1};
+
+
+	INIT
+		( (Nuplace) = (NuSS0) ) &
+		( (NuVsid) = (( -(0ud3_1) )) ) &
+		( (NuVssid) = (( -(0ud3_1) )) ) &
+		( (NuVackReq) = (( -(0ud3_1) )) ) &
+		( (NuVsrc) = (( -(0ud3_1) )) );
+
+	INVAR
+		( (NuPreject) <-> (( (Nuplace) = (NuSS1) )) ) &
+		( (NuPask) <-> (( (Nuplace) = (NuSS0) )) ) &
+		( (NuPaccept) <-> (( (Nuplace) = (NuSS1) )) );
+
+	TRANS
+		( (( (( (( (( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS1) )) )) & (( (active_interaction) = (NuI4) )) )) & (( (next(NuVsid)) = (NuVsid) )) )) & (( (next(NuVssid)) = (NuVssid) )) )) & (( (next(NuVackReq)) = (NuVackReq) )) )) & (( (next(NuVsrc)) = (NuVsrc) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSS1) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI6) )) )) & (( (next(NuVsid)) = (NuVsid) )) )) & (( (next(NuVssid)) = (NuVssid) )) )) & (( (next(NuVackReq)) = (NuVackReq) )) )) & (( (next(NuVsrc)) = (NuVsrc) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSS1) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI5) )) )) & (( (next(NuVsid)) = (NuVsid) )) )) & (( (next(NuVssid)) = (NuVssid) )) )) & (( (next(NuVackReq)) = (NuVackReq) )) )) & (( (next(NuVsrc)) = (NuVsrc) )) ) |
+		( (( (active_interaction) != (NuI5) )) & (( (( (active_interaction) != (NuI6) )) & (( (( (active_interaction) != (NuI4) )) & (( (( (( (( (( (next(Nuplace)) = (Nuplace) )) & (( (next(NuVsid)) = (NuVsid) )) )) & (( (next(NuVssid)) = (NuVssid) )) )) & (( (next(NuVackReq)) = (NuVackReq) )) )) & (( (next(NuVsrc)) = (NuVsrc) )) )) )) )) );
+
+
+MODULE PUS1(active_interaction)
+
+	VAR
+		NuPtm1_7		:		boolean;
+		NuPtm1_8		:		boolean;
+		NuPtm1_4		:		boolean;
+		NuPtm1_1		:		boolean;
+		NuPtm1_2		:		boolean;
+		Nuplace		:		{NuSS0};
+
+
+	INIT
+		( (Nuplace) = (NuSS0) );
+
+	INVAR
+		( (NuPtm1_4) <-> (( (Nuplace) = (NuSS0) )) ) &
+		( (NuPtm1_2) <-> (( (Nuplace) = (NuSS0) )) ) &
+		( (NuPtm1_1) <-> (( (Nuplace) = (NuSS0) )) ) &
+		( (NuPtm1_8) <-> (( (Nuplace) = (NuSS0) )) ) &
+		( (NuPtm1_7) <-> (( (Nuplace) = (NuSS0) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI10) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI7) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI9) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI8) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI11) )) ) |
+		( (( (active_interaction) != (NuI11) )) & (( (( (active_interaction) != (NuI8) )) & (( (( (active_interaction) != (NuI9) )) & (( (( (active_interaction) != (NuI7) )) & (( (( (active_interaction) != (NuI10) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) )) )) );
+
+
+MODULE main
+
+	VAR
+		NuInteraction		:		{NuI1, NuI2, NuI3, NuI4, NuI5, NuI6, NuI7, NuI8, NuI9, NuI10, NuI11, NuI12, NuI13, NuI14, NuI15};
+		veraccfailmon	:	VERACCFAILMON(NuInteraction);
+		pus1_verif	:	PUS1_VERIF(NuInteraction);
+		verifactflab	:	VERIFACTFLAB(NuInteraction);
+		tcverif	:	TCVERIF(NuInteraction);
+		pus1	:	PUS1(NuInteraction);
+
+	DEFINE
+		VERIFACTFLAB_finish		:=		verifactflab.NuPfinish;
+		PUSver		:=		( (verifactflab.NuPPUSver) & (pus1_verif.NuPPUSver) );
+		verif_reject		:=		( (( (verifactflab.NuPreject) & (tcverif.NuPreject) )) & (veraccfailmon.NuPfail) );
+		VERACCFAILMON_tm1_2		:=		( (veraccfailmon.NuPtm1_2) & (pus1.NuPtm1_2) );
+		verif_ask		:=		( (verifactflab.NuPask) & (tcverif.NuPask) );
+		PUS1_tm1_7		:=		pus1.NuPtm1_7;
+		VERIFACTFLAB_dispRet		:=		verifactflab.NuPdispRet;
+		PUS1_tm1_4		:=		pus1.NuPtm1_4;
+		PUS1_tm1_1		:=		pus1.NuPtm1_1;
+		VERIFACTFLAB_start		:=		verifactflab.NuPstart;
+		verif_accept		:=		( (verifactflab.NuPaccept) & (tcverif.NuPaccept) );
+		PUSaccept		:=		( (verifactflab.NuPPUSaccept) & (pus1_verif.NuPPUSaccept) );
+		PUSreject		:=		( (( (verifactflab.NuPPUSreject) & (pus1_verif.NuPPUSreject) )) & (veraccfailmon.NuPfail) );
+		VERIFACTFLAB_disptch		:=		verifactflab.NuPdisptch;
+		PUS1_tm1_8		:=		pus1.NuPtm1_8;
+
+
+	INVAR
+		( (( (NuInteraction) = (NuI14) )) -> (VERIFACTFLAB_finish) ) &
+		( (( (NuInteraction) = (NuI1) )) -> (PUSver) ) &
+		( (( (NuInteraction) = (NuI6) )) -> (verif_reject) ) &
+		( (( (NuInteraction) = (NuI7) )) -> (VERACCFAILMON_tm1_2) ) &
+		( (( (NuInteraction) = (NuI4) )) -> (verif_ask) ) &
+		( (( (NuInteraction) = (NuI8) )) -> (PUS1_tm1_7) ) &
+		( (( (NuInteraction) = (NuI15) )) -> (VERIFACTFLAB_dispRet) ) &
+		( (( (NuInteraction) = (NuI10) )) -> (PUS1_tm1_4) ) &
+		( (( (NuInteraction) = (NuI11) )) -> (PUS1_tm1_1) ) &
+		( (( (NuInteraction) = (NuI13) )) -> (VERIFACTFLAB_start) ) &
+		( (( (NuInteraction) = (NuI5) )) -> (verif_accept) ) &
+		( (( (NuInteraction) = (NuI2) )) -> (PUSaccept) ) &
+		( (( (NuInteraction) = (NuI3) )) -> (PUSreject) ) &
+		( (( (NuInteraction) = (NuI12) )) -> (VERIFACTFLAB_disptch) ) &
+		( (( (NuInteraction) = (NuI9) )) -> (PUS1_tm1_8) );
+
+
+

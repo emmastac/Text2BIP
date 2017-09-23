@@ -1,0 +1,30 @@
+-- Flash Memory Read Action Flow Abort: 
+-- AFΑ2: AG ( flash_memory_checkCRC -> AX A [! (flash_memory_checkCRC) U flash_memory_read ])
+-- AFΑ3: AG ( flash_memory_read -> AX A [! (MEMRD_ACTFLAB_finish) U (  (flash_memory_ok_read1 | flash_memory_ok_read2) |  ( flash_memory_read_fail1 | flash_memory_read_fail2 | flash_memory_bad_CRC) ) ])
+-- AFΑ4: AG ( flash_memory_checkCRC -> AX A [! (flash_memory_checkCRC) U flash_memory_read ])
+-- AF5: AG (  ( flash_memory_read_fail1 | flash_memory_read_fail2 | flash_memory_bad_CRC) -> AX A [! ( (flash_memory_ok_read1 | flash_memory_ok_read2)) U flash_memory_checkCRC ])
+-- AFΑ6: AG (  ( flash_memory_read_fail1 | flash_memory_read_fail2 | flash_memory_bad_CRC) -> AX A [! (flash_memory_checkCRC) U flash_memory_read ])
+
+-- Flash Memory Write Action Flow Abort: 
+-- AFΑ2: AG ( MEMWR_ACTFLAB_wait -> AX A [! (MEMWR_ACTFLAB_wait) U flash_memory_write ])
+-- AFΑ3: AG ( flash_memory_write -> AX A [! (MEMWR_ACTFLAB_finish) U (  (flash_memory_ok_write1 | flash_memory_ok_write2) |  ( flash_memory_write_fail1 | flash_memory_write_fail2 | MEMWR_ACTFLAB_contin) ) ])
+-- AFΑ4: AG ( MEMWR_ACTFLAB_wait -> AX A [! (MEMWR_ACTFLAB_wait) U flash_memory_write ])
+-- AF5: AG (  ( flash_memory_write_fail1 | flash_memory_write_fail2 | MEMWR_ACTFLAB_contin) -> AX A [! ( (flash_memory_ok_write1 | flash_memory_ok_write2)) U MEMWR_ACTFLAB_wait ])
+-- AFΑ6: AG (  ( flash_memory_write_fail1 | flash_memory_write_fail2 | MEMWR_ACTFLAB_contin) -> AX A [! (MEMWR_ACTFLAB_wait) U flash_memory_write ])
+
+-- Flash Memory Read Mode Manager: 
+-- MD1: AG (  flash_memory_read -> memrd_modmng.Nuplace = NuSREAD  )
+
+-- Flash Memory Write Mode Manager: 
+-- MD1: AG (  flash_memory_write -> memwr_modmng.Nuplace = NuSWRITE  )
+
+-- Flash Memory MUTEX: 
+-- MX1: AG ( ( ( flash_memory_setRead1 | flash_memory_setRead2 ) |  ( flash_memory_setWrite1 | flash_memory_setWrite1 ) ) -> AX A [! (( ( flash_memory_setRead1 | flash_memory_setRead2 ) |  ( flash_memory_setWrite1 | flash_memory_setWrite1 ) )) U ( (flash_memory_ok_write1 | flash_memory_ok_write2 | flash_memory_write_fail1 | flash_memory_write_fail2 ) |  (flash_memory_ok_read1 | flash_memory_ok_read2 | flash_memory_read_fail1 | flash_memory_read_fail2 ) ) ])
+
+FAIRNESS ( MEMWR_ACTFLAB_wait );
+FAIRNESS ( flash_memory_read );
+FAIRNESS ( ( (flash_memory_ok_write1 | flash_memory_ok_write2 | flash_memory_write_fail1 | flash_memory_write_fail2 ) |  (flash_memory_ok_read1 | flash_memory_ok_read2 | flash_memory_read_fail1 | flash_memory_read_fail2 ) ) );
+FAIRNESS ( flash_memory_checkCRC );
+FAIRNESS ( (  (flash_memory_ok_write1 | flash_memory_ok_write2) |  ( flash_memory_write_fail1 | flash_memory_write_fail2 | MEMWR_ACTFLAB_contin) ) );
+FAIRNESS ( flash_memory_write );
+FAIRNESS ( (  (flash_memory_ok_read1 | flash_memory_ok_read2) |  ( flash_memory_read_fail1 | flash_memory_read_fail2 | flash_memory_bad_CRC) ) );

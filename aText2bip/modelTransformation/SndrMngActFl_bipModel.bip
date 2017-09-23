@@ -1,0 +1,191 @@
+model SndrMngActFl_bipModel
+
+	port type syncPort
+	
+
+
+connector type SINGLE(syncPort p1)
+define p1
+end
+
+
+connector type RDV2(syncPort p1, syncPort p2)
+define p1 p2
+end	
+
+connector type RDV3(syncPort p1, syncPort p2, syncPort p3)
+define p1 p2 p3
+end	
+
+connector type RDV4(syncPort p1, syncPort p2, syncPort p3, syncPort p4)
+define p1 p2 p3 p4
+end	
+
+connector type RDV5(syncPort p1, syncPort p2, syncPort p3, syncPort p4, syncPort p5)
+define p1 p2 p3 p4 p5
+end	
+
+connector type RDV6(syncPort p1, syncPort p2, syncPort p3, syncPort p4, syncPort p5, syncPort p6)
+define p1 p2 p3 p4 p5 p6
+end	
+
+connector type RDV7(syncPort p1, syncPort p2, syncPort p3, syncPort p4, syncPort p5, syncPort p6, syncPort p7)
+define p1 p2 p3 p4 p5 p6 p7
+end	
+
+connector type RDV8(syncPort p1, syncPort p2, syncPort p3, syncPort p4, syncPort p5, syncPort p6, syncPort p7, syncPort p8)
+define p1 p2 p3 p4 p5 p6 p7 p8
+end	
+
+ 
+atomic type TC_FifoManager
+
+ 
+data int  occup ,sid ,ssid ,ackReq ,TC_CAP  
+   
+	export port  syncPort  get     
+	export port  syncPort  put     
+	export port  syncPort  empty     
+	export port  syncPort  full   
+   
+	export port  syncPort  internal2     
+	export port  syncPort  internal1     
+	export port  syncPort  internal3   
+	place S0 ,S1 ,S2 
+
+initial to  S0 do{  
+	occup=0; sid=-1; ssid=-1; ackReq=-1; TC_CAP=2;  }
+
+ on empty from S0 to S0   
+ on put from S0 to S0   do{
+  occup=occup+1;  }  
+ on internal3 from S0 to S1  provided( (occup==1) )   
+ on put from S1 to S1  provided( !(occup==0) && !(occup==TC_CAP) )   do{
+  occup=occup+1;  }  
+ on get from S1 to S1  provided( !(occup==0) && !(occup==TC_CAP) )   do{
+  occup=occup-1;  }  
+ on internal1 from S1 to S0  provided( (occup==0) )   
+ on internal2 from S1 to S2  provided( (occup==TC_CAP) )   
+ on full from S2 to S2  provided( !(occup<TC_CAP) )   
+ on get from S2 to S2  provided( !(occup<TC_CAP) )   do{
+  occup=occup-1;  }  
+ on internal3 from S2 to S1  provided( (occup<TC_CAP) )   
+
+
+end
+
+ 
+atomic type TCmngt
+
+ 
+data int  sid ,ssid ,ackReq  
+   
+	export port  syncPort  acqSg_e     
+	export port  syncPort  noSg     
+	export port  syncPort  success     
+	export port  syncPort  getGround     
+	export port  syncPort  acqSg_b     
+	export port  syncPort  acqFail_e     
+	export port  syncPort  put     
+	export port  syncPort  acqFail_b   
+ 
+	place S3 ,S0 ,S1 ,S2 
+
+initial to  S0 do{  
+	sid=-1; ssid=-1; ackReq=-1;  }
+
+ on acqSg_b from S0 to S1   
+ on acqSg_e from S1 to S0   
+ on noSg from S0 to S0   
+ on put from S0 to S3   
+ on acqFail_b from S3 to S2   
+ on acqFail_e from S2 to S0   
+ on success from S3 to S0   
+ on getGround from S0 to S0   
+
+
+end
+
+ 
+atomic type SmuTC
+
+ 
+data int  sid ,ssid ,ackReq  
+   
+	export port  syncPort  get_b     
+	export port  syncPort  get_e     
+	export port  syncPort  ask     
+	export port  syncPort  empty   
+ 
+	place S0 ,S1 ,S2 
+
+initial to  S0 do{  
+	sid=-1; ssid=-1; ackReq=-1;  }
+
+ on ask from S0 to S1   
+ on empty from S1 to S0   
+ on get_b from S1 to S2   
+ on get_e from S2 to S0   
+
+
+end
+
+ 
+atomic type TCmngt_ModeManager
+
+   
+	export port  syncPort  toFull     
+	export port  syncPort  acqSg     
+	export port  syncPort  acqFail     
+	export port  syncPort  toNFull   
+ 
+	place nFull ,full 
+
+initial to  nFull do{  }
+
+ on acqSg from nFull to nFull   
+ on toFull from nFull to full   
+ on toNFull from full to nFull   
+ on acqFail from full to full   
+
+
+end
+
+
+
+compound type TCFunction
+
+
+	component TC_FifoManager TCFIFO 
+	component TCmngt TCMNG 
+	component SmuTC SMUTC 
+	component TCmngt_ModeManager TCMOD 
+
+ 
+	connector SINGLE ask ( SMUTC.ask   )  
+	connector RDV2 storeTC ( TCMNG.put ,TCFIFO.put   )  
+	connector RDV3 fullFifo2 ( TCMNG.put ,TCFIFO.full ,TCMOD.toFull   )  
+	connector RDV2 fullFifo1 ( TCMNG.put ,TCFIFO.full   )  
+	connector RDV3 acqSg_b ( SMUTC.get_b ,TCMNG.acqSg_b ,TCMOD.acqSg   )  
+	connector RDV2 acqSg_e ( SMUTC.get_e ,TCMNG.acqSg_e   )  
+	connector SINGLE acqFail_e ( TCMNG.acqFail_e   )  
+	connector RDV2 emptySg ( SMUTC.empty ,TCMNG.noSg   )  
+	connector RDV2 acqFail_b ( TCMNG.acqFail_b ,TCMOD.acqFail   )  
+	connector SINGLE success ( TCMNG.success   )  
+	connector RDV3 nfullFifo2 ( TCFIFO.get ,TCMNG.getGround ,TCMOD.toNFull   )  
+	connector RDV2 nfullFifo1 ( TCFIFO.get ,TCMNG.getGround   )  
+	connector RDV2 emptyGround ( TCFIFO.empty ,TCMNG.getGround   )  
+	connector SINGLE TCFIFO_internal2 ( TCFIFO.internal2   )  
+	connector SINGLE TCFIFO_internal1 ( TCFIFO.internal1   )  
+	connector SINGLE TCFIFO_internal3 ( TCFIFO.internal3   ) 
+
+	
+ 
+	priority fullFifo1_after_fullFifo2 		fullFifo1 < fullFifo2 
+	priority nfullFifo1_after_nfullFifo2 		nfullFifo1 < nfullFifo2
+
+end
+
+component TCFunction Root
+
+end

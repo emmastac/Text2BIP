@@ -1,0 +1,74 @@
+
+$!----------------------------TCFifoManager------------------------------------!$
+atom: TC_FifoManager
+data: occup,sid,ssid,ackReq, TC_CAP
+init: S0
+initAct:  occup=0; sid=-1; ssid=-1; ackReq=-1; TC_CAP=2;
+ports: 
+S0,S0,empty
+S0,S0,put(sid,ssid,ackReq),,occup=occup+1;
+S0,S1,*internal3,(occup==1)
+
+S1,S1,put(sid,ssid,ackReq), !(occup==0) && !(occup==TC_CAP),occup=occup+1;
+S1,S1,get(sid,ssid,ackReq),!(occup==0) && !(occup==TC_CAP),occup=occup-1;
+S1,S0,*internal1,(occup==0)
+S1,S2,*internal2,(occup==TC_CAP)
+
+S2,S2,full, !(occup<TC_CAP)
+S2,S2,get(sid,ssid,ackReq),!(occup<TC_CAP),occup=occup-1;
+S2,S1,*internal3,(occup<TC_CAP)
+end
+
+$!----------------------------TCmngt------------------------------------!$
+atom: TCmngt
+data: sid,ssid,ackReq
+init: S0
+initAct: sid=-1; ssid=-1; ackReq=-1;
+ports: 
+S0,S0,acqSg(sid,ssid,ackReq)
+S0,S0,noSg
+S0,S0,acqFail
+
+S0,S0,put(sid,ssid,ackReq)
+S0,S0,getGround
+
+end
+
+$!----------------------------SmuTC------------------------------------!$
+atom: SmuTC
+data: sid,ssid,ackReq
+init: S0
+initAct: sid=-1; ssid=-1; ackReq=-1;
+ports: 
+S0,S0,empty
+S0,S0,get(sid,ssid,ackReq)
+end
+
+$!-------------------------------mainModel---------------------------------!$
+
+
+compound: TCFunction
+component: TC_FifoManager,TCFIFO
+component: TCmngt,TCMNG
+component: SmuTC,SMUTC
+
+connectors: 
+$! TCM-F1 segment acquisition function !$
+CPTC2,storeTC,,TCMNG.put,TCFIFO.put
+CPTC3full,fullFifo1,,TCMNG.put,TCFIFO.full
+
+CPTC2,acqSg,,SMUTC.get,TCMNG.acqSg
+RDV2,emptySg,,SMUTC.empty,TCMNG.noSg
+
+//SINGLE, acqFail, , TCMNG.acqFail
+
+CPTC2,getGround,,TCFIFO.get,TCMNG.getGround
+RDV2, emptyGround,,TCFIFO.empty,TCMNG.getGround
+
+
+end
+
+
+
+
+

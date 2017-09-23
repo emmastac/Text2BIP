@@ -1,0 +1,35 @@
+
+-- PL Mode Manager: 
+-- MD1: AG (  s128_4_exec -> plmodmng.Nuplace = NuSSCENARIO_READY  )
+-- PL Mode Manager: 
+-- MD1: AG (  s128_4_exec -> plmodmng.Nuplace = NuSSCENARIO_READY  )
+-- MD1: AG (  s128_1_load -> plmodmng.Nuplace = NuSIDLE  )
+-- PL Mode Manager: 
+-- MD1: AG (  s128_4_exec -> plmodmng.Nuplace = NuSSCENARIO_READY  )
+-- MD1: AG (  s128_1_load -> plmodmng.Nuplace = NuSIDLE  )
+-- MD1: AG ( (  payload_ready1 |  payload_ready2 ) -> plmodmng.Nuplace = NuSRESULT_READY  )
+-- PL Mode Manager: 
+-- MD1: AG (  s128_4_exec -> plmodmng.Nuplace = NuSSCENARIO_READY  )
+-- MD1: AG (  s128_1_load -> plmodmng.Nuplace = NuSIDLE  )
+-- MD1: AG ( (  payload_ready1 |  payload_ready2 ) -> plmodmng.Nuplace = NuSRESULT_READY  )
+-- MD1: AG (  status_verif_started -> plmodmng.Nuplace = NuSSTARTED  )
+
+-- Data transfer Mode Manager: 
+-- MD1: AG (  data_transfer_start -> datrans_modmng.Nuplace = NuSBUSY  )
+
+-- s128_4 MUTEX: 
+-- MX1: AG ( s128_4_takeTC -> AX A [! (s128_4_takeTC) U ( s128_4_I2C_fail |  s128_4_wrong_state |  s128_4_fail |  (s128_4_success1 | s128_4_success2) ) ])
+
+-- s128_1 MUTEX: 
+-- MX1: AG ( s128_1_takeTC -> AX A [! (s128_1_takeTC) U ( s128_1_fail |  (s128_1_success1 | s128_1_success2) |  s128_1_I2C_fail |  s128_1_wrong_state ) ])
+
+-- s128_5 MUTEX: 
+-- MX1: AG ( s128_5_takeTC -> AX A [! (s128_5_takeTC) U ( ( s128_5_aborted2 | s128_5_aborted1)  |  s128_5_fail |   s128_5_I2C_fail ) ])
+
+-- Status Verification MUTEX: 
+-- MX1: AG ( status_verif_started -> AX A [! (status_verif_started) U ( ( status_verif_to_idle1 | status_verif_to_idle2 ) |  (status_verif_result1 | status_verif_result2) ) ])
+
+FAIRNESS ( ( ( s128_5_aborted2 | s128_5_aborted1)  |  s128_5_fail |   s128_5_I2C_fail ) );
+FAIRNESS ( ( s128_1_fail |  (s128_1_success1 | s128_1_success2) |  s128_1_I2C_fail |  s128_1_wrong_state ) );
+FAIRNESS ( ( s128_4_I2C_fail |  s128_4_wrong_state |  s128_4_fail |  (s128_4_success1 | s128_4_success2) ) );
+FAIRNESS ( ( ( status_verif_to_idle1 | status_verif_to_idle2 ) |  (status_verif_result1 | status_verif_result2) ) );

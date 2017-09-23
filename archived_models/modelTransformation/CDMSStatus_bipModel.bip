@@ -1,0 +1,130 @@
+model CDMSStatus_bipModel
+
+	port type syncPort
+	
+
+
+connector type SINGLE(syncPort p1)
+define p1
+end
+
+
+connector type RDV2(syncPort p1, syncPort p2)
+define p1 p2
+end	
+
+connector type RDV3(syncPort p1, syncPort p2, syncPort p3)
+define p1 p2 p3
+end	
+
+connector type RDV4(syncPort p1, syncPort p2, syncPort p3, syncPort p4)
+define p1 p2 p3 p4
+end	
+
+connector type RDV5(syncPort p1, syncPort p2, syncPort p3, syncPort p4, syncPort p5)
+define p1 p2 p3 p4 p5
+end	
+
+connector type RDV6(syncPort p1, syncPort p2, syncPort p3, syncPort p4, syncPort p5, syncPort p6)
+define p1 p2 p3 p4 p5 p6
+end	
+
+connector type RDV7(syncPort p1, syncPort p2, syncPort p3, syncPort p4, syncPort p5, syncPort p6, syncPort p7)
+define p1 p2 p3 p4 p5 p6 p7
+end	
+
+connector type RDV8(syncPort p1, syncPort p2, syncPort p3, syncPort p4, syncPort p5, syncPort p6, syncPort p7, syncPort p8)
+define p1 p2 p3 p4 p5 p6 p7 p8
+end	
+
+ /* Part of the CDMS_status. There is an implementation for the CDSM_STATUS component and there are timing ports there. */ 
+ 
+atomic type WatchdogReset
+
+ 
+data int  timer  
+   
+	export port  syncPort  internal_watchdog     
+	export port  syncPort  done   
+ 
+	place S0 ,S1 
+
+initial to  S0 do{  
+	timer=0;  }
+
+ on internal_watchdog from S0 to S1   do{
+  timer = 0;  }  
+ on done from S1 to S0   
+
+
+end
+
+ 
+atomic type CdmsStatusActionFlow
+
+   
+	export port  syncPort  I2C_ask     
+	export port  syncPort  done_reset     
+	export port  syncPort  start     
+	export port  syncPort  finish     
+	export port  syncPort  I2C_res     
+	export port  syncPort  start_reset   
+ 
+	place ASKED ,NOMINAL ,START ,RESET ,HEARTBEAT ,RESULT 
+
+initial to  NOMINAL do{  }
+
+ on start from NOMINAL to START   
+ on start_reset from START to RESET   
+ on done_reset from RESET to HEARTBEAT   
+ on I2C_ask from HEARTBEAT to ASKED   
+ on I2C_res from ASKED to RESULT   
+ on finish from RESULT to NOMINAL   
+
+
+end
+
+ 
+atomic type MessageLibrary
+
+   
+	export port  syncPort  composeMessage     
+	export port  syncPort  decodeMessage   
+ 
+	place S0 
+
+initial to  S0 do{  }
+
+ on decodeMessage from S0 to S0   
+ on composeMessage from S0 to S0   
+
+
+end
+
+
+
+compound type CdmsStatus
+
+
+	component WatchdogReset WATCHDOG 
+	component CdmsStatusActionFlow CDMSSTATACTFL 
+	component MessageLibrary MSGLIB 
+
+ 
+	/******** cdms_status ***********/
+	connector RDV2 internal_watchdog ( WATCHDOG.internal_watchdog ,CDMSSTATACTFL.start_reset   )  
+	connector RDV2 reset_done ( CDMSSTATACTFL.done_reset ,WATCHDOG.done   )  
+	connector RDV2 cdms_I2C_res ( CDMSSTATACTFL.I2C_res ,MSGLIB.decodeMessage   )  
+	connector RDV2 cdms_I2C_res_error ( CDMSSTATACTFL.I2C_res ,MSGLIB.decodeMessage   )  
+	connector RDV2 cdms_I2C_ask ( CDMSSTATACTFL.I2C_ask ,MSGLIB.composeMessage   )  
+	connector RDV2 done ( CDMSSTATACTFL.done_reset ,WATCHDOG.done   )  
+	connector SINGLE CDMSSTATACTFL_start ( CDMSSTATACTFL.start   )  
+	connector SINGLE CDMSSTATACTFL_finish ( CDMSSTATACTFL.finish   ) 
+
+	
+
+end
+
+component CdmsStatus Root
+
+end

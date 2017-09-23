@@ -1,0 +1,154 @@
+MODULE I2C_SAT_ACTFL(active_interaction)
+
+	VAR
+		NuPpoll		:		boolean;
+		NuPno_message		:		boolean;
+		NuPerror1		:		boolean;
+		NuPreturn		:		boolean;
+		NuVno_msg		:		unsigned word[3];
+		NuVbad_crc		:		unsigned word[3];
+		Nuplace		:		{NuSREAD, NuSVERIFY};
+
+
+	INIT
+		( (Nuplace) = (NuSREAD) ) &
+		( (NuVno_msg) = (0ud3_0) ) &
+		( (NuVbad_crc) = (0ud3_0) );
+
+	INVAR
+		( (NuPerror1) <-> (( (( (Nuplace) = (NuSVERIFY) )) & (( (( (NuVbad_crc) = (( -(0ud3_1) )) )) | (( (NuVbad_crc) = (0ud3_1) )) )) )) ) &
+		( (NuPreturn) <-> (( (( (Nuplace) = (NuSVERIFY) )) & (( (( (( (NuVno_msg) = (( -(0ud3_1) )) )) | (( (NuVbad_crc) = (( -(0ud3_1) )) )) )) | (( (( (NuVno_msg) = (0ud3_0) )) & (( (NuVbad_crc) = (0ud3_0) )) )) )) )) ) &
+		( (NuPpoll) <-> (( (Nuplace) = (NuSREAD) )) ) &
+		( (NuPno_message) <-> (( (( (Nuplace) = (NuSVERIFY) )) & (( (( (NuVno_msg) = (( -(0ud3_1) )) )) | (( (NuVno_msg) = (0ud3_1) )) )) )) );
+
+	TRANS
+		( (( (( (( (( (Nuplace) = (NuSREAD) )) & (( (next(Nuplace)) = (NuSVERIFY) )) )) & (( (active_interaction) = (NuI6) )) )) & (( (next(NuVno_msg)) = (( -(0ud3_1) )) )) )) & (( (next(NuVbad_crc)) = (( -(0ud3_1) )) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSVERIFY) )) & (( (next(Nuplace)) = (NuSREAD) )) )) & (( (active_interaction) = (NuI10) )) )) & (( (next(NuVno_msg)) = (NuVno_msg) )) )) & (( (next(NuVbad_crc)) = (NuVbad_crc) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSVERIFY) )) & (( (next(Nuplace)) = (NuSREAD) )) )) & (( (active_interaction) = (NuI1) )) )) & (( (next(NuVno_msg)) = (NuVno_msg) )) )) & (( (next(NuVbad_crc)) = (NuVbad_crc) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSVERIFY) )) & (( (next(Nuplace)) = (NuSREAD) )) )) & (( (active_interaction) = (NuI2) )) )) & (( (next(NuVno_msg)) = (NuVno_msg) )) )) & (( (next(NuVbad_crc)) = (NuVbad_crc) )) ) |
+		( (( (( (( (( (Nuplace) = (NuSVERIFY) )) & (( (next(Nuplace)) = (NuSREAD) )) )) & (( (active_interaction) = (NuI9) )) )) & (( (next(NuVno_msg)) = (NuVno_msg) )) )) & (( (next(NuVbad_crc)) = (NuVbad_crc) )) ) |
+		( (( (active_interaction) != (NuI9) )) & (( (( (active_interaction) != (NuI2) )) & (( (( (active_interaction) != (NuI1) )) & (( (( (active_interaction) != (NuI10) )) & (( (( (active_interaction) != (NuI6) )) & (( (( (( (next(Nuplace)) = (Nuplace) )) & (( (next(NuVno_msg)) = (NuVno_msg) )) )) & (( (next(NuVbad_crc)) = (NuVbad_crc) )) )) )) )) )) )) );
+
+
+MODULE I2C_SAT_MODMNG(active_interaction)
+
+	VAR
+		NuPpoll		:		boolean;
+		NuPsend		:		boolean;
+		NuPreturn		:		boolean;
+		Nuplace		:		{NuSS0, NuSS1};
+
+
+	INIT
+		( (Nuplace) = (NuSS0) );
+
+	INVAR
+		( (NuPreturn) <-> (( (Nuplace) = (NuSS1) )) ) &
+		( (NuPsend) <-> (( (Nuplace) = (NuSS0) )) ) &
+		( (NuPpoll) <-> (( (Nuplace) = (NuSS1) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS1) )) )) & (( (active_interaction) = (NuI7) )) ) |
+		( (( (( (Nuplace) = (NuSS1) )) & (( (next(Nuplace)) = (NuSS1) )) )) & (( (active_interaction) = (NuI6) )) ) |
+		( (( (( (Nuplace) = (NuSS1) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI1) )) ) |
+		( (( (active_interaction) != (NuI1) )) & (( (( (active_interaction) != (NuI6) )) & (( (( (active_interaction) != (NuI7) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) );
+
+
+MODULE I2C_SAT_ACTFLAB(active_interaction)
+
+	VAR
+		NuPrequest		:		boolean;
+		NuPsend		:		boolean;
+		NuPerror3		:		boolean;
+		NuPreturn		:		boolean;
+		NuPerror2		:		boolean;
+		NuVmax_poll		:		unsigned word[3];
+		NuVcount_poll		:		unsigned word[3];
+		NuVmax_write		:		unsigned word[3];
+		NuVcount_write		:		unsigned word[3];
+		Nuplace		:		{NuSREAD, NuSIDLE, NuSWRITE};
+
+
+	INIT
+		( (Nuplace) = (NuSIDLE) ) &
+		( (NuVmax_write) = (0ud3_2) ) &
+		( (NuVmax_poll) = (0ud3_2) ) &
+		( (NuVcount_poll) = (0ud3_0) ) &
+		( (NuVcount_write) = (0ud3_0) );
+
+	INVAR
+		( (NuPreturn) <-> (( (( (Nuplace) = (NuSREAD) )) & (( (( (NuVmax_poll) = (( -(0ud3_1) )) )) | (( (NuVcount_poll) < (NuVmax_poll) )) )) )) ) &
+		( (NuPrequest) <-> (( (Nuplace) = (NuSIDLE) )) ) &
+		( (NuPsend) <-> (( (( (Nuplace) = (NuSWRITE) )) & (( (( (NuVmax_write) = (( -(0ud3_1) )) )) | (( (NuVcount_write) < (NuVmax_write) )) )) )) ) &
+		( (NuPerror2) <-> (( (( (Nuplace) = (NuSREAD) )) & (( (( (NuVmax_poll) = (( -(0ud3_1) )) )) | (( (NuVcount_poll) = (NuVmax_poll) )) )) )) ) &
+		( (NuPerror3) <-> (( (( (Nuplace) = (NuSWRITE) )) & (( (( (NuVmax_write) = (( -(0ud3_1) )) )) | (( (NuVcount_write) = (NuVmax_write) )) )) )) );
+
+	TRANS
+		( (( (( (( (( (( (( (Nuplace) = (NuSIDLE) )) & (( (next(Nuplace)) = (NuSWRITE) )) )) & (( (active_interaction) = (NuI5) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVcount_poll)) = (NuVcount_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) )) & (( (next(NuVcount_write)) = (NuVcount_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSWRITE) )) & (( (next(Nuplace)) = (NuSREAD) )) )) & (( (active_interaction) = (NuI7) )) )) & (( (next(NuVcount_write)) = (( (NuVcount_write) + (0ud3_1) )) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVcount_poll)) = (NuVcount_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSWRITE) )) & (( (next(Nuplace)) = (NuSREAD) )) )) & (( (active_interaction) = (NuI8) )) )) & (( (next(NuVcount_write)) = (( (NuVcount_write) + (0ud3_1) )) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVcount_poll)) = (NuVcount_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSWRITE) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI4) )) )) & (( (next(NuVcount_write)) = (0ud3_0) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVcount_poll)) = (NuVcount_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSREAD) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI1) )) )) & (( (next(NuVcount_poll)) = (( (NuVcount_poll) + (0ud3_1) )) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) )) & (( (next(NuVcount_write)) = (NuVcount_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSREAD) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI2) )) )) & (( (next(NuVcount_poll)) = (( (NuVcount_poll) + (0ud3_1) )) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) )) & (( (next(NuVcount_write)) = (NuVcount_write) )) ) |
+		( (( (( (( (( (( (( (Nuplace) = (NuSREAD) )) & (( (next(Nuplace)) = (NuSIDLE) )) )) & (( (active_interaction) = (NuI3) )) )) & (( (next(NuVcount_poll)) = (0ud3_0) )) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) )) & (( (next(NuVcount_write)) = (NuVcount_write) )) ) |
+		( (( (active_interaction) != (NuI3) )) & (( (( (active_interaction) != (NuI2) )) & (( (( (active_interaction) != (NuI1) )) & (( (( (active_interaction) != (NuI4) )) & (( (( (active_interaction) != (NuI8) )) & (( (( (active_interaction) != (NuI7) )) & (( (( (active_interaction) != (NuI5) )) & (( (( (( (( (( (next(Nuplace)) = (Nuplace) )) & (( (next(NuVmax_poll)) = (NuVmax_poll) )) )) & (( (next(NuVcount_poll)) = (NuVcount_poll) )) )) & (( (next(NuVmax_write)) = (NuVmax_write) )) )) & (( (next(NuVcount_write)) = (NuVcount_write) )) )) )) )) )) )) )) )) );
+
+
+MODULE I2C_SAT_LIB(active_interaction)
+
+	VAR
+		NuPmasterWrite		:		boolean;
+		NuPmasterRead		:		boolean;
+		Nuplace		:		{NuSS0};
+
+
+	INIT
+		( (Nuplace) = (NuSS0) );
+
+	INVAR
+		( (NuPmasterWrite) <-> (( (Nuplace) = (NuSS0) )) ) &
+		( (NuPmasterRead) <-> (( (Nuplace) = (NuSS0) )) );
+
+	TRANS
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI7) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI8) )) ) |
+		( (( (( (Nuplace) = (NuSS0) )) & (( (next(Nuplace)) = (NuSS0) )) )) & (( (active_interaction) = (NuI6) )) ) |
+		( (( (active_interaction) != (NuI6) )) & (( (( (active_interaction) != (NuI8) )) & (( (( (active_interaction) != (NuI7) )) & (( (next(Nuplace)) = (Nuplace) )) )) )) );
+
+
+MODULE main
+
+	VAR
+		NuInteraction		:		{NuI1, NuI2, NuI3, NuI4, NuI5, NuI6, NuI7, NuI8, NuI9, NuI10};
+		i2c_sat_actfl	:	I2C_SAT_ACTFL(NuInteraction);
+		i2c_sat_modmng	:	I2C_SAT_MODMNG(NuInteraction);
+		i2c_sat_actflab	:	I2C_SAT_ACTFLAB(NuInteraction);
+		i2c_sat_lib	:	I2C_SAT_LIB(NuInteraction);
+
+	DEFINE
+		cdms_I2C_res3		:=		( (i2c_sat_actfl.NuPreturn) & (i2c_sat_actflab.NuPreturn) );
+		cdms_I2C_res4		:=		( (( (i2c_sat_actfl.NuPreturn) & (i2c_sat_actflab.NuPreturn) )) & (i2c_sat_modmng.NuPreturn) );
+		I2C_sat_poll		:=		( (( (i2c_sat_actfl.NuPpoll) & (i2c_sat_modmng.NuPpoll) )) & (i2c_sat_lib.NuPmasterRead) );
+		cdms_I2C_res_error3		:=		i2c_sat_actflab.NuPerror3;
+		cdms_I2C_ask		:=		i2c_sat_actflab.NuPrequest;
+		I2C_sat_send2		:=		( (( (i2c_sat_actflab.NuPsend) & (i2c_sat_lib.NuPmasterWrite) )) & (i2c_sat_modmng.NuPsend) );
+		I2C_SAT_ACTFL_no_message		:=		i2c_sat_actfl.NuPno_message;
+		I2C_sat_send1		:=		( (i2c_sat_actflab.NuPsend) & (i2c_sat_lib.NuPmasterWrite) );
+		I2C_sat_error1		:=		i2c_sat_actfl.NuPerror1;
+		cdms_I2C_res_error2		:=		i2c_sat_actflab.NuPerror2;
+
+
+	INVAR
+		( (( (NuInteraction) = (NuI2) )) -> (cdms_I2C_res3) ) &
+		( (( (NuInteraction) = (NuI1) )) -> (cdms_I2C_res4) ) &
+		( (( (NuInteraction) = (NuI6) )) -> (I2C_sat_poll) ) &
+		( (( (NuInteraction) = (NuI4) )) -> (cdms_I2C_res_error3) ) &
+		( (( (NuInteraction) = (NuI5) )) -> (cdms_I2C_ask) ) &
+		( (( (NuInteraction) = (NuI7) )) -> (I2C_sat_send2) ) &
+		( (( (NuInteraction) = (NuI10) )) -> (I2C_SAT_ACTFL_no_message) ) &
+		( (( (NuInteraction) = (NuI8) )) -> (I2C_sat_send1) ) &
+		( (( (NuInteraction) = (NuI9) )) -> (I2C_sat_error1) ) &
+		( (( (NuInteraction) = (NuI3) )) -> (cdms_I2C_res_error2) );
+
+
+

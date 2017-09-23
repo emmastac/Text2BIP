@@ -1,0 +1,284 @@
+model TM_bipModel
+
+	port type aPort
+	port type int1Port(int msg1)
+	port type int2Port(int msg1, int msg2)
+	port type int3Port(int msg1, int msg2, int msg3)
+	port type int4Port(int msg1, int msg2, int msg3, int msg4)
+
+connector type RETS2(int1Port p1, int1Port p2)
+define p1 p2
+on p1 p2
+down{ p2.msg1=p1.msg1; }
+end	
+
+connector type CPTC1(int3Port p1)
+define p1
+end	
+
+connector type CPTCIF2(int3Port p1, int3Port p2)
+define p1 p2
+on p1 p2
+provided(p1.msg1==-1 || p2.msg1==p1.msg1 )
+down{ p2.msg1=p1.msg1; p2.msg2=p1.msg2; p2.msg3=p1.msg3;  }
+end	
+
+connector type CPSG2(int4Port p1, int4Port p2)
+define p1 p2
+on p1 p2
+down{ p2.msg1=p1.msg1; p2.msg2=p1.msg2; p2.msg3=p1.msg3; p2.msg4=p1.msg4;  }
+end
+
+connector type SINGLE2(int2Port p1)
+define p1
+end	
+
+connector type SINGLE4(int4Port p1)
+define p1
+end	
+
+
+connector type SINGLE(aPort p1)
+define p1
+end
+
+
+connector type SINGLE1(int1Port p1)
+define p1
+end
+
+connector type SINGLE3(int3Port p1)
+define p1
+end	
+
+
+connector type RDV2(aPort p1, aPort p2)
+define p1 p2
+end	
+
+connector type RDV3(aPort p1, aPort p2, aPort p3)
+define p1 p2 p3
+end	
+
+
+connector type CPTC2(int3Port p1, int3Port p2)
+define p1 p2
+on p1 p2
+down{ p2.msg1=p1.msg1; p2.msg2=p1.msg2; p2.msg3=p1.msg3;  }
+end	
+
+connector type CP12(int1Port p1, int1Port p2)
+define p1 p2
+on p1 p2
+down{ p2.msg1=p1.msg1;  }
+end	
+
+connector type CP13(int1Port p1, int1Port p2, int1Port p3)
+define p1 p2 p3
+on p1 p2 p3
+down{ p2.msg1=p1.msg1; p3.msg1=p1.msg1; }
+end	
+
+connector type CPHLC2(int2Port p1, int2Port p2)
+define p1 p2
+on p1 p2
+down{ p2.msg1=p1.msg1; p2.msg2=p1.msg2;  }
+end	
+
+connector type CPHLC3(int2Port p1, int2Port p2, int2Port p3)
+define p1 p2 p3
+on p1 p2 p3
+down{ p2.msg1=p1.msg1; p2.msg2=p1.msg2;  }
+end	
+
+connector type CP12ALLOW(int1Port p1, int1Port p2, aPort p3)
+define p1 p2 p3
+on p1 p2 p3
+down{ p2.msg1=p1.msg1;  }
+end	
+ 
+atomic type vc1
+
+ 
+data int  occup ,sid ,ssid ,accReq  
+   
+	export port  aPort  nFull     
+	export port  int3Port  get (sid ,ssid ,accReq  )    
+	export port  int3Port  put (sid ,ssid ,accReq  )    
+	export port  aPort  full   
+ 
+	place S0 ,S1 ,S2 
+
+initial to  S0 do{  
+	occup=0; sid=-1; ssid=-1; accReq=-1;  }
+
+ on nFull  from S0 to S0   
+ on put  from S0 to S0   do{
+  occup=occup+1;  }  
+ internal  from S0 to S1  provided( (occup==1) )   
+ on put  from S1 to S1   do{
+  occup=occup+1;  }  
+ on get  from S1 to S1   do{
+  occup=occup-1;  }  
+ internal  from S1 to S0  provided( (occup==0) )   
+ internal  from S1 to S2  provided( (occup==VC1_CAP) )   
+ on nFull  from S1 to S1   
+ on full  from S2 to S2   
+ on get  from S2 to S2   do{
+  occup=occup-1;  }  
+ internal  from S2 to S1  provided( (occup<VC1_CAP) )   
+
+
+end
+
+ 
+atomic type pus129
+
+ 
+data int  SID ,SSID ,accReq ,rate  
+   
+	export port  int1Port  setHPTMGenRate (rate  )    
+	export port  int1Port  setTMEncRate (rate  )    
+	export port  aPort  setDefTMEncRate      
+	export port  int3Port  tcComm (SID ,SSID ,accReq  )  
+ 
+	place S0 ,S1 
+
+initial to  S0 do{  
+	SID=129; SSID=-1; accReq=-1; rate= -1;  }
+
+ on tcComm  from S0 to S1   
+ on setDefTMEncRate   from S1 to S0  provided( ( SSID==-1 || SSID==SET_DEF_TMENCODER_RATE_SSID) )   
+ on setTMEncRate  from S1 to S0  provided( ( SSID==-1 || SSID!=SET_DEF_TMENCODER_RATE_SSID) )   
+ on setHPTMGenRate  from S1 to S0  provided( ( SSID==-1 || SSID!=SET_DEF_TMENCODER_RATE_SSID) )   
+
+
+end
+
+ 
+atomic type TMEncoder
+
+ 
+data int  bitrate ,rateIn  
+   
+	export port  aPort  encodeTM     
+	export port  int1Port  setTMEncRate (rateIn  )    
+	export port  aPort  encoderAlive     
+	export port  aPort  encoderFailed     
+	export port  aPort  setDefTMEncRate      
+	export port  aPort  encodeTMdone   
+ 
+	place S10 ,S0 ,S1 ,S2 
+
+initial to  S0, S10 do{  
+	bitrate = TM_ENCODER_DEFAULT_RATE;  }
+
+ on encodeTM  from S0 to S1   
+ on encoderFailed  from S0 to S2   
+ on encodeTMdone  from S1 to S0   
+ on encoderFailed  from S1 to S2   
+ on encoderAlive  from S2 to S0   
+ on setDefTMEncRate   from S10 to S10   do{
+  bitrate = AJ_TM_ENCODER_DEFAULT_RATE_IN_SAFE;  }  
+ on setTMEncRate  from S10 to S10   do{
+  bitrate = rateIn;  }  
+
+
+end
+
+ 
+atomic type ColdRedundancyMng
+
+   
+	export port  aPort  resume_encTMSecondary     
+	export port  aPort  encTMSecondary_done     
+	export port  aPort  setDefTMEncRateSecondary     
+	export port  aPort  setDefTMEncRatePrimary     
+	export port  aPort  setTMEncRatePrimary     
+	export port  aPort  setTMEncRateSecondary     
+	export port  aPort  encTMPrimary_done     
+	export port  aPort  primaryAlive     
+	export port  aPort  resume_encTMPrimary     
+	export port  aPort  encTMPrimary     
+	export port  aPort  encTMSecondary     
+	export port  aPort  primaryFailed   
+ 
+	place S11 ,S02 ,S01 ,S12 ,S0 ,S1 
+
+initial to  S0 do{  }
+
+ on encTMPrimary  from S0 to S01   
+ on resume_encTMPrimary  from S02 to S01   
+ on encTMPrimary_done  from S01 to S0   
+ on primaryFailed  from S0 to S02   
+ on primaryAlive  from S1 to S12   
+ on encTMSecondary  from S1 to S11   
+ on resume_encTMSecondary  from S12 to S11   
+ on encTMSecondary_done  from S11 to S1   
+ on setDefTMEncRatePrimary  from S0 to S0   
+ on setTMEncRatePrimary  from S0 to S0   
+ on setDefTMEncRateSecondary  from S1 to S1   
+ on setTMEncRateSecondary  from S1 to S1   
+
+
+end
+
+ 
+atomic type HPTMmodule
+
+ 
+data int  generationRate ,rateIn  
+   
+	export port  int1Port  setHPTMGenRate (rateIn  )  
+ 
+	place S10 
+
+initial to  S0, S10 do{  
+	generationRate = HPTM_DEFAULT_RATE;  }
+
+ on setHPTMGenRate  from S10 to S10   do{
+  generationRate = rateIn;  }  
+
+
+end
+
+
+
+compound type TMFunction
+
+
+	component pus129 PUS129 
+	component TMenc_rate_change_monit TMENC_CHNG 
+	component TMEncoder TMENC_PRIM 
+	component TMEncoder TMENC_SECOND 
+	component HPTMmodule HPTM1 
+	component HPTMmodule HPTM2 
+	component ColdRedundancyMng REDUNDMNG 
+
+ 
+	connector RDV3 setDefTMEncRate1 ( PUS129.setDefTMEncRate ,REDUNDMNG.setDefTMEncRatePrimary ,TMENC_PRIM.setDefTMEncRate   )  
+	connector RDV3 setDefTMEncRate2 ( PUS129.setDefTMEncRate ,REDUNDMNG.setDefTMEncRateSecondary ,TMENC_SECOND.setDefTMEncRate   )  
+	connector CP12ALLOW setTMEncRate1 ( PUS129.setTMEncRate ,TMENC_PRIM.setTMEncRate ,REDUNDMNG.setTMEncRatePrimary   )  
+	connector CP12ALLOW setTMEncRate2 ( PUS129.setTMEncRate ,TMENC_SECOND.setTMEncRate ,REDUNDMNG.setTMEncRateSecondary   )  
+	connector CP13 setHPTMGenRate ( PUS129.setHPTMGenRate ,HPTM1.setHPTMGenRate ,HPTM2.setHPTMGenRate   )  
+	connector RDV2 encTMPrimary ( REDUNDMNG.encTMPrimary ,TMENC_PRIM.encodeTM   )  
+	connector RDV2 encTMSecondary ( REDUNDMNG.encTMSecondary ,TMENC_SECOND.encodeTM   )  
+	connector RDV2 resume_encTMPrimary ( REDUNDMNG.resume_encTMPrimary ,TMENC_PRIM.encodeTM   )  
+	connector RDV2 resume_encTMSecondary ( REDUNDMNG.resume_encTMSecondary ,TMENC_SECOND.encodeTM   )  
+	connector RDV2 encTMPrimary_done ( REDUNDMNG.encTMPrimary_done ,TMENC_PRIM.encodeTMdone   )  
+	connector RDV2 encTMSecondary_done ( REDUNDMNG.encTMSecondary_done ,TMENC_SECOND.encodeTMdone   )  
+	connector RDV2 primaryFailed ( REDUNDMNG.primaryFailed ,TMENC_PRIM.encoderFailed   )  
+	connector RDV2 primaryAlive ( REDUNDMNG.primaryAlive ,TMENC_SECOND.encoderAlive   )  
+	connector SINGLE PUS129_setDefTMEncRate  ( PUS129.setDefTMEncRate    )  
+	connector SINGLE3 PUS129_tcComm ( PUS129.tcComm   )  
+	connector SINGLE TMENC_PRIM_encoderAlive ( TMENC_PRIM.encoderAlive   )  
+	connector SINGLE TMENC_PRIM_setDefTMEncRate  ( TMENC_PRIM.setDefTMEncRate    )  
+	connector SINGLE TMENC_SECOND_encoderFailed ( TMENC_SECOND.encoderFailed   )  
+	connector SINGLE TMENC_SECOND_setDefTMEncRate  ( TMENC_SECOND.setDefTMEncRate    ) 
+
+
+end
+
+component  Root
+
+end

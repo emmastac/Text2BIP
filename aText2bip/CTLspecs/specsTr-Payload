@@ -1,0 +1,50 @@
+
+-- PL Mode Manager:
+-- MD1: AG (  s128_4_exec -> plmodmng.Nuplace = NuSSCENARIO_READY  )
+CTLSPEC  AG (  (NuInteraction) = (NuI4) -> plmodmng.Nuplace = NuSSCENARIO_READY  )
+-- PL Mode Manager:
+-- MD1: AG (  s128_4_exec -> plmodmng.Nuplace = NuSSCENARIO_READY  )
+CTLSPEC  AG (  (NuInteraction) = (NuI4) -> plmodmng.Nuplace = NuSSCENARIO_READY  )
+-- MD1: AG (  s128_1_load -> plmodmng.Nuplace = NuSIDLE  )
+CTLSPEC  AG (  (NuInteraction) = (NuI13) -> plmodmng.Nuplace = NuSIDLE  )
+-- PL Mode Manager:
+-- MD1: AG (  s128_4_exec -> plmodmng.Nuplace = NuSSCENARIO_READY  )
+CTLSPEC  AG (  (NuInteraction) = (NuI4) -> plmodmng.Nuplace = NuSSCENARIO_READY  )
+-- MD1: AG (  s128_1_load -> plmodmng.Nuplace = NuSIDLE  )
+CTLSPEC  AG (  (NuInteraction) = (NuI13) -> plmodmng.Nuplace = NuSIDLE  )
+-- MD1: AG ( (  payload_ready1 |  payload_ready2 ) -> plmodmng.Nuplace = NuSRESULT_READY  )
+CTLSPEC  AG ( (  (NuInteraction) = (NuI34) |  (NuInteraction) = (NuI35) ) -> plmodmng.Nuplace = NuSRESULT_READY  )
+-- PL Mode Manager:
+-- MD1: AG (  s128_4_exec -> plmodmng.Nuplace = NuSSCENARIO_READY  )
+CTLSPEC  AG (  (NuInteraction) = (NuI4) -> plmodmng.Nuplace = NuSSCENARIO_READY  )
+-- MD1: AG (  s128_1_load -> plmodmng.Nuplace = NuSIDLE  )
+CTLSPEC  AG (  (NuInteraction) = (NuI13) -> plmodmng.Nuplace = NuSIDLE  )
+-- MD1: AG ( (  payload_ready1 |  payload_ready2 ) -> plmodmng.Nuplace = NuSRESULT_READY  )
+CTLSPEC  AG ( (  (NuInteraction) = (NuI34) |  (NuInteraction) = (NuI35) ) -> plmodmng.Nuplace = NuSRESULT_READY  )
+-- MD1: AG (  status_verif_started -> plmodmng.Nuplace = NuSSTARTED  )
+CTLSPEC  AG (  (NuInteraction) = (NuI26) -> plmodmng.Nuplace = NuSSTARTED  )
+
+-- Data transfer Mode Manager:
+-- MD1: AG (  data_transfer_start -> datrans_modmng.Nuplace = NuSBUSY  )
+CTLSPEC  AG (  (NuInteraction) = (NuI36) -> datrans_modmng.Nuplace = NuSBUSY  )
+
+-- s128_4 MUTEX:
+-- MX1: AG ( s128_4_takeTC -> AX A [! (s128_4_takeTC) U ( s128_4_I2C_fail |  s128_4_wrong_state |  s128_4_fail |  (s128_4_success1 | s128_4_success2) ) ])
+CTLSPEC  AG ( (NuInteraction) = (NuI3) -> AX A [! ((NuInteraction) = (NuI3)) U ( (NuInteraction) = (NuI9) |  (NuInteraction) = (NuI2) |  (NuInteraction) = (NuI1) |  ((NuInteraction) = (NuI5) | (NuInteraction) = (NuI6)) ) ])
+
+-- s128_1 MUTEX:
+-- MX1: AG ( s128_1_takeTC -> AX A [! (s128_1_takeTC) U ( s128_1_fail |  (s128_1_success1 | s128_1_success2) |  s128_1_I2C_fail |  s128_1_wrong_state ) ])
+CTLSPEC  AG ( (NuInteraction) = (NuI12) -> AX A [! ((NuInteraction) = (NuI12)) U ( (NuInteraction) = (NuI10) |  ((NuInteraction) = (NuI14) | (NuInteraction) = (NuI15)) |  (NuInteraction) = (NuI18) |  (NuInteraction) = (NuI11) ) ])
+
+-- s128_5 MUTEX:
+-- MX1: AG ( s128_5_takeTC -> AX A [! (s128_5_takeTC) U ( ( s128_5_aborted2 | s128_5_aborted1)  |  s128_5_fail |   s128_5_I2C_fail ) ])
+CTLSPEC  AG ( (NuInteraction) = (NuI22) -> AX A [! ((NuInteraction) = (NuI22)) U ( ( (NuInteraction) = (NuI21) | (NuInteraction) = (NuI20))  |  (NuInteraction) = (NuI19) |   (NuInteraction) = (NuI25) ) ])
+
+-- Status Verification MUTEX:
+-- MX1: AG ( status_verif_started -> AX A [! (status_verif_started) U ( ( status_verif_to_idle1 | status_verif_to_idle2 ) |  (status_verif_result1 | status_verif_result2) ) ])
+CTLSPEC  AG ( (NuInteraction) = (NuI26) -> AX A [! ((NuInteraction) = (NuI26)) U ( ( (NuInteraction) = (NuI29) | (NuInteraction) = (NuI30) ) |  ((NuInteraction) = (NuI27) | (NuInteraction) = (NuI28)) ) ])
+
+FAIRNESS ( ( ( (NuInteraction) = (NuI21) | (NuInteraction) = (NuI20))  |  (NuInteraction) = (NuI19) |   (NuInteraction) = (NuI25) ) );
+FAIRNESS ( ( (NuInteraction) = (NuI10) |  ((NuInteraction) = (NuI14) | (NuInteraction) = (NuI15)) |  (NuInteraction) = (NuI18) |  (NuInteraction) = (NuI11) ) );
+FAIRNESS ( ( (NuInteraction) = (NuI9) |  (NuInteraction) = (NuI2) |  (NuInteraction) = (NuI1) |  ((NuInteraction) = (NuI5) | (NuInteraction) = (NuI6)) ) );
+FAIRNESS ( ( ( (NuInteraction) = (NuI29) | (NuInteraction) = (NuI30) ) |  ((NuInteraction) = (NuI27) | (NuInteraction) = (NuI28)) ) );

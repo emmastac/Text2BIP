@@ -1,0 +1,480 @@
+$!-------------------------HKcyc---------------------------------------!$
+atom: HKcyc
+documentation: Generates Cyclic Housekeeping Reports. It is hardcoded to handle a Predefined  and a ground defined housekeeping definition.
+data: sid,svc,ssvc,HKparam , predefHKstatus , groundHKstatus, groundHK_init, ridIn, cP, cG
+init: S0, S3
+initAct: sid=-1; svc=-1; ssvc=-1; HKparam=-1; predefHKstatus=0;  groundHKstatus=0; groundHK_init=-1; ridIn=-1; cP=0; cG=0;
+ports:
+S0,S1,*predefExpired, (testEXP==0 || (testEXP==1 && cP<1)) && ( predefHKstatus==-1 || predefHKstatus==1) , sid=-1; svc=-1; ssvc=-1; HKparam=-1; cP=cP+1;
+S0,S1,*groundExpired, (testEXP==0 || (testEXP==1 && cG<1)) && (groundHK_init==1) , sid=-1; svc=-1; ssvc=-1; HKparam=-1;   cG=cG+1;
+
+S1,S0, genTM(svc,ssvc,HKparam) ,, 
+
+
+S3,S3, enablePredefCyc, , predefHKstatus=1;
+S3,S3, disablePredefCyc, , predefHKstatus=0;
+$! S3,S3, enableGroundCyc, , if(groundHK_init==1) then groundHKstatus=1; fi !$
+S3,S3, disableGroundCyc, ,  if(groundHK_init==1) then  groundHKstatus=0; fi
+S3,S3, initGroundCyc(ridIn), , groundHK_init=1; groundHKstatus=0;
+
+S3,S33, enableCycHK(ridIn), , 
+S33,S3, , ridIn==PREDEF_HK_RID,  predefHKstatus=1;
+S33,S3, , ridIn==GROUND_HK_RID,  if(groundHK_init==1) then groundHKstatus=1; fi
+S3,S33, disableCycHK(ridIn), , 
+S33,S3, , ridIn==PREDEF_HK_SID,  predefHKstatus=0;
+S33,S3, , ridIn==GROUND_HK_RID,  if(groundHK_init==1) then  groundHKstatus=0; fi
+end
+$!-------------------------DIAGcyc---------------------------------------!$
+
+atom: DIAGcyc
+documentation: Generates Cyclic Diagnostic Reports. It is hardcoded to handle a Predefined  and a ground defined housekeeping definition.
+data: sid,svc,ssvc, DIAGparam , predefDIAGstatus , groundDIAGstatus, ridIn, groundDIAG_init, cP, cG
+init: S0
+initAct: sid=-1; svc=-1; ssvc=-1; DIAGparam=-1; predefDIAGstatus=0; groundDIAGstatus=0; groundDIAG_init=-1; cP=0; cG=0;
+ports:
+S0,S1,*predefExpired, (testEXP==0 || (testEXP==1 && cP<1)) &&( predefDIAGstatus==-1 || predefDIAGstatus==1) ,sid=-1; svc=-1; ssvc=-1; DIAGparam=-1;
+S0,S1,*groundExpired,(testEXP==0 || (testEXP==1 && cG<1)) && (groundDIAG_init==1), sid=-1; svc=-1; ssvc=-1; DIAGparam=-1;
+
+S1,S0, genTM(svc,ssvc,DIAGparam) ,(predefDIAGstatus==-1 || predefDIAGstatus==1), 
+
+S3,S3, enablePredefCyc, , predefDIAGstatus=1;
+$!
+S3,S3, disablePredefCyc, , predefDIAGstatus=0;
+S3,S3, enableGroundCyc, , if(groundDIAG_init==1) then groundDIAGstatus=1; fi
+S3,S3, disableGroundCyc, ,if(groundDIAG_init==1) then groundDIAGstatus=0; fi
+!$
+S3,S3, initGroundCyc(ridIn), , groundDIAG_init=1; groundDIAGstatus=0;
+
+S3,S33, enableCycDIAG(ridIn), , 
+S33,S3, , ridIn==PREDEF_DIAG_RID,  predefDIAGstatus=1;
+S33,S3, , ridIn==GROUND_DIAG_RID,  if(groundDIAG_init==1) then  groundDIAGstatus=1; fi
+S3,S33, disableCycDIAG(ridIn), , 
+S33,S3, , ridIn==PREDEF_DIAG_RID,  predefDIAGstatus=0;
+S33,S3, , ridIn==GROUND_DIAG_RID,  if(groundDIAG_init==1) then groundDIAGstatus=0; fi
+end
+
+$!-------------------------PlatCyc_modeMng---------------------------------------!$
+
+atom: PlatCyc_modeMng
+documentation: Enables and disables each HK and DIAG generator upon changes of the SC mode.
+init: S0
+ports:
+S0,S1,CSWinitEnd
+S1,S2,enablePredefHKcyc
+S2,S3,enablePredefDIAGcyc
+S3,S11,CSWinitEnd_done
+S11,S4,modeChanged
+S4,S5,enablePredefHKcyc, (preHKonModeChange==-1 || preHKonModeChange==1 )
+S4,S5,disablePredefHKcyc, (preHKonModeChange==-1 || preHKonModeChange==0 )
+S5,S6,disableGroundHKcyc
+S6,S11,modeChanged_done
+end
+
+$!-------------------------PlatCycTM---------------------------------------!$
+
+compound: PlatCycTM
+documentation: Wraps Cyclic HK and DIAG generators and their mode management component.
+component: HKcyc,HK1
+component: DIAGcyc, DIAG1
+component: PlatCyc_modeMng,CYCTM_MODEMNG 
+connectors:
+SINGLEE , modeChanged1, modeChanged, CYCTM_MODEMNG.modeChanged
+SINGLEE , modeChanged_done1, modeChanged_done, CYCTM_MODEMNG.modeChanged_done
+SINGLEE,CSWinitEnd1,CSWinitEnd,CYCTM_MODEMNG.CSWinitEnd
+SINGLEE,CSWinitEnd_done1,CSWinitEnd_done,CYCTM_MODEMNG.CSWinitEnd_done
+
+BRD2,disableGroundHKcyc,,CYCTM_MODEMNG.disableGroundHKcyc,HK1.disableGroundCyc
+BRD2,disablePredefHKcyc,,CYCTM_MODEMNG.disablePredefHKcyc,HK1.disablePredefCyc
+BRD2,enablePredefHKcyc,,CYCTM_MODEMNG.enablePredefHKcyc,HK1.enablePredefCyc
+BRD2,enablePredefDIAGcyc,,CYCTM_MODEMNG.enablePredefDIAGcyc,DIAG1.enablePredefCyc
+
+SINGLE1E, enableCycHK1 , enableCycHK , HK1.enableCycHK
+SINGLE1E, disableCycHK1 , disableCycHK , HK1.disableCycHK 
+SINGLE1E, enableCycDIAG1 , enableCycDIAG , DIAG1.enableCycDIAG
+SINGLE1E, disableCycDIAG1 , disableCycDIAG , DIAG1.disableCycDIAG 
+SINGLE1E, initHK1 , initHK , HK1.initGroundCyc
+SINGLE1E, initDIAG1 , initDIAG , DIAG1.initGroundCyc
+
+SINGLE3E, genTM_HK1 , genTM , HK1.genTM
+SINGLE3E, genTM_DIAG1 , genTM , DIAG1.genTM
+end
+
+$!---------------------------- TimeSource ------------------------------------!$
+
+atom: TimeSource
+data: APID, SVC, SSVC, appData, c
+init:S0
+initAct: APID=TIME_REPORT_APID; SVC=TIME_REPORT_SID; SSVC=TIME_REPORT_SSID; appData=-1; c=0;
+ports:
+S0,S1,genTM(SVC,SSVC,appData),(testEXP==0 || (testEXP==1 && c<1)) , c=c+1;
+S0,S0,empty
+S1,S1,empty
+end
+$!---------------------------- CELT ------------------------------------!$
+
+atom: celt
+data: APID, SVC, SSVC, appData, c
+init:S0
+initAct: APID=CELT_APID; SVC=CELT_SID; SSVC=CELT_SSID; appData=-1; c=0;
+ports:
+S0,S1,genTM(SVC,SSVC,appData), (testEXP==0 || (testEXP==1 && c<1)) , c=c+1;
+S0,S0,empty,
+S1,S1,empty,
+end
+
+
+
+
+$!----------------------------TMrouting------------------------------------!$
+
+atom: TMrouting
+documentation: Controls routing of TM packets. 
+init: S0, S10
+data: svc,ssvc,sid, apid, tmSid, tmSSid, tmData, satur
+data: enabled
+initAct: sid=-1; svc=-1; ssvc=-1; apid=-1; satur=0;
+initAct: setFWstatus(-1,-1, 1); setTMtypeFWstatus(PREDEF_HK_TYPE, 0); setTMtypeFWstatus(PREDEF_DIAG_TYPE, 0);
+ports:
+S0,S1,nSaturTM,
+S0,S2,saturTM,
+S1,S2,noCELT,
+S1,S22,getCELT(svc,ssvc,sid)
+S22,S0,storeTM(svc,ssvc,sid)
+
+S2,S3,getTime(svc,ssvc,sid), , getFWstatus(TIME_REPORT_SID ,TIME_REPORT_SSID ,-1, enabled);
+S2,S5,noTime,
+S3,S5,storeTM(svc,ssvc,sid), (enabled==-1 || enabled==1) ,  satur=0;
+S3,S5,*nEnabled, (enabled==-1 || enabled==0) ,
+S3,S4,saturTM, (enabled==-1 || enabled==1) ,tmSid=EVENT_REPORTING_SID; tmSSid=MEDIUM_ANOMALY_REPORT_SSID; tmData=-1;  satur=1;
+S4,S5,genTM(tmSid, tmSSid, tmData)
+
+S5,S0,*noTM
+S5,S6,getTM(svc,ssvc,sid), , getFWstatus(svc,ssvc,sid,enabled);
+S6,S8,storeTM(svc,ssvc,sid), (enabled==-1 || enabled==1) ,  satur=0;
+S6,S8,*nEnabled, (enabled==-1 || enabled==0) ,
+S6,S7,saturTM, (enabled==-1 || enabled==1) ,tmSid=EVENT_REPORTING_SID; tmSSid=MEDIUM_ANOMALY_REPORT_SSID; tmData=-1;  satur=1;
+S7,S8,genTM(tmSid, tmSSid, tmData)
+S8,S0,,
+
+$! S10,S10,enableSVC_SSVC, , setFWstatus(-1,-1); !$
+S10,S10,enablePredefHKcyc, , setTMtypeFWstatus(PREDEF_HK_TYPE, 1);
+S10,S10,disablePredefHKcyc, , setTMtypeFWstatus(PREDEF_HK_TYPE, 0);
+S10,S10,disablePredefDIAGcyc, , setTMtypeFWstatus(PREDEF_DIAG_TYPE, 0);
+S10,S10,disableGroundHKcyc, , setTMtypeFWstatus(GROUND_HK_TYPE, 0);
+
+
+S10,S10,enableTMSource(svc,ssvc,sid), , setFWstatus(svc,ssvc,1);
+S10,S10,disableTMSource(svc,ssvc,sid), , setFWstatus(svc,ssvc, 0);
+S10,S10,enableEvRep(svc,ssvc,sid), , setFWstatus(svc,ssvc,sid,1);
+S10,S10,disableEvRep(svc,ssvc,sid), , setFWstatus(svc,ssvc,sid, 0);
+
+S10,S10,enableHkTM(svc,ssvc,sid), , setFWstatus(svc,ssvc,sid,1);
+S10,S10,disableHkTM(svc,ssvc,sid), , setFWstatus(svc,ssvc,sid, 0);
+S10,S10,enableDiagTM(svc,ssvc,sid), , setFWstatus(svc,ssvc,sid,1);
+S10,S10,disableDiagTM(svc,ssvc,sid), , setFWstatus(svc,ssvc,sid, 0);
+
+end
+
+$!-------------------------TMrouting_modeMng---------------------------------------!$
+
+atom: TMrouting_modeMng
+documentation: Enables and disables each TM routing to VC0 upon changes of the SC mode.
+init: S0
+data: _preHKonModeChange
+initAct: _preHKonModeChange = preHKonModeChange;
+ports:
+S0,S1,CSWinitEnd
+S1,S2,disablePredefHKcyc
+S2,S3,disablePredefDIAGcyc
+S3,S11,CSWinitEnd_done
+S11,S4,modeChanged
+S4,S5,enablePredefHKcyc, (_preHKonModeChange==-1 || _preHKonModeChange==1 ), _preHKonModeChange=1;
+S4,S5,disablePredefHKcyc, (_preHKonModeChange==-1 || _preHKonModeChange==0 ), _preHKonModeChange=0;
+S5,S6,disableGroundHKcyc
+S6,S12,modeChanged_done
+end
+
+
+$!----------------------------TMdownlink------------------------------------!$
+compound: TMdownlink
+component: TMrouting, ROUTE
+component: celt, CELT
+component: TimeSource, TIME
+component: TMrouting_modeMng, ROUTE_MNG
+connectors:
+CPTC2, routeTIME, ,TIME.genTM, ROUTE.getTime
+CPTC2, routeCELT, ,CELT.genTM, ROUTE.getCELT
+RDV2, noCELT, ,CELT.empty, ROUTE.noCELT
+RDV2, noTIME, ,TIME.empty, ROUTE.noTime
+
+RDV2, enablePredefHKcyc, , ROUTE_MNG.enablePredefHKcyc ,ROUTE.enablePredefHKcyc
+RDV2, disablePredefHKcyc, , ROUTE_MNG.disablePredefHKcyc ,ROUTE.disablePredefHKcyc
+RDV2, disablePredefDIAGcyc, , ROUTE_MNG.disablePredefDIAGcyc ,ROUTE.disablePredefDIAGcyc
+RDV2, disableGroundHKcyc, , ROUTE_MNG.disableGroundHKcyc ,ROUTE.disableGroundHKcyc
+
+SINGLE3E, storeTM1, storeTM, ROUTE.storeTM 
+SINGLE3E, getTM1, getTM, ROUTE.getTM
+
+SINGLEE, nSaturTM1, nSaturTM, ROUTE.nSaturTM
+SINGLEE, saturTM1, saturTM, ROUTE.saturTM
+
+SINGLE3E, enableTMSource1, enableTMSource, ROUTE.enableTMSource 
+SINGLE3E, disableTMSource1, disableTMSource, ROUTE.disableTMSource
+SINGLE3E, enableEvRep1, enableEvRep, ROUTE.enableEvRep 
+SINGLE3E, disableEvRep1, disableEvRep, ROUTE.disableEvRep
+SINGLE3E, enableHkTM1, enableHkTM, ROUTE.enableHkTM 
+SINGLE3E, disableHkTM1, disableHkTM, ROUTE.disableHkTM
+SINGLE3E, enableDiagTM1, enableDiagTM, ROUTE.enableDiagTM 
+SINGLE3E, disableDiagTM1, disableDiagTM, ROUTE.disableDiagTM
+
+SINGLEE, CSWinitEnd1, CSWinitEnd, ROUTE_MNG.CSWinitEnd
+SINGLEE, CSWinitEnd_done1, CSWinitEnd_done, ROUTE_MNG.CSWinitEnd_done
+SINGLEE, modeChanged1, modeChanged, ROUTE_MNG.modeChanged
+SINGLEE, modeChanged_done1, modeChanged_done, ROUTE_MNG.modeChanged_done
+end
+
+$!----------------------------vc0------------------------------------!$
+atom: vc0
+data: occup,sid,ssid,accReq
+init: S0
+initAct:  occup=0; sid=-1; ssid=-1; accReq=-1;
+ports: 
+$! S0,S0,empty!$
+S0,S0,nFull 
+S0,S0,put(sid,ssid,accReq),,occup=occup+1;
+S0,S1,,(occup==1)
+
+S1,S1,put(sid,ssid,accReq),,occup=occup+1;
+S1,S1,get(sid,ssid,accReq),,occup=occup-1;
+S1,S0,,(occup==0)
+S1,S2,,(occup==VC0_CAP)
+S1,S1,nFull
+$!
+S1,S1,nEmpty
+!$
+ 
+S2,S2,full
+$!
+S2,S2,nEmpty
+!$
+S2,S2,get(sid,ssid,accReq),,occup=occup-1;
+S2,S1,,(occup<VC0_CAP)
+end
+$!-------------------------------Telemetry---------------------------------!$
+
+compound: Telemetry
+component: PlatCycTM,PLAT_CYCTM
+component: TMdownlink,TMDOWNL
+component: vc0,VC0
+connectors: 
+CPTC2, storeVC0, ,TMDOWNL.storeTM, VC0.put
+RDV2, saturTM, ,TMDOWNL.saturTM, VC0.full
+RDV2, nSaturTM, , TMDOWNL.nSaturTM, VC0.nFull
+
+SINGLE3E, enableEvRep1, enableEvRep, TMDOWNL.enableEvRep
+SINGLE3E, disableEvRep1 , disableEvRep ,TMDOWNL.disableEvRep
+SINGLE3E, enableTMSource1, enableTMSource, TMDOWNL.enableTMSource
+SINGLE3E, disableTMSource1 , disableTMSource ,TMDOWNL.disableTMSource
+SINGLE3E, enableHkTM1 , enableHkTM , TMDOWNL.enableHkTM
+SINGLE3E, disableHkTM1 , disableHkTM , TMDOWNL.disableHkTM 
+SINGLE3E, enableDiagTM1 , enableDiagTM , TMDOWNL.enableDiagTM
+SINGLE3E, disableDiagTM1 , disableDiagTM , TMDOWNL.disableDiagTM 
+
+SINGLE1E, enableCycHK1 , enableCycHK , PLAT_CYCTM.enableCycHK
+SINGLE1E, disableCycHK1 , disableCycHK , PLAT_CYCTM.disableCycHK 
+SINGLE1E, enableCycDIAG1 , enableCycDIAG , PLAT_CYCTM.enableCycDIAG
+SINGLE1E, disableCycDIAG1 , disableCycDIAG , PLAT_CYCTM.disableCycDIAG 
+SINGLE1E, initHK1 , initHK , PLAT_CYCTM.initHK
+SINGLE1E, initDIAG1 , initDIAG , PLAT_CYCTM.initDIAG
+
+RDV2E, CSWinitEnd1, CSWinitEnd , PLAT_CYCTM.CSWinitEnd, TMDOWNL.CSWinitEnd
+RDV2E, CSWinitEnd_done1, CSWinitEnd_done , PLAT_CYCTM.CSWinitEnd_done, TMDOWNL.CSWinitEnd_done
+RDV2E, modeChanged1, modeChanged , PLAT_CYCTM.modeChanged, TMDOWNL.modeChanged
+RDV2E, modeChanged_done1, modeChanged_done , PLAT_CYCTM.modeChanged_done, TMDOWNL.modeChanged_done
+
+SINGLE3E, getTM1, getTM, TMDOWNL.getTM
+CPTC2, downlCycTM, , PLAT_CYCTM.genTM, TMDOWNL.getTM
+end
+
+$!-------------------------PUS3---------------------------------------!$
+
+atom: pus3
+data: SID,SSID,accReq , sid,ssid,apid, rid
+init: S0
+initAct: SID=3; SSID=-1; accReq=-1; sid= -1; ssid=-1; apid=APP_APID; rid = -1;
+ports: 
+S0,S1,tcComm(SID,SSID,accReq)
+S1,S2,*newHK , ( SSID==-1 || SSID==NEW_HK_REPORTING_SSID) , SSID=NEW_HK_REPORTING_SSID; sid=GROUND_HK_SID; ssid=GROUND_HK_SSID; rid=GROUND_HK_RID;
+S2,S10, newCycHK(rid)
+
+S1,S3,*newDIAG , ( SSID==-1 || SSID==NEW_DIAG_REPORTING_SSID) , SSID=NEW_DIAG_REPORTING_SSID; sid=GROUND_DIAG_SID; ssid=GROUND_DIAG_SSID; rid=GROUND_DIAG_RID;
+S3,S10, newCycDIAG(rid)
+$!
+S1,S4,*clearHK , ( SSID==-1 || SSID==CLEAR_HK_REPORTING_SSID) , SSID=CLEAR_HK_REPORTING_SSID;
+S1,S5,*clearDIAG , ( SSID==-1 || SSID==CLEAR_DIAG_REPORTING_SSID) , SSID=CLEAR_DIAG_REPORTING_SSID;
+!$
+S1,S66, *enableHK, ( SSID==-1 || SSID==ENABLE_HK_REPORTING_SSID) , SSID=ENABLE_HK_REPORTING_SSID;
+S66,S6, *predef, , sid=PREDEF_HK_SID; ssid=PREDEF_HK_SSID; rid=PREDEF_HK_RID;
+S66,S6, *ground, , sid=GROUND_HK_SID; ssid=GROUND_HK_SSID; rid=GROUND_HK_RID;
+S6,S10, enableCycHK(rid)
+
+S1,S77, *disableHK, ( SSID==-1 || SSID==DISABLE_HK_REPORTING_SSID) , SSID=DISABLE_HK_REPORTING_SSID;
+S77,S7, *predef, , sid=PREDEF_HK_SID; ssid=PREDEF_HK_SSID; rid=PREDEF_HK_RID;
+S77,S7, *ground, , sid=GROUND_HK_SID; ssid=GROUND_HK_SSID; rid=GROUND_HK_RID;
+S7,S10, disableCycHK(rid)
+
+S1,S88, *enableDIAG, ( SSID==-1 || SSID==ENABLE_DIAG_REPORTING_SSID) , SSID=ENABLE_DIAG_REPORTING_SSID;
+S88,S8, *predef, , sid=PREDEF_DIAG_SID; ssid=PREDEF_DIAG_SSID; rid=PREDEF_DIAG_RID;
+S88,S8, *ground, , sid=GROUND_DIAG_SID; ssid=GROUND_DIAG_SSID; rid=GROUND_DIAG_RID;
+S8,S10, enableCycDIAG(rid)
+
+S1,S99, *disableDIAG, ( SSID==-1 || SSID==DISABLE_DIAG_REPORTING_SSID) , SSID=DISABLE_DIAG_REPORTING_SSID;
+S99,S9, *predef, , sid=PREDEF_DIAG_SID; ssid=PREDEF_DIAG_SSID; rid=PREDEF_DIAG_RID;
+S99,S9, *ground, , sid=GROUND_DIAG_SID; ssid=GROUND_DIAG_SSID; rid=GROUND_DIAG_RID;
+S9,S10, disableCycDIAG(rid)
+
+S10,S0, , ,
+end
+
+$!-------------------------PUS14---------------------------------------!$
+
+atom: pus14
+documentation: The packet forwarding control service. Any number of on-board application processesmay provide a single instance of the packet forwarding control service.
+data: SID,SSID,req , svc,ssvc,srid
+init: S2
+initAct: SID=DOWNLINK_FORWARDING_SID; SSID=-1; req=-1; /* */ svc=-1; ssvc=-1; srid=-1;
+ports: 
+S0,S1,tcComm(SID,SSID,req), ,SSID=-1; 
+
+S1,S2, enableHkTM(svc,ssvc,srid) , (SSID==-1 || SSID==ENABLE_FORWARDING_HK_SSID), SSID=ENABLE_FORWARDING_HK_SSID;
+S1,S2, disableHkTM(svc,ssvc,srid) , (SSID==-1 || SSID==DISABLE_FORWARDING_HK_SSID), SSID=DISABLE_FORWARDING_HK_SSID;
+S1,S2, enableDiagTM(svc,ssvc,srid) , (SSID==-1 || SSID==ENABLE_FORWARDING_DIAG_SSID), SSID=ENABLE_FORWARDING_DIAG_SSID;
+S1,S2, disableDiagTM(svc,ssvc,srid) , (SSID==-1 || SSID==DISABLE_FORWARDING_DIAG_SSID), SSID=DISABLE_FORWARDING_DIAG_SSID;
+S1,S2, enableTMSource(svc,ssvc,srid) , (SSID==-1 || SSID == ENABLE_FORWARDING_TM_SOURCE_SSID ) 
+S1,S2, disableTMSource(svc,ssvc,srid) , (SSID==-1 || SSID == DISABLE_FORWARDING_TM_SOURCE_SSID ) 
+S1,S2, enableEvRep(svc,ssvc,srid) , (SSID==-1 || SSID == ENABLE_FORWARDING_EVENT_REPORT_SSID ) 
+S1,S2, disableEvRep(svc,ssvc,srid) , (SSID==-1 || SSID == DISABLE_FORWARDING_EVENT_REPORT_SSID ) 
+S2,S0, , ,
+end
+
+
+
+$!---------------------------- ASYN ------------------------------------!$
+
+atom: asyn_application
+data: APID, svc, ssvc, appData, hkInit, diagInit, c
+init:S01
+initAct: APID=APP_APID; svc=-1; ssvc=-1; appData=-1; hkInit = -1; diagInit = -1;  c=0;
+ports:
+S01,S0,init
+S0,S1,*enableGRHK,(testEXP==0 || (testEXP==1 && c<1)) && (hkInit==1), svc= HK_DIAG_REPORTING_SID; ssvc=ENABLE_HK_REPORTING_SSID; appData = GROUND_HK_RID; c=c+1;
+S0,S1,*enablePREHK, (testEXP==0 || (testEXP==1 && c<1)) ,svc= HK_DIAG_REPORTING_SID; ssvc=ENABLE_HK_REPORTING_SSID; appData = PREDEF_HK_RID; c=c+1;
+S0,S1,*disableGRHK,(testEXP==0 || (testEXP==1 && c<1)) && (hkInit==1),svc= HK_DIAG_REPORTING_SID; ssvc=DISABLE_HK_REPORTING_SSID; appData = GROUND_HK_RID; c=c+1;
+S0,S1,*disablePRHK,(testEXP==0 || (testEXP==1 && c<1)) ,svc= HK_DIAG_REPORTING_SID; ssvc=DISABLE_HK_REPORTING_SSID; appData = PREDEF_HK_RID; c=c+1;
+
+S0,S1,*enableGRDIAG,(testEXP==0 || (testEXP==1 && c<1)) && (diagInit==1), svc= HK_DIAG_REPORTING_SID; ssvc=ENABLE_DIAG_REPORTING_SSID; appData = GROUND_DIAG_RID; c=c+1;
+S0,S1,*enablePREDIAG,(testEXP==0 || (testEXP==1 && c<1)) ,svc= HK_DIAG_REPORTING_SID; ssvc=ENABLE_DIAG_REPORTING_SSID; appData = PREDEF_DIAG_RID; c=c+1;
+S0,S1,*disableGRDIAG,(testEXP==0 || (testEXP==1 && c<1)) && (diagInit==1),svc= HK_DIAG_REPORTING_SID; ssvc=DISABLE_DIAG_REPORTING_SSID; appData = GROUND_DIAG_RID; c=c+1;
+S0,S1,*disablePRDIAG,(testEXP==0 || (testEXP==1 && c<1)),svc= HK_DIAG_REPORTING_SID; ssvc=DISABLE_DIAG_REPORTING_SSID; appData = PREDEF_DIAG_RID; c=c+1;
+
+S0,S2,*prepTM,(testEXP==0 || (testEXP==1 && c<1)), svc=ASYN_SID; ssvc=ASYN_SSID; c=c+1;
+S0,S1,*newHK,(testEXP==0 || (testEXP==1 && c<1)), hkInit=1; svc= HK_DIAG_REPORTING_SID;  ssvc=NEW_HK_REPORTING_SSID; appData = GROUND_HK_RID; c=c+1;
+S0,S1,*newDIAG,(testEXP==0 || (testEXP==1 && c<1)), diagInit=1; svc= HK_DIAG_REPORTING_SID;  ssvc=NEW_DIAG_REPORTING_SSID; appData = GROUND_DIAG_RID; c=c+1;
+
+S1,S0,sndTC(svc,ssvc,appData), , svc=-1; ssvc=-1; appData=-1;
+S2,S0,genTM(svc,ssvc,appData), , svc=-1; ssvc=-1; appData=-1;
+end
+
+$!-------------------------------CSWinit---------------------------------!$
+atom: CSWinit
+init:S0
+ports:
+S0,S1,CSWInit_start
+S1,S2,initApp
+S2,S3,fw_CSWinitEnd
+S3,S4,rc_CSWinitEnd_done
+S4,S5,fw_modeChanged
+S5,S4, rc_modeChanged_done
+end
+
+
+$!----------------------------PUS129------------------------------------!$
+atom: pus129
+data: SID,SSID,accReq , sid,ssid,apid, rid
+init: S0
+initAct: SID=129; SSID=-1; accReq=-1; rate= -1;
+ports:
+S0,S1,tcComm(SID,SSID,accReq)
+S1,S0,setDefTMEncRate , ( SSID==-1 || SSID==SET_DEF_TMENCODER_RATE_SSID)
+$!-- TODO: add the rate value to TC's parameters --!$
+S1,S0,setTMEncRate(rate) , ( SSID==-1 || SSID!=SET_DEF_TMENCODER_RATE_SSID)
+S1,S0,setHPTMGenRate(rate) , ( SSID==-1 || SSID!=SET_DEF_TMENCODER_RATE_SSID)
+end
+
+$!----------------------------TMEncoder------------------------------------!$
+atom: TMEncoder
+data: bitrate, rateIn
+init: S0, S10
+initAct: bitrate = TM_ENCODER_DEFAULT_RATE;
+ports:
+S0,S0, encTM
+S10,S10,setDefTMEncRate , , bitrate = AJ_TM_ENCODER_DEFAULT_RATE_IN_SAFE;
+S10,S10,setTMEncRate(rateIn) , , bitrate = rateIn; 
+end
+
+$!----------------------------HPTMmodule------------------------------------!$
+atom: HPTMModule
+data: generationRate, rateIn
+init: S0, S10
+initAct: generationRate = HPTM_DEFAULT_RATE;
+ports:
+S0,S0, encTM
+S10,S10,setHPTMGenRate(rateIn) , , generationRate = rateIn; 
+end
+
+
+$!-------------------------------TMFunction---------------------------------!$
+
+compound: HPTM_TMenc_PropertMng
+component: TMEncoder, TMENC
+component: TMEncoder, TMENC
+
+
+end
+
+$!-------------------------------TMFunction---------------------------------!$
+
+compound: TMFunction
+component: Telemetry,TM
+component: pus3, PUS3
+component: pus14, PUS14
+component: asyn_application, ASYN
+component: CSWinit, CSW_INIT
+connectors: 
+CPTC2, enableHkTM , ,PUS14.enableHkTM , TM.enableHkTM
+CPTC2, disableHkTM , ,PUS14.disableHkTM , TM.disableHkTM
+CPTC2, enableDiagTM , ,PUS14.enableDiagTM , TM.enableDiagTM
+CPTC2, disableDiagTM , ,PUS14.disableDiagTM , TM.disableDiagTM
+CPTC2, enableTMSource , ,PUS14.enableTMSource , TM.enableTMSource
+CPTC2, disableTMSource, ,PUS14.disableTMSource , TM.disableTMSource
+CPTC2, enableEvRep , ,PUS14.enableEvRep , TM.enableEvRep
+CPTC2, disableEvRep, ,PUS14.disableEvRep , TM.disableEvRep
+
+CP12, newCycHK, , PUS3.newCycHK, TM.initHK
+CP12, newCycDIAG, , PUS3.newCycDIAG, TM.initDIAG
+CP12, enableCycHK , ,PUS3.enableCycHK , TM.enableCycHK
+CP12, disableCycHK , ,PUS3.disableCycHK , TM.disableCycHK
+CP12, enableCycDIAG , ,PUS3.enableCycDIAG , TM.enableCycDIAG
+CP12, disableCycDIAG , ,PUS3.disableCycDIAG , TM.disableCycDIAG
+
+CPTC2, sndTC1 , ,ASYN.sndTC , PUS3.tcComm
+CPTC2, sndTC2 , ,ASYN.sndTC , PUS14.tcComm
+CPTC2, genTM1 , ,ASYN.genTM , TM.getTM
+
+RDV2,initApp, ,CSW_INIT.initApp, ASYN.init
+RDV2,fw_CSWinitEnd, ,CSW_INIT.fw_CSWinitEnd, TM.CSWinitEnd
+RDV2,rc_CSWinitEnd_done, ,TM.CSWinitEnd_done, CSW_INIT.rc_CSWinitEnd_done
+RDV2,fw_modeChanged, ,CSW_INIT.fw_modeChanged, TM.modeChanged
+RDV2,rc_modeChanged_done, ,TM.modeChanged_done, CSW_INIT.rc_modeChanged_done
+end
+

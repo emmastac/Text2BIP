@@ -1,0 +1,15 @@
+success < acqFail_b
+
+fullFifo1 < fullFifo2
+
+nfullFifo1 < nfullFifo2
+
+execOK_ack_228_11 < execOK_ack_228_12
+execOK_ack_228_21 < execOK_ack_228_22
+execOK_ack_228_31 < execOK_ack_228_32
+execOK_ack_228_41 < execOK_ack_228_42
+
+execOK_228_11 < execOK_228_12
+execOK_228_21 < execOK_228_22
+execOK_228_31 < execOK_228_32
+execOK_228_41 < execOK_228_42

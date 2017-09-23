@@ -1,0 +1,9 @@
+-- CDMS status Action Flow: 
+-- AF1: AG ( CDMSSTATACTFL_start -> AX A [! (cdms_I2C_ask ) U  reset_done ])
+-- AF2: AG ( internal_watchdog -> AX A [! (internal_watchdog) U CDMSSTATACTFL_start ])
+-- AF2: AG ( cdms_I2C_ask  -> AX A [! (cdms_I2C_ask ) U CDMSSTATACTFL_start ])
+-- AF3: AG ( CDMSSTATACTFL_start -> AX A [! (CDMSSTATACTFL_finish) U  cdms_I2C_res ])
+
+FAIRNESS (  reset_done );
+FAIRNESS (  cdms_I2C_res );
+FAIRNESS ( CDMSSTATACTFL_start );

@@ -1,0 +1,29 @@
+Architecture: AFA
+coordinator: Flash Memory Read Action Flow Abort
+start: flash_memory_read
+finish: MEMRD_ACTFLAB_finish
+act-1: flash_memory_checkCRC, (flash_memory_ok_read1 | flash_memory_ok_read2), ( flash_memory_read_fail1 | flash_memory_read_fail2 | flash_memory_bad_CRC)
+end
+
+Architecture: AFA
+coordinator: Flash Memory Write Action Flow Abort
+start: flash_memory_write
+finish: MEMWR_ACTFLAB_finish
+act-1: MEMWR_ACTFLAB_wait, (flash_memory_ok_write1 | flash_memory_ok_write2), ( flash_memory_write_fail1 | flash_memory_write_fail2 | MEMWR_ACTFLAB_contin)
+end
+
+Architecture: MD
+coordinator: Flash Memory Read Mode Manager
+mode-act: memrd_modmng.Nuplace = NuSREAD , flash_memory_read
+end
+
+Architecture: MD
+coordinator: Flash Memory Write Mode Manager
+mode-act: memwr_modmng.Nuplace = NuSWRITE , flash_memory_write
+end
+
+Architecture: MX
+coordinator: Flash Memory MUTEX
+take: ( flash_memory_setRead1 | flash_memory_setRead2 ), ( flash_memory_setWrite1 | flash_memory_setWrite1 )
+release: (flash_memory_ok_write1 | flash_memory_ok_write2 | flash_memory_write_fail1 | flash_memory_write_fail2 ), (flash_memory_ok_read1 | flash_memory_ok_read2 | flash_memory_read_fail1 | flash_memory_read_fail2 )
+end

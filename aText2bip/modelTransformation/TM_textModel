@@ -1,0 +1,138 @@
+
+$!----------------------------vc1------------------------------------!$
+atom: vc1
+data: occup,sid,ssid,accReq
+init: S0
+initAct:  occup=0; sid=-1; ssid=-1; accReq=-1;
+ports: 
+$! S0,S0,empty!$
+S0,S0,nFull 
+S0,S0,put(sid,ssid,accReq),,occup=occup+1;
+S0,S1,,(occup==1)
+
+S1,S1,put(sid,ssid,accReq),,occup=occup+1;
+S1,S1,get(sid,ssid,accReq),,occup=occup-1;
+S1,S0,,(occup==0)
+S1,S2,,(occup==VC1_CAP)
+S1,S1,nFull
+$!
+S1,S1,nEmpty
+!$
+ 
+S2,S2,full
+$!
+S2,S2,nEmpty
+!$
+S2,S2,get(sid,ssid,accReq),,occup=occup-1;
+S2,S1,,(occup<VC1_CAP)
+end
+
+$!----------------------------PUS129------------------------------------!$
+atom: pus129
+data: SID,SSID,accReq , rate
+init: S0
+initAct: SID=129; SSID=-1; accReq=-1; rate= -1;
+ports:
+S0,S1,tcComm(SID,SSID,accReq)
+S1,S0,setDefTMEncRate , ( SSID==-1 || SSID==SET_DEF_TMENCODER_RATE_SSID)
+$!-- TODO: add the rate value to TC's parameters --!$
+S1,S0,setTMEncRate(rate) , ( SSID==-1 || SSID!=SET_DEF_TMENCODER_RATE_SSID)
+S1,S0,setHPTMGenRate(rate) , ( SSID==-1 || SSID!=SET_DEF_TMENCODER_RATE_SSID)
+end
+
+$!----------------------------TMEncoder------------------------------------!$
+atom: TMEncoder
+data: bitrate, rateIn
+init: S0, S10
+initAct: bitrate = TM_ENCODER_DEFAULT_RATE;
+ports:
+S0,S1, encodeTM
+S0,S2, encoderFailed
+S1,S0, encodeTMdone
+S1,S2, encoderFailed
+S2,S0, encoderAlive
+S10,S10,setDefTMEncRate , , bitrate = AJ_TM_ENCODER_DEFAULT_RATE_IN_SAFE;
+S10,S10,setTMEncRate(rateIn) , , bitrate = rateIn; 
+end
+
+$!----------------------------ColdRedundancyMng------------------------------------!$
+atom: ColdRedundancyMng
+init: S0
+ports:
+S0,S01, encTMPrimary
+S02,S01, resume_encTMPrimary
+S01,S0, encTMPrimary_done
+
+S0,S02, primaryFailed
+S1,S12, primaryAlive
+
+S1,S11, encTMSecondary
+S12,S11, resume_encTMSecondary
+S11,S1, encTMSecondary_done
+
+S0,S0, setDefTMEncRatePrimary
+S0,S0, setTMEncRatePrimary
+
+S1,S1, setDefTMEncRateSecondary
+S1,S1, setTMEncRateSecondary
+end
+
+$!----------------------------HPTMmodule------------------------------------!$
+atom: HPTMmodule
+data: generationRate, rateIn
+init: S0, S10
+initAct: generationRate = HPTM_DEFAULT_RATE;
+ports:
+$! S0,S0, encTM !$
+S10,S10,setHPTMGenRate(rateIn) , , generationRate = rateIn; 
+end
+
+
+$!-------------------------TMenc_rate_change_monit---------------------------------
+
+compound: TMenc_rate_change_monit
+init:S0
+initAct: CmdDuration=MI_HLC_PULSE_DURATION;
+ports:
+S0,S1,TMEncRateChanged(rate)
+S1,S2, , (rate==-1 || rate==LOW_BIT_RATE), outputLineId=MI_ATB_HIGHBITRATE_CMD_OUTPUT;
+S1,S2, , (rate==-1 || rate==HIGH_BIT_RATE), outputLineId=MI_ATB_LOWBITRATE_CMD_OUTPUT;
+S2,S0,HLCcomm(outputLineId, CmdDuration)
+
+end
+!$
+
+$!-------------------------------TMFunction---------------------------------!$
+
+compound: TMFunction
+$!
+component: HPTM_TMenc_PropertMng, HPTM_TM_PROP
+!$
+component: pus129, PUS129
+component: TMenc_rate_change_monit, TMENC_CHNG
+
+component: TMEncoder, TMENC_PRIM
+component: TMEncoder, TMENC_SECOND
+component: HPTMmodule, HPTM1
+component: HPTMmodule, HPTM2
+component: ColdRedundancyMng, REDUNDMNG
+
+connectors: 
+RDV3, setDefTMEncRate1 , ,PUS129.setDefTMEncRate , REDUNDMNG.setDefTMEncRatePrimary, TMENC_PRIM.setDefTMEncRate 
+RDV3, setDefTMEncRate2 , ,PUS129.setDefTMEncRate , REDUNDMNG.setDefTMEncRateSecondary, TMENC_SECOND.setDefTMEncRate
+CP12ALLOW, setTMEncRate1, , PUS129.setTMEncRate, TMENC_PRIM.setTMEncRate, REDUNDMNG.setTMEncRatePrimary
+CP12ALLOW, setTMEncRate2, , PUS129.setTMEncRate, TMENC_SECOND.setTMEncRate, REDUNDMNG.setTMEncRateSecondary
+CP13, setHPTMGenRate, , PUS129.setHPTMGenRate, HPTM1.setHPTMGenRate, HPTM2.setHPTMGenRate
+
+RDV2, encTMPrimary , , REDUNDMNG.encTMPrimary, TMENC_PRIM.encodeTM 
+RDV2, encTMSecondary , , REDUNDMNG.encTMSecondary, TMENC_SECOND.encodeTM 
+RDV2, resume_encTMPrimary , , REDUNDMNG.resume_encTMPrimary, TMENC_PRIM.encodeTM 
+RDV2, resume_encTMSecondary , , REDUNDMNG.resume_encTMSecondary, TMENC_SECOND.encodeTM 
+RDV2, encTMPrimary_done , , REDUNDMNG.encTMPrimary_done, TMENC_PRIM.encodeTMdone 
+RDV2, encTMSecondary_done , , REDUNDMNG.encTMSecondary_done, TMENC_SECOND.encodeTMdone 
+
+RDV2, primaryFailed , , REDUNDMNG.primaryFailed, TMENC_PRIM.encoderFailed
+RDV2, primaryAlive , , REDUNDMNG.primaryAlive, TMENC_SECOND.encoderAlive 
+
+end
+

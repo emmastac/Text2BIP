@@ -1,0 +1,252 @@
+
+$!-------------------------MessageLibrary---------------------------------------!$
+atom: MessageLibrary
+init: S0
+ports: 
+S0,S0,decodeMessage
+S0,S0,composeMessage
+end
+
+ $!-------------------------sMutex---------------------------------------!$
+atom: sMutex
+init: IDLE
+ports: 
+IDLE,BUSY,take
+BUSY,IDLE,release
+end
+
+ $!-------------------------s128_4ActionFlowWithAbort---------------------------------------!$
+atom: s128_4ActionFlowWithAbort
+documentation: Part of the s128_4
+init: IDLE
+ports: 
+IDLE ,BUSY ,start
+BUSY ,VALIDATE , tc128_4
+VALIDATE ,START ,exec
+VALIDATE ,IDLE ,wrong_state
+START ,I2C ,I2C_ask
+I2C ,IDLE ,I2C_fail
+I2C ,END ,I2C_res
+END ,IDLE ,executed
+END ,IDLE ,fail
+end
+
+ $!-------------------------s128_1ActionFlowWithAbort---------------------------------------!$
+atom: s128_1ActionFlowWithAbort
+documentation: Part of the s128_1
+init: IDLE
+ports: 
+IDLE ,BUSY ,start
+BUSY ,VALIDATE , tc128_1
+VALIDATE ,START ,load
+VALIDATE ,IDLE ,wrong_state
+START ,I2C ,I2C_ask
+I2C ,IDLE ,I2C_fail
+I2C ,END ,I2C_res
+END ,IDLE ,loaded
+END ,IDLE ,fail
+end
+
+ $!-------------------------s128_5ActionFlowWithAbort---------------------------------------!$
+atom: s128_5ActionFlowWithAbort
+documentation: Part of the s128_5
+init: IDLE
+ports: 
+IDLE ,START , tc128_5
+START ,I2C ,I2C_ask
+I2C ,IDLE ,I2C_fail
+I2C ,END ,I2C_res
+END ,IDLE ,aborted
+END ,IDLE ,fail
+end
+
+ $!-------------------------status_statusVerificationActionFlowWithAbort-----------------!$
+atom: statusVerificationActionFlowWithAbort
+documentation: Part of the status_verification
+init: IDLE
+ports: 
+IDLE ,CHECK_STATUS ,started
+CHECK_STATUS ,I2C ,I2C_ask
+I2C ,IDLE ,I2C_fail
+I2C ,END ,I2C_res
+END ,IDLE ,complete
+END ,IDLE ,full
+end
+
+$!-------------------------plModeManager---------------------------------------!$
+atom: plModeManager
+init: IDLE
+ports: 
+IDLE ,IDLE, load
+IDLE, SCENARIO_READY, to_scenario_ready
+SCENARIO_READY, SCENARIO_READY, exec
+SCENARIO_READY, IDLE, to_idle
+SCENARIO_READY, STARTED, to_started
+STARTED, STARTED, started
+STARTED, IDLE, to_idle
+STARTED, RESULT_READY, to_result_ready
+RESULT_READY, STARTED, to_started
+RESULT_READY, RESULT_READY, ready
+RESULT_READY, IDLE, to_idle
+end
+ 
+$!-------------------------data_transferActionFlowWithAbort-------------!$
+atom: data_transferActionFlowWithAbort
+data: finish
+init: IDLE
+initAct: finish=0;
+ports: 
+IDLE ,ACQUIRE, start
+ACQUIRE, I2C, I2C_ask
+I2C, IDLE, I2C_fail
+I2C, SAVE, I2C_res
+SAVE, MEM, ask_mem
+MEM, END, mem_res, , finish=-1; /* finished=-1, as long as it is non-deterministically assigned */
+END, IDLE, done, (finish==-1 || finish==1)
+END, IDLE, not_done, (finish==-1 || finish==0)
+end
+  
+$!-------------------------data_transferModeManager---------------------------------------!$
+atom: data_transferModeManager
+init: IDLE
+ports: 
+IDLE,BUSY,to_busy
+BUSY,IDLE,to_idle
+BUSY,BUSY, contin
+end
+
+
+
+$!-------------------------flash_memory_readActionFlowWithAbort---------------------------------------!$
+atom: flash_memory_readActionFlowWithAbort
+init: IDLE
+ports: 
+IDLE, CRC, read
+CRC, STATUS_READ, check_CRC
+STATUS_READ, IDLE, bad_CRC
+STATUS_READ, READ, ok_CRC
+READ, IDLE, fail
+READ, IDLE, return
+end
+
+$!-------------------------flash_memory_writeActionFlowWithAbort---------------------------------------!$
+atom: flash_memory_writeActionFlowWithAbort
+init: IDLE
+ports: 
+IDLE, WAIT, write
+WAIT, STATUS_WRITE, wait
+STATUS_WRITE, IDLE, contin
+STATUS_WRITE, WRITE, done
+WRITE, IDLE, fail
+WRITE, IDLE, return
+end
+
+$!-------------------------memory_library---------------------------------------!$
+atom: memory_library
+init: S0
+ports: 
+S0, S0, setWrite
+S0, S0, setRead
+S0, S0, checkCRC
+end
+
+$!-------------------------TC1---------------------------------------!$
+atom: TC_128_4
+init: S0
+ports: 
+S0, S1, send_128_4
+S1, S0, response
+end
+
+$!-------------------------------mainModel---------------------------------!$
+compound: CubETH_payload
+component: MessageLibrary, MSGLIB
+component: sMutex, s128_4_MUX
+component: s128_4ActionFlowWithAbort, s128_4_ACTFLAB
+component: sMutex, s128_1_MUX
+component: s128_1ActionFlowWithAbort, s128_1_ACTFLAB
+component: sMutex, s128_5_MUX
+component: s128_5ActionFlowWithAbort, s128_5_ACTFLAB
+component: sMutex, STAT_VER_MUX
+component: statusVerificationActionFlowWithAbort, STAT_VER_ACTFLAB
+component: plModeManager, PLMODMNG
+component: data_transferActionFlowWithAbort, DATRANS_ACTFLAB
+component: data_transferModeManager, DATRANS_MODMNG
+component: memory_library, MEMLIB
+connectors: 
+
+/******** s_128_4 ***********/
+RDV2, s128_4_fail, , s128_4_MUX.release, s128_4_ACTFLAB.fail
+RDV2, s128_4_wrong_state, , s128_4_MUX.release, s128_4_ACTFLAB.wrong_state
+RDV2, s128_4_takeTC, , s128_4_MUX.take, s128_4_ACTFLAB.tc128_4
+RDV2, s128_4_exec, , s128_4_ACTFLAB.exec, PLMODMNG.exec
+/* TODO: add in .smv file : s128_4_executed2 > s128_4_executed1 */
+RDV2, s128_4_success1, , s128_4_MUX.release, s128_4_ACTFLAB.executed
+RDV3, s128_4_success2, , s128_4_MUX.release,s128_4_ACTFLAB.executed, PLMODMNG.to_started
+
+RDV2, s128_4_I2C_ask, , s128_4_ACTFLAB.I2C_ask, MSGLIB.composeMessage
+RDV2, s128_4_I2C_res, , s128_4_ACTFLAB.I2C_res, MSGLIB.decodeMessage
+RDV3, s128_4_I2C_fail, , s128_4_MUX.release, s128_4_ACTFLAB.I2C_fail, MSGLIB.decodeMessage
+
+/******** s_128_1 ***********/
+RDV2, s128_1_fail, , s128_1_MUX.release, s128_1_ACTFLAB.fail
+RDV2, s128_1_wrong_state, , s128_1_MUX.release, s128_1_ACTFLAB.wrong_state
+RDV2, s128_1_takeTC, , s128_1_MUX.take, s128_1_ACTFLAB.tc128_1
+RDV2, s128_1_load, , s128_1_ACTFLAB.load, PLMODMNG.load
+/* TODO: add in .smv file : s128_1_success2 > s128_1_success1 */
+RDV2, s128_1_success1, , s128_1_MUX.release, s128_1_ACTFLAB.loaded
+RDV3, s128_1_success2, , s128_1_MUX.release, s128_1_ACTFLAB.loaded, PLMODMNG.to_scenario_ready
+
+RDV2, s128_1_I2C_ask, , s128_1_ACTFLAB.I2C_ask, MSGLIB.composeMessage
+RDV2, s128_1_I2C_res, , s128_1_ACTFLAB.I2C_res, MSGLIB.decodeMessage
+RDV3, s128_1_I2C_fail, , s128_1_MUX.release, s128_1_ACTFLAB.I2C_fail, MSGLIB.decodeMessage
+
+/******** s_128_5 ***********/
+RDV2, s128_5_fail, , s128_5_MUX.release, s128_5_ACTFLAB.fail
+/* TODO: add in .smv file : s128_5_aborted2 > s128_5_aborted1 */
+RDV2, s128_5_aborted1, , s128_1_MUX.release, s128_5_ACTFLAB.aborted
+RDV3, s128_5_aborted2, , s128_1_MUX.release, s128_5_ACTFLAB.aborted, PLMODMNG.to_idle 
+RDV2, s128_5_takeTC, , s128_5_MUX.take, s128_5_ACTFLAB.tc128_5
+
+RDV2, s128_5_I2C_ask, , s128_5_ACTFLAB.I2C_ask, MSGLIB.composeMessage
+RDV2, s128_5_I2C_res, , s128_5_ACTFLAB.I2C_res, MSGLIB.decodeMessage
+RDV3, s128_5_I2C_fail, , s128_5_MUX.release, s128_5_ACTFLAB.I2C_fail, MSGLIB.decodeMessage
+
+/******** status verification ***********/
+RDV3, status_verif_started , , STAT_VER_MUX.take, STAT_VER_ACTFLAB.started, PLMODMNG.started
+/* TODO: add in .smv file : status_verif_result2 > status_verif_result1 */
+RDV2, status_verif_result1 , , STAT_VER_MUX.release , STAT_VER_ACTFLAB.full
+RDV3, status_verif_result2 , , STAT_VER_MUX.release , STAT_VER_ACTFLAB.full, PLMODMNG.to_result_ready
+
+/* TODO: add in .smv file : status_verif_to_idle2 > status_verif_to_idle1 */
+RDV2, status_verif_to_idle1 , , STAT_VER_MUX.release , STAT_VER_ACTFLAB.complete
+RDV3, status_verif_to_idle2 , , STAT_VER_MUX.release , STAT_VER_ACTFLAB.complete, PLMODMNG.to_idle
+
+RDV2, status_verif_I2C_ask, , STAT_VER_ACTFLAB.I2C_ask, MSGLIB.composeMessage
+RDV2, status_verif_I2C_res, , STAT_VER_ACTFLAB.I2C_res, MSGLIB.decodeMessage
+RDV2, status_verif_I2C_fail, , STAT_VER_ACTFLAB.I2C_fail, MSGLIB.decodeMessage
+
+/******** data transfer ***********/
+
+/* TODO: add in .smv file : payload_ready2 > 1 */
+SINGLE, payload_ready1, ,PLMODMNG.ready
+RDV2, payload_ready2, ,PLMODMNG.ready, DATRANS_MODMNG.to_busy
+
+RDV2, data_transfer_start, ,DATRANS_ACTFLAB.start, DATRANS_MODMNG.contin
+/* TODO: add in .smv file : data_transfer_done4 > ..3, 2, 1 & 2 > 1, 3 > 1 */
+SINGLE, data_transfer_done1, ,DATRANS_ACTFLAB.done
+RDV2, data_transfer_done2, ,DATRANS_ACTFLAB.done, DATRANS_MODMNG.to_idle
+RDV2, data_transfer_done3, ,DATRANS_ACTFLAB.done, PLMODMNG.to_started
+RDV3, data_transfer_done4, ,DATRANS_ACTFLAB.done, DATRANS_MODMNG.to_idle, PLMODMNG.to_started
+
+RDV2, data_transfer_I2C_ask, , DATRANS_ACTFLAB.I2C_ask, MSGLIB.composeMessage
+RDV2, data_transfer_I2C_res, , DATRANS_ACTFLAB.I2C_res, MSGLIB.decodeMessage
+RDV2, data_transfer_I2C_fail, , DATRANS_ACTFLAB.I2C_fail, MSGLIB.decodeMessage
+
+/* PL_to_MEM → write (Flash memory)  + setwrite (MEM_LIB) */
+RDV2, data_transfer_ask_mem, , DATRANS_ACTFLAB.ask_mem, MEMLIB.setWrite
+/* PL_to_MEM → return (Flash memory)  */
+SINGLE, data_transfer_mem_res, , DATRANS_ACTFLAB.mem_res
+
+end
+

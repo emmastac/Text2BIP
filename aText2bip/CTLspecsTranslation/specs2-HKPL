@@ -1,0 +1,13 @@
+-- HKPL PS Mode Manager: 
+-- MD1: AG (  HKPL_mem_write_req -> hkeps_psmodmng.Nuplace = NuSMEMORY  )
+-- HKPL PS Mode Manager: 
+-- MD1: AG (  HKPL_mem_write_req -> hkeps_psmodmng.Nuplace = NuSMEMORY  )
+-- MD1: AG (  HKPL_ask_I2C_TTC -> hkeps_psmodmng.Nuplace = NuSTTC  )
+
+-- HKPL Mode Manager: 
+-- MD1: AG (  HKPL_read_HK -> hkeps_modmng.Nuplace = NuSENABLED  )
+
+-- HKPL MUTEX: 
+-- MX1: AG ( HKPL_read_HK -> AX A [! (HKPL_read_HK) U ( HKPL_I2C_res |  (HKPL_mem_res_return | HKPL_mem_res_fail) |  HKPL_I2C_fail_error ) ])
+
+FAIRNESS ( ( HKPL_I2C_res |  (HKPL_mem_res_return | HKPL_mem_res_fail) |  HKPL_I2C_fail_error ) );

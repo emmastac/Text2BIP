@@ -1,0 +1,16 @@
+Architecture: MD
+coordinator: HKEPS PS Mode Manager
+mode-act: hkeps_psmodmng.Nuplace = NuSMEMORY , HKEPS_mem_write_req
+mode-act: hkeps_psmodmng.Nuplace = NuSTTC , HKEPS_ask_I2C_TTC
+end
+
+Architecture: MD
+coordinator: HKEPS Mode Manager
+mode-act: hkeps_modmng.Nuplace = NuSENABLED , HKEPS_read_HK
+end
+
+Architecture: MX
+coordinator: HKEPS MUTEX
+take: HKEPS_read_HK
+release: HKEPS_I2C_res, (HKEPS_mem_res_return | HKEPS_mem_res_fail), HKEPS_I2C_fail_error
+end

@@ -1,0 +1,4 @@
+[BIP ENGINE]: BIP Engine (version 2015.04-RC7 )
+[BIP ENGINE]:
+[BIP ENGINE]: initialize components...
+[name:Atom1,from:initial,to:A][name:Atom2,from:initial,to:A][BIP ENGINE]: computing reachable states:.[name:Atom1,from:A,to:B][name:Atom2,from:A,to:B].[name:Atom1,from:B,to:A].[name:Atom1,from:A,to:C].[name:Atom1,from:C,to:B].[name:Atom2,from:B,to:A].[name:Atom1,from:C,to:B].[name:Atom1,from:B,to:A].[name:Atom2,from:A,to:C].[name:Atom1,from:B,to:A].[name:Atom1,from:A,to:C].[name:Atom1,from:C,to:B][name:Atom2,from:C,to:B].[name:Atom2,from:A,to:C].[name:Atom2,from:B,to:A].[name:Atom2,from:B,to:A].[name:Atom1,from:A,to:C].[name:Atom2,from:A,to:C]. found 9 reachable states, 0 deadlock, and 0 error in 0 state

@@ -1,0 +1,875 @@
+model TMF1F2_bipModel
+
+	port type syncPort
+	
+
+
+connector type SINGLE(syncPort p1)
+define p1
+end
+
+
+connector type RDV2(syncPort p1, syncPort p2)
+define p1 p2
+end	
+
+connector type RDV3(syncPort p1, syncPort p2, syncPort p3)
+define p1 p2 p3
+end	
+
+connector type RDV4(syncPort p1, syncPort p2, syncPort p3, syncPort p4)
+define p1 p2 p3 p4
+end	
+
+connector type RDV5(syncPort p1, syncPort p2, syncPort p3, syncPort p4, syncPort p5)
+define p1 p2 p3 p4 p5
+end	
+
+connector type RDV6(syncPort p1, syncPort p2, syncPort p3, syncPort p4, syncPort p5, syncPort p6)
+define p1 p2 p3 p4 p5 p6
+end	
+
+connector type RDV7(syncPort p1, syncPort p2, syncPort p3, syncPort p4, syncPort p5, syncPort p6, syncPort p7)
+define p1 p2 p3 p4 p5 p6 p7
+end	
+
+connector type RDV8(syncPort p1, syncPort p2, syncPort p3, syncPort p4, syncPort p5, syncPort p6, syncPort p7, syncPort p8)
+define p1 p2 p3 p4 p5 p6 p7 p8
+end	
+
+ /* Generates Cyclic Housekeeping Reports. It is hardcoded to handle a Predefined  and a ground defined housekeeping definition. */ 
+ 
+atomic type HKcyc
+
+ 
+data int  sid ,svc ,ssvc ,HKparam ,predefHKstatus ,groundHKstatus ,groundHK_init ,ridIn ,cP ,cG  
+   
+	export port  syncPort  disableGroundCyc     
+	export port  sync1Port  enableCycHK (ridIn  )    
+	export port  sync3Port  genTM (svc ,ssvc ,HKparam  )    
+	export port  syncPort  enablePredefCyc     
+	export port  syncPort  disablePredefCyc     
+	export port  sync1Port  initGroundCyc (ridIn  )    
+	export port  sync1Port  disableCycHK (ridIn  )  
+   
+	export port  syncPort  predefExpired     
+	export port  syncPort  groundExpired   
+	place S3 ,S33 ,S0 ,S1 
+
+initial to  S0, S3 do{  
+	sid=-1; svc=-1; ssvc=-1; HKparam=-1; predefHKstatus=0;  groundHKstatus=0; groundHK_init=-1; ridIn=-1; cP=0; cG=0;  }
+
+ on predefExpired from S0 to S1  provided( (testEXP==0 || (testEXP==1 && cP<1)) && ( predefHKstatus==-1 || predefHKstatus==1) )   do{
+  sid=-1; svc=-1; ssvc=-1; HKparam=-1; cP=cP+1;  }  
+ on groundExpired from S0 to S1  provided( (testEXP==0 || (testEXP==1 && cG<1)) && (groundHK_init==1) )   do{
+  sid=-1; svc=-1; ssvc=-1; HKparam=-1;   cG=cG+1;  }  
+ on genTM from S1 to S0   
+ on enablePredefCyc from S3 to S3   do{
+  predefHKstatus=1;  }  
+ on disablePredefCyc from S3 to S3   do{
+  predefHKstatus=0;  }  
+ on disableGroundCyc from S3 to S3   do{
+  if(groundHK_init==1) then  groundHKstatus=0; fi  }  
+ on initGroundCyc from S3 to S3   do{
+  groundHK_init=1; groundHKstatus=0;  }  
+ on enableCycHK from S3 to S33   
+ on  from S33 to S3  provided( ridIn==PREDEF_HK_RID )   do{
+  predefHKstatus=1;  }  
+ on  from S33 to S3  provided( ridIn==GROUND_HK_RID )   do{
+  if(groundHK_init==1) then groundHKstatus=1; fi  }  
+ on disableCycHK from S3 to S33   
+ on  from S33 to S3  provided( ridIn==PREDEF_HK_SID )   do{
+  predefHKstatus=0;  }  
+ on  from S33 to S3  provided( ridIn==GROUND_HK_RID )   do{
+  if(groundHK_init==1) then  groundHKstatus=0; fi  }  
+
+
+end
+
+ /* Generates Cyclic Diagnostic Reports. It is hardcoded to handle a Predefined  and a ground defined housekeeping definition. */ 
+ 
+atomic type DIAGcyc
+
+ 
+data int  sid ,svc ,ssvc ,DIAGparam ,predefDIAGstatus ,groundDIAGstatus ,ridIn ,groundDIAG_init ,cP ,cG  
+   
+	export port  sync3Port  genTM (svc ,ssvc ,DIAGparam  )    
+	export port  syncPort  enablePredefCyc     
+	export port  sync1Port  enableCycDIAG (ridIn  )    
+	export port  sync1Port  disableCycDIAG (ridIn  )    
+	export port  sync1Port  initGroundCyc (ridIn  )  
+   
+	export port  syncPort  predefExpired     
+	export port  syncPort  groundExpired   
+	place S3 ,S33 ,S0 ,S1 
+
+initial to  S0 do{  
+	sid=-1; svc=-1; ssvc=-1; DIAGparam=-1; predefDIAGstatus=0; groundDIAGstatus=0; groundDIAG_init=-1; cP=0; cG=0;  }
+
+ on predefExpired from S0 to S1  provided( (testEXP==0 || (testEXP==1 && cP<1)) &&( predefDIAGstatus==-1 || predefDIAGstatus==1) )   do{
+  sid=-1; svc=-1; ssvc=-1; DIAGparam=-1;  }  
+ on groundExpired from S0 to S1  provided( (testEXP==0 || (testEXP==1 && cG<1)) && (groundDIAG_init==1) )   do{
+  sid=-1; svc=-1; ssvc=-1; DIAGparam=-1;  }  
+ on genTM from S1 to S0  provided( (predefDIAGstatus==-1 || predefDIAGstatus==1) )   
+ on enablePredefCyc from S3 to S3   do{
+  predefDIAGstatus=1;  }  
+ on initGroundCyc from S3 to S3   do{
+  groundDIAG_init=1; groundDIAGstatus=0;  }  
+ on enableCycDIAG from S3 to S33   
+ on  from S33 to S3  provided( ridIn==PREDEF_DIAG_RID )   do{
+  predefDIAGstatus=1;  }  
+ on  from S33 to S3  provided( ridIn==GROUND_DIAG_RID )   do{
+  if(groundDIAG_init==1) then  groundDIAGstatus=1; fi  }  
+ on disableCycDIAG from S3 to S33   
+ on  from S33 to S3  provided( ridIn==PREDEF_DIAG_RID )   do{
+  predefDIAGstatus=0;  }  
+ on  from S33 to S3  provided( ridIn==GROUND_DIAG_RID )   do{
+  if(groundDIAG_init==1) then groundDIAGstatus=0; fi  }  
+
+
+end
+
+ /* Enables and disables each HK and DIAG generator upon changes of the SC mode. */ 
+ 
+atomic type PlatCyc_modeMng
+
+   
+	export port  syncPort  enablePredefDIAGcyc     
+	export port  syncPort  CSWinitEnd_done     
+	export port  syncPort  disableGroundHKcyc     
+	export port  syncPort  modeChanged_done     
+	export port  syncPort  disablePredefHKcyc     
+	export port  syncPort  CSWinitEnd     
+	export port  syncPort  enablePredefHKcyc     
+	export port  syncPort  modeChanged   
+ 
+	place S3 ,S4 ,S11 ,S5 ,S6 ,S0 ,S1 ,S2 
+
+initial to  S0 do{  }
+
+ on CSWinitEnd from S0 to S1   
+ on enablePredefHKcyc from S1 to S2   
+ on enablePredefDIAGcyc from S2 to S3   
+ on CSWinitEnd_done from S3 to S11   
+ on modeChanged from S11 to S4   
+ on enablePredefHKcyc from S4 to S5  provided( (preHKonModeChange==-1 || preHKonModeChange==1 ) )   
+ on disablePredefHKcyc from S4 to S5  provided( (preHKonModeChange==-1 || preHKonModeChange==0 ) )   
+ on disableGroundHKcyc from S5 to S6   
+ on modeChanged_done from S6 to S11   
+
+
+end
+
+
+ /* Wraps Cyclic HK and DIAG generators and their mode management component. */ 
+
+compound type PlatCycTM
+
+
+	component HKcyc HK1 
+	component DIAGcyc DIAG1 
+	component PlatCyc_modeMng CYCTM_MODEMNG 
+
+ 
+	connector SINGLEE modeChanged1 ( CYCTM_MODEMNG.modeChanged   )  
+	connector SINGLEE modeChanged_done1 ( CYCTM_MODEMNG.modeChanged_done   )  
+	connector SINGLEE CSWinitEnd1 ( CYCTM_MODEMNG.CSWinitEnd   )  
+	connector SINGLEE CSWinitEnd_done1 ( CYCTM_MODEMNG.CSWinitEnd_done   )  
+	connector BRD2 disableGroundHKcyc ( CYCTM_MODEMNG.disableGroundHKcyc ,HK1.disableGroundCyc   )  
+	connector BRD2 disablePredefHKcyc ( CYCTM_MODEMNG.disablePredefHKcyc ,HK1.disablePredefCyc   )  
+	connector BRD2 enablePredefHKcyc ( CYCTM_MODEMNG.enablePredefHKcyc ,HK1.enablePredefCyc   )  
+	connector BRD2 enablePredefDIAGcyc ( CYCTM_MODEMNG.enablePredefDIAGcyc ,DIAG1.enablePredefCyc   )  
+	connector SINGLE1E enableCycHK1 ( HK1.enableCycHK   )  
+	connector SINGLE1E disableCycHK1 ( HK1.disableCycHK   )  
+	connector SINGLE1E enableCycDIAG1 ( DIAG1.enableCycDIAG   )  
+	connector SINGLE1E disableCycDIAG1 ( DIAG1.disableCycDIAG   )  
+	connector SINGLE1E initHK1 ( HK1.initGroundCyc   )  
+	connector SINGLE1E initDIAG1 ( DIAG1.initGroundCyc   )  
+	connector SINGLE3E genTM_HK1 ( HK1.genTM   )  
+	connector SINGLE3E genTM_DIAG1 ( DIAG1.genTM   )  
+	connector SINGLE HK1_predefExpired ( HK1.predefExpired   )  
+	connector SINGLE HK1_groundExpired ( HK1.groundExpired   )  
+	connector SINGLE DIAG1_predefExpired ( DIAG1.predefExpired   )  
+	connector SINGLE DIAG1_groundExpired ( DIAG1.groundExpired   ) 
+
+ 
+	export port enableCycHK1.exp  as enableCycHK  
+	export port CSWinitEnd_done1.exp  as CSWinitEnd_done  
+	export port modeChanged_done1.exp  as modeChanged_done  
+	export port genTM_HK1.exp ,genTM_DIAG1.exp  as genTM  
+	export port initDIAG1.exp  as initDIAG  
+	export port enableCycDIAG1.exp  as enableCycDIAG  
+	export port disableCycDIAG1.exp  as disableCycDIAG  
+	export port CSWinitEnd1.exp  as CSWinitEnd  
+	export port disableCycHK1.exp  as disableCycHK  
+	export port modeChanged1.exp  as modeChanged  
+	export port initHK1.exp  as initHK 
+	
+
+end
+
+ 
+atomic type TimeSource
+
+ 
+data int  APID ,SVC ,SSVC ,appData ,c  
+   
+	export port  sync3Port  genTM (SVC ,SSVC ,appData  )    
+	export port  syncPort  empty   
+ 
+	place S0 ,S1 
+
+initial to S0 do{  
+	APID=TIME_REPORT_APID; SVC=TIME_REPORT_SID; SSVC=TIME_REPORT_SSID; appData=-1; c=0;  }
+
+ on genTM from S0 to S1  provided( (testEXP==0 || (testEXP==1 && c<1)) )   do{
+  c=c+1;  }  
+ on empty from S0 to S0   
+ on empty from S1 to S1   
+
+
+end
+
+ 
+atomic type celt
+
+ 
+data int  APID ,SVC ,SSVC ,appData ,c  
+   
+	export port  sync3Port  genTM (SVC ,SSVC ,appData  )    
+	export port  syncPort  empty   
+ 
+	place S0 ,S1 
+
+initial to S0 do{  
+	APID=CELT_APID; SVC=CELT_SID; SSVC=CELT_SSID; appData=-1; c=0;  }
+
+ on genTM from S0 to S1  provided( (testEXP==0 || (testEXP==1 && c<1)) )   do{
+  c=c+1;  }  
+ on empty from S0 to S0   
+ on empty from S1 to S1   
+
+
+end
+
+ /* Controls routing of TM packets. */ 
+ 
+atomic type TMrouting
+
+ 
+data int  svc ,ssvc ,sid ,apid ,tmSid ,tmSSid ,tmData ,satur   
+data int  enabled  
+   
+	export port  sync3Port  disableHkTM (svc ,ssvc ,sid  )    
+	export port  syncPort  disableGroundHKcyc     
+	export port  sync3Port  enableEvRep (svc ,ssvc ,sid  )    
+	export port  sync3Port  disableTMSource (svc ,ssvc ,sid  )    
+	export port  sync3Port  getTime (svc ,ssvc ,sid  )    
+	export port  syncPort  nSaturTM     
+	export port  sync3Port  storeTM (svc ,ssvc ,sid  )    
+	export port  sync3Port  disableEvRep (svc ,ssvc ,sid  )    
+	export port  sync3Port  enableTMSource (svc ,ssvc ,sid  )    
+	export port  sync3Port  enableHkTM (svc ,ssvc ,sid  )    
+	export port  sync3Port  disableDiagTM (svc ,ssvc ,sid  )    
+	export port  syncPort  saturTM     
+	export port  sync3Port  genTM (tmSid , tmSSid , tmData  )    
+	export port  sync3Port  enableDiagTM (svc ,ssvc ,sid  )    
+	export port  sync3Port  getTM (svc ,ssvc ,sid  )    
+	export port  syncPort  disablePredefHKcyc     
+	export port  syncPort  noTime     
+	export port  syncPort  noCELT     
+	export port  sync3Port  getCELT (svc ,ssvc ,sid  )    
+	export port  syncPort  enablePredefHKcyc     
+	export port  syncPort  disablePredefDIAGcyc   
+   
+	export port  syncPort  noTM     
+	export port  syncPort  nEnabled   
+	place S3 ,S4 ,S22 ,S5 ,S6 ,S10 ,S7 ,S8 ,S0 ,S1 ,S2 
+
+initial to  S0, S10 do{  
+	sid=-1; svc=-1; ssvc=-1; apid=-1; satur=0;  
+	setFWstatus(-1,-1, 1); setTMtypeFWstatus(PREDEF_HK_TYPE, 0); setTMtypeFWstatus(PREDEF_DIAG_TYPE, 0);  }
+
+ on nSaturTM from S0 to S1   
+ on saturTM from S0 to S2   
+ on noCELT from S1 to S2   
+ on getCELT from S1 to S22   
+ on storeTM from S22 to S0   
+ on getTime from S2 to S3   do{
+  getFWstatus(TIME_REPORT_SID ,TIME_REPORT_SSID ,-1, enabled);  }  
+ on noTime from S2 to S5   
+ on storeTM from S3 to S5  provided( (enabled==-1 || enabled==1) )   do{
+  satur=0;  }  
+ on nEnabled from S3 to S5  provided( (enabled==-1 || enabled==0) )   
+ on saturTM from S3 to S4  provided( (enabled==-1 || enabled==1) )   do{
+  tmSid=EVENT_REPORTING_SID; tmSSid=MEDIUM_ANOMALY_REPORT_SSID; tmData=-1;  satur=1;  }  
+ on genTM from S4 to S5   
+ on noTM from S5 to S0   
+ on getTM from S5 to S6   do{
+  getFWstatus(svc,ssvc,sid,enabled);  }  
+ on storeTM from S6 to S8  provided( (enabled==-1 || enabled==1) )   do{
+  satur=0;  }  
+ on nEnabled from S6 to S8  provided( (enabled==-1 || enabled==0) )   
+ on saturTM from S6 to S7  provided( (enabled==-1 || enabled==1) )   do{
+  tmSid=EVENT_REPORTING_SID; tmSSid=MEDIUM_ANOMALY_REPORT_SSID; tmData=-1;  satur=1;  }  
+ on genTM from S7 to S8   
+ on  from S8 to S0   
+ on enablePredefHKcyc from S10 to S10   do{
+  setTMtypeFWstatus(PREDEF_HK_TYPE, 1);  }  
+ on disablePredefHKcyc from S10 to S10   do{
+  setTMtypeFWstatus(PREDEF_HK_TYPE, 0);  }  
+ on disablePredefDIAGcyc from S10 to S10   do{
+  setTMtypeFWstatus(PREDEF_DIAG_TYPE, 0);  }  
+ on disableGroundHKcyc from S10 to S10   do{
+  setTMtypeFWstatus(GROUND_HK_TYPE, 0);  }  
+ on enableTMSource from S10 to S10   do{
+  setFWstatus(svc,ssvc,1);  }  
+ on disableTMSource from S10 to S10   do{
+  setFWstatus(svc,ssvc, 0);  }  
+ on enableEvRep from S10 to S10   do{
+  setFWstatus(svc,ssvc,sid,1);  }  
+ on disableEvRep from S10 to S10   do{
+  setFWstatus(svc,ssvc,sid, 0);  }  
+ on enableHkTM from S10 to S10   do{
+  setFWstatus(svc,ssvc,sid,1);  }  
+ on disableHkTM from S10 to S10   do{
+  setFWstatus(svc,ssvc,sid, 0);  }  
+ on enableDiagTM from S10 to S10   do{
+  setFWstatus(svc,ssvc,sid,1);  }  
+ on disableDiagTM from S10 to S10   do{
+  setFWstatus(svc,ssvc,sid, 0);  }  
+
+
+end
+
+ /* Enables and disables each TM routing to VC0 upon changes of the SC mode. */ 
+ 
+atomic type TMrouting_modeMng
+
+ 
+data int  _preHKonModeChange  
+   
+	export port  syncPort  CSWinitEnd_done     
+	export port  syncPort  disableGroundHKcyc     
+	export port  syncPort  modeChanged_done     
+	export port  syncPort  disablePredefHKcyc     
+	export port  syncPort  CSWinitEnd     
+	export port  syncPort  enablePredefHKcyc     
+	export port  syncPort  disablePredefDIAGcyc     
+	export port  syncPort  modeChanged   
+ 
+	place S3 ,S4 ,S11 ,S5 ,S6 ,S12 ,S0 ,S1 ,S2 
+
+initial to  S0 do{  
+	_preHKonModeChange = preHKonModeChange;  }
+
+ on CSWinitEnd from S0 to S1   
+ on disablePredefHKcyc from S1 to S2   
+ on disablePredefDIAGcyc from S2 to S3   
+ on CSWinitEnd_done from S3 to S11   
+ on modeChanged from S11 to S4   
+ on enablePredefHKcyc from S4 to S5  provided( (_preHKonModeChange==-1 || _preHKonModeChange==1 ) )   do{
+  _preHKonModeChange=1;  }  
+ on disablePredefHKcyc from S4 to S5  provided( (_preHKonModeChange==-1 || _preHKonModeChange==0 ) )   do{
+  _preHKonModeChange=0;  }  
+ on disableGroundHKcyc from S5 to S6   
+ on modeChanged_done from S6 to S12   
+
+
+end
+
+
+
+compound type TMdownlink
+
+
+	component TMrouting ROUTE 
+	component celt CELT 
+	component TimeSource TIME 
+	component TMrouting_modeMng ROUTE_MNG 
+
+ 
+	connector CPTC2 routeTIME ( TIME.genTM ,ROUTE.getTime   )  
+	connector CPTC2 routeCELT ( CELT.genTM ,ROUTE.getCELT   )  
+	connector RDV2 noCELT ( CELT.empty ,ROUTE.noCELT   )  
+	connector RDV2 noTIME ( TIME.empty ,ROUTE.noTime   )  
+	connector RDV2 enablePredefHKcyc ( ROUTE_MNG.enablePredefHKcyc ,ROUTE.enablePredefHKcyc   )  
+	connector RDV2 disablePredefHKcyc ( ROUTE_MNG.disablePredefHKcyc ,ROUTE.disablePredefHKcyc   )  
+	connector RDV2 disablePredefDIAGcyc ( ROUTE_MNG.disablePredefDIAGcyc ,ROUTE.disablePredefDIAGcyc   )  
+	connector RDV2 disableGroundHKcyc ( ROUTE_MNG.disableGroundHKcyc ,ROUTE.disableGroundHKcyc   )  
+	connector SINGLE3E storeTM1 ( ROUTE.storeTM   )  
+	connector SINGLE3E getTM1 ( ROUTE.getTM   )  
+	connector SINGLEE nSaturTM1 ( ROUTE.nSaturTM   )  
+	connector SINGLEE saturTM1 ( ROUTE.saturTM   )  
+	connector SINGLE3E enableTMSource1 ( ROUTE.enableTMSource   )  
+	connector SINGLE3E disableTMSource1 ( ROUTE.disableTMSource   )  
+	connector SINGLE3E enableEvRep1 ( ROUTE.enableEvRep   )  
+	connector SINGLE3E disableEvRep1 ( ROUTE.disableEvRep   )  
+	connector SINGLE3E enableHkTM1 ( ROUTE.enableHkTM   )  
+	connector SINGLE3E disableHkTM1 ( ROUTE.disableHkTM   )  
+	connector SINGLE3E enableDiagTM1 ( ROUTE.enableDiagTM   )  
+	connector SINGLE3E disableDiagTM1 ( ROUTE.disableDiagTM   )  
+	connector SINGLEE CSWinitEnd1 ( ROUTE_MNG.CSWinitEnd   )  
+	connector SINGLEE CSWinitEnd_done1 ( ROUTE_MNG.CSWinitEnd_done   )  
+	connector SINGLEE modeChanged1 ( ROUTE_MNG.modeChanged   )  
+	connector SINGLEE modeChanged_done1 ( ROUTE_MNG.modeChanged_done   )  
+	connector SINGLE3 ROUTE_genTM ( ROUTE.genTM   )  
+	connector SINGLE ROUTE_noTM ( ROUTE.noTM   )  
+	connector SINGLE ROUTE_nEnabled ( ROUTE.nEnabled   ) 
+
+ 
+	export port disableHkTM1.exp  as disableHkTM  
+	export port enableEvRep1.exp  as enableEvRep  
+	export port modeChanged_done1.exp  as modeChanged_done  
+	export port disableTMSource1.exp  as disableTMSource  
+	export port nSaturTM1.exp  as nSaturTM  
+	export port storeTM1.exp  as storeTM  
+	export port disableEvRep1.exp  as disableEvRep  
+	export port enableTMSource1.exp  as enableTMSource  
+	export port CSWinitEnd1.exp  as CSWinitEnd  
+	export port enableHkTM1.exp  as enableHkTM  
+	export port disableDiagTM1.exp  as disableDiagTM  
+	export port saturTM1.exp  as saturTM  
+	export port CSWinitEnd_done1.exp  as CSWinitEnd_done  
+	export port enableDiagTM1.exp  as enableDiagTM  
+	export port getTM1.exp  as getTM  
+	export port modeChanged1.exp  as modeChanged 
+	
+
+end
+
+ 
+atomic type vc0
+
+ 
+data int  occup ,sid ,ssid ,accReq  
+   
+	export port  syncPort  nFull     
+	export port  sync3Port  get (sid ,ssid ,accReq  )    
+	export port  sync3Port  put (sid ,ssid ,accReq  )    
+	export port  syncPort  full   
+ 
+	place S0 ,S1 ,S2 
+
+initial to  S0 do{  
+	occup=0; sid=-1; ssid=-1; accReq=-1;  }
+
+ on nFull from S0 to S0   
+ on put from S0 to S0   do{
+  occup=occup+1;  }  
+ on  from S0 to S1  provided( (occup==1) )   
+ on put from S1 to S1   do{
+  occup=occup+1;  }  
+ on get from S1 to S1   do{
+  occup=occup-1;  }  
+ on  from S1 to S0  provided( (occup==0) )   
+ on  from S1 to S2  provided( (occup==VC0_CAP) )   
+ on nFull from S1 to S1   
+ on full from S2 to S2   
+ on get from S2 to S2   do{
+  occup=occup-1;  }  
+ on  from S2 to S1  provided( (occup<VC0_CAP) )   
+
+
+end
+
+
+
+compound type Telemetry
+
+
+	component PlatCycTM PLAT_CYCTM 
+	component TMdownlink TMDOWNL 
+	component vc0 VC0 
+
+ 
+	connector CPTC2 storeVC0 ( TMDOWNL.storeTM ,VC0.put   )  
+	connector RDV2 saturTM ( TMDOWNL.saturTM ,VC0.full   )  
+	connector RDV2 nSaturTM ( TMDOWNL.nSaturTM ,VC0.nFull   )  
+	connector SINGLE3E enableEvRep1 ( TMDOWNL.enableEvRep   )  
+	connector SINGLE3E disableEvRep1 ( TMDOWNL.disableEvRep   )  
+	connector SINGLE3E enableTMSource1 ( TMDOWNL.enableTMSource   )  
+	connector SINGLE3E disableTMSource1 ( TMDOWNL.disableTMSource   )  
+	connector SINGLE3E enableHkTM1 ( TMDOWNL.enableHkTM   )  
+	connector SINGLE3E disableHkTM1 ( TMDOWNL.disableHkTM   )  
+	connector SINGLE3E enableDiagTM1 ( TMDOWNL.enableDiagTM   )  
+	connector SINGLE3E disableDiagTM1 ( TMDOWNL.disableDiagTM   )  
+	connector SINGLE1E enableCycHK1 ( PLAT_CYCTM.enableCycHK   )  
+	connector SINGLE1E disableCycHK1 ( PLAT_CYCTM.disableCycHK   )  
+	connector SINGLE1E enableCycDIAG1 ( PLAT_CYCTM.enableCycDIAG   )  
+	connector SINGLE1E disableCycDIAG1 ( PLAT_CYCTM.disableCycDIAG   )  
+	connector SINGLE1E initHK1 ( PLAT_CYCTM.initHK   )  
+	connector SINGLE1E initDIAG1 ( PLAT_CYCTM.initDIAG   )  
+	connector RDV2E CSWinitEnd1 ( PLAT_CYCTM.CSWinitEnd ,TMDOWNL.CSWinitEnd   )  
+	connector RDV2E CSWinitEnd_done1 ( PLAT_CYCTM.CSWinitEnd_done ,TMDOWNL.CSWinitEnd_done   )  
+	connector RDV2E modeChanged1 ( PLAT_CYCTM.modeChanged ,TMDOWNL.modeChanged   )  
+	connector RDV2E modeChanged_done1 ( PLAT_CYCTM.modeChanged_done ,TMDOWNL.modeChanged_done   )  
+	connector SINGLE3E getTM1 ( TMDOWNL.getTM   )  
+	connector CPTC2 downlCycTM ( PLAT_CYCTM.genTM ,TMDOWNL.getTM   )  
+	connector SINGLE3 VC0_get ( VC0.get   ) 
+
+ 
+	export port disableHkTM1.exp  as disableHkTM  
+	export port enableCycHK1.exp  as enableCycHK  
+	export port enableEvRep1.exp  as enableEvRep  
+	export port modeChanged_done1.exp  as modeChanged_done  
+	export port initDIAG1.exp  as initDIAG  
+	export port disableTMSource1.exp  as disableTMSource  
+	export port enableCycDIAG1.exp  as enableCycDIAG  
+	export port disableCycDIAG1.exp  as disableCycDIAG  
+	export port disableEvRep1.exp  as disableEvRep  
+	export port enableTMSource1.exp  as enableTMSource  
+	export port CSWinitEnd1.exp  as CSWinitEnd  
+	export port enableHkTM1.exp  as enableHkTM  
+	export port disableDiagTM1.exp  as disableDiagTM  
+	export port CSWinitEnd_done1.exp  as CSWinitEnd_done  
+	export port enableDiagTM1.exp  as enableDiagTM  
+	export port getTM1.exp  as getTM  
+	export port disableCycHK1.exp  as disableCycHK  
+	export port initHK1.exp  as initHK  
+	export port modeChanged1.exp  as modeChanged 
+	
+
+end
+
+ 
+atomic type pus3
+
+ 
+data int  SID ,SSID ,accReq ,sid ,ssid ,apid ,rid  
+   
+	export port  sync1Port  enableCycHK (rid  )    
+	export port  sync1Port  newCycDIAG (rid  )    
+	export port  sync1Port  enableCycDIAG (rid  )    
+	export port  sync1Port  disableCycDIAG (rid  )    
+	export port  sync1Port  disableCycHK (rid  )    
+	export port  sync3Port  tcComm (SID ,SSID ,accReq  )    
+	export port  sync1Port  newCycHK (rid  )  
+   
+	export port  syncPort  disableDIAG     
+	export port  syncPort  newDIAG      
+	export port  syncPort  newHK      
+	export port  syncPort  predef     
+	export port  syncPort  enableHK     
+	export port  syncPort  ground     
+	export port  syncPort  disableHK     
+	export port  syncPort  enableDIAG   
+	place S3 ,S6 ,S7 ,S8 ,S9 ,S66 ,S77 ,S88 ,S99 ,S10 ,S0 ,S1 ,S2 
+
+initial to  S0 do{  
+	SID=3; SSID=-1; accReq=-1; sid= -1; ssid=-1; apid=APP_APID; rid = -1;  }
+
+ on tcComm from S0 to S1   
+ on newHK  from S1 to S2  provided( ( SSID==-1 || SSID==NEW_HK_REPORTING_SSID) )   do{
+  SSID=NEW_HK_REPORTING_SSID; sid=GROUND_HK_SID; ssid=GROUND_HK_SSID; rid=GROUND_HK_RID;  }  
+ on newCycHK from S2 to S10   
+ on newDIAG  from S1 to S3  provided( ( SSID==-1 || SSID==NEW_DIAG_REPORTING_SSID) )   do{
+  SSID=NEW_DIAG_REPORTING_SSID; sid=GROUND_DIAG_SID; ssid=GROUND_DIAG_SSID; rid=GROUND_DIAG_RID;  }  
+ on newCycDIAG from S3 to S10   
+ on enableHK from S1 to S66  provided( ( SSID==-1 || SSID==ENABLE_HK_REPORTING_SSID) )   do{
+  SSID=ENABLE_HK_REPORTING_SSID;  }  
+ on predef from S66 to S6   do{
+  sid=PREDEF_HK_SID; ssid=PREDEF_HK_SSID; rid=PREDEF_HK_RID;  }  
+ on ground from S66 to S6   do{
+  sid=GROUND_HK_SID; ssid=GROUND_HK_SSID; rid=GROUND_HK_RID;  }  
+ on enableCycHK from S6 to S10   
+ on disableHK from S1 to S77  provided( ( SSID==-1 || SSID==DISABLE_HK_REPORTING_SSID) )   do{
+  SSID=DISABLE_HK_REPORTING_SSID;  }  
+ on predef from S77 to S7   do{
+  sid=PREDEF_HK_SID; ssid=PREDEF_HK_SSID; rid=PREDEF_HK_RID;  }  
+ on ground from S77 to S7   do{
+  sid=GROUND_HK_SID; ssid=GROUND_HK_SSID; rid=GROUND_HK_RID;  }  
+ on disableCycHK from S7 to S10   
+ on enableDIAG from S1 to S88  provided( ( SSID==-1 || SSID==ENABLE_DIAG_REPORTING_SSID) )   do{
+  SSID=ENABLE_DIAG_REPORTING_SSID;  }  
+ on predef from S88 to S8   do{
+  sid=PREDEF_DIAG_SID; ssid=PREDEF_DIAG_SSID; rid=PREDEF_DIAG_RID;  }  
+ on ground from S88 to S8   do{
+  sid=GROUND_DIAG_SID; ssid=GROUND_DIAG_SSID; rid=GROUND_DIAG_RID;  }  
+ on enableCycDIAG from S8 to S10   
+ on disableDIAG from S1 to S99  provided( ( SSID==-1 || SSID==DISABLE_DIAG_REPORTING_SSID) )   do{
+  SSID=DISABLE_DIAG_REPORTING_SSID;  }  
+ on predef from S99 to S9   do{
+  sid=PREDEF_DIAG_SID; ssid=PREDEF_DIAG_SSID; rid=PREDEF_DIAG_RID;  }  
+ on ground from S99 to S9   do{
+  sid=GROUND_DIAG_SID; ssid=GROUND_DIAG_SSID; rid=GROUND_DIAG_RID;  }  
+ on disableCycDIAG from S9 to S10   
+ on  from S10 to S0   
+
+
+end
+
+ /* The packet forwarding control service. Any number of on-board application processesmay provide a single instance of the packet forwarding control service. */ 
+ 
+atomic type pus14
+
+ 
+data int  SID ,SSID ,req ,svc ,ssvc ,srid  
+   
+	export port  sync3Port  disableHkTM (svc ,ssvc ,srid  )    
+	export port  sync3Port  enableEvRep (svc ,ssvc ,srid  )    
+	export port  sync3Port  enableDiagTM (svc ,ssvc ,srid  )    
+	export port  sync3Port  disableTMSource (svc ,ssvc ,srid  )    
+	export port  sync3Port  disableEvRep (svc ,ssvc ,srid  )    
+	export port  sync3Port  enableTMSource (svc ,ssvc ,srid  )    
+	export port  sync3Port  enableHkTM (svc ,ssvc ,srid  )    
+	export port  sync3Port  disableDiagTM (svc ,ssvc ,srid  )    
+	export port  sync3Port  tcComm (SID ,SSID ,req  )  
+ 
+	place S0 ,S1 ,S2 
+
+initial to  S2 do{  
+	SID=DOWNLINK_FORWARDING_SID; SSID=-1; req=-1; /* */ svc=-1; ssvc=-1; srid=-1;  }
+
+ on tcComm from S0 to S1   do{
+  SSID=-1;  }  
+ on enableHkTM from S1 to S2  provided( (SSID==-1 || SSID==ENABLE_FORWARDING_HK_SSID) )   do{
+  SSID=ENABLE_FORWARDING_HK_SSID;  }  
+ on disableHkTM from S1 to S2  provided( (SSID==-1 || SSID==DISABLE_FORWARDING_HK_SSID) )   do{
+  SSID=DISABLE_FORWARDING_HK_SSID;  }  
+ on enableDiagTM from S1 to S2  provided( (SSID==-1 || SSID==ENABLE_FORWARDING_DIAG_SSID) )   do{
+  SSID=ENABLE_FORWARDING_DIAG_SSID;  }  
+ on disableDiagTM from S1 to S2  provided( (SSID==-1 || SSID==DISABLE_FORWARDING_DIAG_SSID) )   do{
+  SSID=DISABLE_FORWARDING_DIAG_SSID;  }  
+ on enableTMSource from S1 to S2  provided( (SSID==-1 || SSID == ENABLE_FORWARDING_TM_SOURCE_SSID ) )   
+ on disableTMSource from S1 to S2  provided( (SSID==-1 || SSID == DISABLE_FORWARDING_TM_SOURCE_SSID ) )   
+ on enableEvRep from S1 to S2  provided( (SSID==-1 || SSID == ENABLE_FORWARDING_EVENT_REPORT_SSID ) )   
+ on disableEvRep from S1 to S2  provided( (SSID==-1 || SSID == DISABLE_FORWARDING_EVENT_REPORT_SSID ) )   
+ on  from S2 to S0   
+
+
+end
+
+ 
+atomic type asyn_application
+
+ 
+data int  APID ,svc ,ssvc ,appData ,hkInit ,diagInit ,c  
+   
+	export port  sync3Port  sndTC (svc ,ssvc ,appData  )    
+	export port  syncPort  init     
+	export port  sync3Port  genTM (svc ,ssvc ,appData  )  
+   
+	export port  syncPort  enablePREHK     
+	export port  syncPort  prepTM     
+	export port  syncPort  enableGRHK     
+	export port  syncPort  disableGRDIAG     
+	export port  syncPort  disableGRHK     
+	export port  syncPort  disablePRHK     
+	export port  syncPort  enablePREDIAG     
+	export port  syncPort  enableGRDIAG     
+	export port  syncPort  newDIAG     
+	export port  syncPort  disablePRDIAG     
+	export port  syncPort  newHK   
+	place S01 ,S0 ,S1 ,S2 
+
+initial to S01 do{  
+	APID=APP_APID; svc=-1; ssvc=-1; appData=-1; hkInit = -1; diagInit = -1;  c=0;  }
+
+ on init from S01 to S0   
+ on enableGRHK from S0 to S1  provided( (testEXP==0 || (testEXP==1 && c<1)) && (hkInit==1) )   do{
+  svc= HK_DIAG_REPORTING_SID; ssvc=ENABLE_HK_REPORTING_SSID; appData = GROUND_HK_RID; c=c+1;  }  
+ on enablePREHK from S0 to S1  provided( (testEXP==0 || (testEXP==1 && c<1)) )   do{
+  svc= HK_DIAG_REPORTING_SID; ssvc=ENABLE_HK_REPORTING_SSID; appData = PREDEF_HK_RID; c=c+1;  }  
+ on disableGRHK from S0 to S1  provided( (testEXP==0 || (testEXP==1 && c<1)) && (hkInit==1) )   do{
+  svc= HK_DIAG_REPORTING_SID; ssvc=DISABLE_HK_REPORTING_SSID; appData = GROUND_HK_RID; c=c+1;  }  
+ on disablePRHK from S0 to S1  provided( (testEXP==0 || (testEXP==1 && c<1)) )   do{
+  svc= HK_DIAG_REPORTING_SID; ssvc=DISABLE_HK_REPORTING_SSID; appData = PREDEF_HK_RID; c=c+1;  }  
+ on enableGRDIAG from S0 to S1  provided( (testEXP==0 || (testEXP==1 && c<1)) && (diagInit==1) )   do{
+  svc= HK_DIAG_REPORTING_SID; ssvc=ENABLE_DIAG_REPORTING_SSID; appData = GROUND_DIAG_RID; c=c+1;  }  
+ on enablePREDIAG from S0 to S1  provided( (testEXP==0 || (testEXP==1 && c<1)) )   do{
+  svc= HK_DIAG_REPORTING_SID; ssvc=ENABLE_DIAG_REPORTING_SSID; appData = PREDEF_DIAG_RID; c=c+1;  }  
+ on disableGRDIAG from S0 to S1  provided( (testEXP==0 || (testEXP==1 && c<1)) && (diagInit==1) )   do{
+  svc= HK_DIAG_REPORTING_SID; ssvc=DISABLE_DIAG_REPORTING_SSID; appData = GROUND_DIAG_RID; c=c+1;  }  
+ on disablePRDIAG from S0 to S1  provided( (testEXP==0 || (testEXP==1 && c<1)) )   do{
+  svc= HK_DIAG_REPORTING_SID; ssvc=DISABLE_DIAG_REPORTING_SSID; appData = PREDEF_DIAG_RID; c=c+1;  }  
+ on prepTM from S0 to S2  provided( (testEXP==0 || (testEXP==1 && c<1)) )   do{
+  svc=ASYN_SID; ssvc=ASYN_SSID; c=c+1;  }  
+ on newHK from S0 to S1  provided( (testEXP==0 || (testEXP==1 && c<1)) )   do{
+  hkInit=1; svc= HK_DIAG_REPORTING_SID;  ssvc=NEW_HK_REPORTING_SSID; appData = GROUND_HK_RID; c=c+1;  }  
+ on newDIAG from S0 to S1  provided( (testEXP==0 || (testEXP==1 && c<1)) )   do{
+  diagInit=1; svc= HK_DIAG_REPORTING_SID;  ssvc=NEW_DIAG_REPORTING_SSID; appData = GROUND_DIAG_RID; c=c+1;  }  
+ on sndTC from S1 to S0   do{
+  svc=-1; ssvc=-1; appData=-1;  }  
+ on genTM from S2 to S0   do{
+  svc=-1; ssvc=-1; appData=-1;  }  
+
+
+end
+
+ 
+atomic type CSWinit
+
+   
+	export port  syncPort  CSWInit_start     
+	export port  syncPort  initApp     
+	export port  syncPort  fw_modeChanged     
+	export port  syncPort  fw_CSWinitEnd     
+	export port  syncPort  rc_CSWinitEnd_done     
+	export port  syncPort  rc_modeChanged_done   
+ 
+	place S3 ,S4 ,S5 ,S0 ,S1 ,S2 
+
+initial to S0 do{  }
+
+ on CSWInit_start from S0 to S1   
+ on initApp from S1 to S2   
+ on fw_CSWinitEnd from S2 to S3   
+ on rc_CSWinitEnd_done from S3 to S4   
+ on fw_modeChanged from S4 to S5   
+ on rc_modeChanged_done from S5 to S4   
+
+
+end
+
+ 
+atomic type pus129
+
+ 
+data int  SID ,SSID ,accReq ,sid ,ssid ,apid ,rid  
+   
+	export port  sync1Port  setHPTMGenRate (rate  )    
+	export port  sync1Port  setTMEncRate (rate  )    
+	export port  syncPort  setDefTMEncRate      
+	export port  sync3Port  tcComm (SID ,SSID ,accReq  )  
+ 
+	place S0 ,S1 
+
+initial to  S0 do{  
+	SID=129; SSID=-1; accReq=-1; rate= -1;  }
+
+ on tcComm from S0 to S1   
+ on setDefTMEncRate  from S1 to S0  provided( ( SSID==-1 || SSID==SET_DEF_TMENCODER_RATE_SSID) )   
+ on setTMEncRate from S1 to S0  provided( ( SSID==-1 || SSID!=SET_DEF_TMENCODER_RATE_SSID) )   
+ on setHPTMGenRate from S1 to S0  provided( ( SSID==-1 || SSID!=SET_DEF_TMENCODER_RATE_SSID) )   
+
+
+end
+
+ 
+atomic type TMEncoder
+
+ 
+data int  bitrate ,rateIn  
+   
+	export port  syncPort  encTM     
+	export port  sync1Port  setTMEncRate (rateIn  )    
+	export port  syncPort  setDefTMEncRate    
+ 
+	place S10 ,S0 
+
+initial to  S0, S10 do{  
+	bitrate = TM_ENCODER_DEFAULT_RATE;  }
+
+ on encTM from S0 to S0   
+ on setDefTMEncRate  from S10 to S10   do{
+  bitrate = AJ_TM_ENCODER_DEFAULT_RATE_IN_SAFE;  }  
+ on setTMEncRate from S10 to S10   do{
+  bitrate = rateIn;  }  
+
+
+end
+
+ 
+atomic type HPTMModule
+
+ 
+data int  generationRate ,rateIn  
+   
+	export port  syncPort  encTM     
+	export port  sync1Port  setHPTMGenRate (rateIn  )  
+ 
+	place S10 ,S0 
+
+initial to  S0, S10 do{  
+	generationRate = HPTM_DEFAULT_RATE;  }
+
+ on encTM from S0 to S0   
+ on setHPTMGenRate from S10 to S10   do{
+  generationRate = rateIn;  }  
+
+
+end
+
+
+
+compound type HPTM_TMenc_PropertMng
+
+
+	component TMEncoder TMENC 
+	component TMEncoder TMENC 
+
+ 
+	connector SINGLE TMENC_encTM ( TMENC.encTM   )  
+	connector SINGLE1 TMENC_setTMEncRate ( TMENC.setTMEncRate   )  
+	connector SINGLE TMENC_setDefTMEncRate  ( TMENC.setDefTMEncRate    )  
+	connector SINGLE TMENC_encTM ( TMENC.encTM   )  
+	connector SINGLE1 TMENC_setTMEncRate ( TMENC.setTMEncRate   )  
+	connector SINGLE TMENC_setDefTMEncRate  ( TMENC.setDefTMEncRate    ) 
+
+	
+
+end
+
+
+
+compound type TMFunction
+
+
+	component Telemetry TM 
+	component pus3 PUS3 
+	component pus14 PUS14 
+	component asyn_application ASYN 
+	component CSWinit CSW_INIT 
+
+ 
+	connector CPTC2 enableHkTM ( PUS14.enableHkTM ,TM.enableHkTM   )  
+	connector CPTC2 disableHkTM ( PUS14.disableHkTM ,TM.disableHkTM   )  
+	connector CPTC2 enableDiagTM ( PUS14.enableDiagTM ,TM.enableDiagTM   )  
+	connector CPTC2 disableDiagTM ( PUS14.disableDiagTM ,TM.disableDiagTM   )  
+	connector CPTC2 enableTMSource ( PUS14.enableTMSource ,TM.enableTMSource   )  
+	connector CPTC2 disableTMSource ( PUS14.disableTMSource ,TM.disableTMSource   )  
+	connector CPTC2 enableEvRep ( PUS14.enableEvRep ,TM.enableEvRep   )  
+	connector CPTC2 disableEvRep ( PUS14.disableEvRep ,TM.disableEvRep   )  
+	connector CP12 newCycHK ( PUS3.newCycHK ,TM.initHK   )  
+	connector CP12 newCycDIAG ( PUS3.newCycDIAG ,TM.initDIAG   )  
+	connector CP12 enableCycHK ( PUS3.enableCycHK ,TM.enableCycHK   )  
+	connector CP12 disableCycHK ( PUS3.disableCycHK ,TM.disableCycHK   )  
+	connector CP12 enableCycDIAG ( PUS3.enableCycDIAG ,TM.enableCycDIAG   )  
+	connector CP12 disableCycDIAG ( PUS3.disableCycDIAG ,TM.disableCycDIAG   )  
+	connector CPTC2 sndTC1 ( ASYN.sndTC ,PUS3.tcComm   )  
+	connector CPTC2 sndTC2 ( ASYN.sndTC ,PUS14.tcComm   )  
+	connector CPTC2 genTM1 ( ASYN.genTM ,TM.getTM   )  
+	connector RDV2 initApp ( CSW_INIT.initApp ,ASYN.init   )  
+	connector RDV2 fw_CSWinitEnd ( CSW_INIT.fw_CSWinitEnd ,TM.CSWinitEnd   )  
+	connector RDV2 rc_CSWinitEnd_done ( TM.CSWinitEnd_done ,CSW_INIT.rc_CSWinitEnd_done   )  
+	connector RDV2 fw_modeChanged ( CSW_INIT.fw_modeChanged ,TM.modeChanged   )  
+	connector RDV2 rc_modeChanged_done ( TM.modeChanged_done ,CSW_INIT.rc_modeChanged_done   )  
+	connector SINGLE PUS3_disableDIAG ( PUS3.disableDIAG   )  
+	connector SINGLE PUS3_newDIAG  ( PUS3.newDIAG    )  
+	connector SINGLE PUS3_newHK  ( PUS3.newHK    )  
+	connector SINGLE PUS3_predef ( PUS3.predef   )  
+	connector SINGLE PUS3_enableHK ( PUS3.enableHK   )  
+	connector SINGLE PUS3_ground ( PUS3.ground   )  
+	connector SINGLE PUS3_disableHK ( PUS3.disableHK   )  
+	connector SINGLE PUS3_enableDIAG ( PUS3.enableDIAG   )  
+	connector SINGLE ASYN_enablePREHK ( ASYN.enablePREHK   )  
+	connector SINGLE ASYN_prepTM ( ASYN.prepTM   )  
+	connector SINGLE ASYN_enableGRHK ( ASYN.enableGRHK   )  
+	connector SINGLE ASYN_disableGRDIAG ( ASYN.disableGRDIAG   )  
+	connector SINGLE ASYN_disableGRHK ( ASYN.disableGRHK   )  
+	connector SINGLE ASYN_disablePRHK ( ASYN.disablePRHK   )  
+	connector SINGLE ASYN_enablePREDIAG ( ASYN.enablePREDIAG   )  
+	connector SINGLE ASYN_enableGRDIAG ( ASYN.enableGRDIAG   )  
+	connector SINGLE ASYN_newDIAG ( ASYN.newDIAG   )  
+	connector SINGLE ASYN_disablePRDIAG ( ASYN.disablePRDIAG   )  
+	connector SINGLE ASYN_newHK ( ASYN.newHK   )  
+	connector SINGLE CSW_INIT_CSWInit_start ( CSW_INIT.CSWInit_start   ) 
+
+	
+
+end
+
+component TMFunction Root
+
+end

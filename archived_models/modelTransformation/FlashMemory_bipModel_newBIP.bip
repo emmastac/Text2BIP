@@ -1,0 +1,216 @@
+package FlashMemory_bipModel_newBIP
+
+	port type syncPort()
+	
+
+
+connector type SINGLE(syncPort p1)
+define p1
+end
+
+
+connector type RDV2(syncPort p1, syncPort p2)
+define p1 p2
+end	
+
+connector type RDV3(syncPort p1, syncPort p2, syncPort p3)
+define p1 p2 p3
+end	
+
+connector type RDV4(syncPort p1, syncPort p2, syncPort p3, syncPort p4)
+define p1 p2 p3 p4
+end	
+
+connector type RDV5(syncPort p1, syncPort p2, syncPort p3, syncPort p4, syncPort p5)
+define p1 p2 p3 p4 p5
+end	
+
+connector type RDV6(syncPort p1, syncPort p2, syncPort p3, syncPort p4, syncPort p5, syncPort p6)
+define p1 p2 p3 p4 p5 p6
+end	
+
+connector type RDV7(syncPort p1, syncPort p2, syncPort p3, syncPort p4, syncPort p5, syncPort p6, syncPort p7)
+define p1 p2 p3 p4 p5 p6 p7
+end	
+
+connector type RDV8(syncPort p1, syncPort p2, syncPort p3, syncPort p4, syncPort p5, syncPort p6, syncPort p7, syncPort p8)
+define p1 p2 p3 p4 p5 p6 p7 p8
+end	
+
+ 
+atom type sMutex()
+
+   
+	export port  syncPort  take()     
+	export port  syncPort  release()   
+ 
+	place IDLE ,BUSY 
+
+initial to  IDLE do{  }
+
+ on take from IDLE to BUSY   
+ on release from BUSY to IDLE   
+
+
+end
+
+ 
+atom type flash_memory_readModeManager()
+
+   
+	export port  syncPort  read()     
+	export port  syncPort  contin()     
+	export port  syncPort  done()   
+ 
+	place READ ,IDLE 
+
+initial to  IDLE do{  }
+
+ on read from IDLE to READ   
+ on done from READ to IDLE   
+ on contin from READ to READ   
+
+
+end
+
+ 
+atom type flash_memory_writeModeManager()
+
+   
+	export port  syncPort  contin()     
+	export port  syncPort  write()     
+	export port  syncPort  done ()  
+ 
+	place READ ,IDLE 
+
+initial to  IDLE do{  }
+
+ on write from IDLE to READ   
+ on done from READ to IDLE   
+ on contin from READ to READ   
+
+
+end
+
+ 
+atom type flash_memory_readActionFlowWithAbort()
+
+   
+	export port  syncPort  fail     ()
+	export port  syncPort  read     ()
+	export port  syncPort  ok_read     ()
+	export port  syncPort  finish     ()
+	export port  syncPort  check_CRC ()    
+	export port  syncPort  bad_CRC   ()
+ 
+	place READ_BUFFER ,DONE ,CRC ,STATUS_READ 
+
+initial to  READ_BUFFER do{  }
+
+ on read from READ_BUFFER to CRC   
+ on check_CRC from CRC to STATUS_READ   
+ on bad_CRC from STATUS_READ to READ_BUFFER   
+ on fail from STATUS_READ to READ_BUFFER   
+ on ok_read from STATUS_READ to DONE   
+ on finish from DONE to READ_BUFFER   
+
+
+end
+
+ 
+atom type flash_memory_writeActionFlowWithAbort()
+
+   
+	export port  syncPort  fail     ()
+	export port  syncPort  wait     ()
+	export port  syncPort  ok_write  ()   
+	export port  syncPort  contin   ()  
+	export port  syncPort  finish   ()  
+	export port  syncPort  write   ()
+ 
+	place STATUS_WRITE ,DONE ,WRITE_BUFFER ,WAIT 
+
+initial to  WRITE_BUFFER do{  }
+
+ on write from WRITE_BUFFER to WAIT   
+ on wait from WAIT to STATUS_WRITE   
+ on contin from STATUS_WRITE to WRITE_BUFFER   
+ on fail from STATUS_WRITE to WRITE_BUFFER   
+ on ok_write from STATUS_WRITE to DONE   
+ on finish from DONE to WRITE_BUFFER   
+
+
+end
+
+ 
+atom type memory_library()
+
+   
+	export port  syncPort  setWrite ()    
+	export port  syncPort  checkCRC ()    
+	export port  syncPort  setRead   ()
+ 
+	place S0 
+
+initial to  S0 do{  }
+
+ on setWrite from S0 to S0   
+ on setRead from S0 to S0   
+ on checkCRC from S0 to S0   
+
+
+end
+
+
+
+compound type CubETH()
+
+
+	component sMutex MEM_MUX()
+	component flash_memory_readActionFlowWithAbort MEMRD_ACTFLAB() 
+	component flash_memory_writeActionFlowWithAbort MEMWR_ACTFLAB() 
+	component memory_library MEMLIB() 
+	component flash_memory_readModeManager MEMRD_MODMNG ()
+	component flash_memory_writeModeManager MEMWR_MODMNG ()
+
+ 
+	/* TODO: add in .smv file : flash_memory_read2 > 1 */
+	connector RDV3 flash_memory_setRead2 ( MEM_MUX.take ,MEMLIB.setRead ,MEMRD_MODMNG.read   )  
+	connector RDV2 flash_memory_setRead1 ( MEM_MUX.take ,MEMLIB.setRead   )  
+	connector RDV2 flash_memory_read ( MEMRD_MODMNG.contin ,MEMRD_ACTFLAB.read   )  
+	/0* TODO: add in .smv file : flash_memory_read_fail2 > flash_memory_read_fail1 */
+	connector RDV3 flash_memory_read_fail2 ( MEMRD_ACTFLAB.fail ,MEM_MUX.release ,MEMRD_MODMNG.done   )  
+	connector RDV2 flash_memory_read_fail1 ( MEMRD_ACTFLAB.fail ,MEM_MUX.release   )  
+	/* TODO: add in .smv file : flash_memory_ok_read2 > flash_memory_ok_read1 */
+	connector RDV3 flash_memory_ok_read2 ( MEMRD_ACTFLAB.ok_read ,MEM_MUX.release ,MEMRD_MODMNG.done   )  
+	connector RDV2 flash_memory_ok_read1 ( MEMRD_ACTFLAB.ok_read ,MEM_MUX.release   )  
+	connector RDV2 flash_memory_checkCRC ( MEMRD_ACTFLAB.check_CRC ,MEMLIB.checkCRC   )  
+	connector SINGLE flash_memory_bad_CRC ( MEMRD_ACTFLAB.bad_CRC   )  
+	connector RDV2 flash_memory_write ( MEMWR_MODMNG.contin ,MEMWR_ACTFLAB.write   )  
+	/* TODO: add in .smv file : flash_memory_read2 > 1 */
+	connector RDV3 flash_memory_setWrite2 ( MEM_MUX.take ,MEMLIB.setWrite ,MEMWR_MODMNG.write   )  
+	connector RDV2 flash_memory_setWrite1 ( MEM_MUX.take ,MEMLIB.setWrite   )  
+	/* TODO: add in .smv file : flash_memory_write_fail2 > flash_memory_write_fail1 */
+	connector RDV3 flash_memory_write_fail2 ( MEMWR_ACTFLAB.fail ,MEM_MUX.release ,MEMWR_MODMNG.done   )  
+	connector RDV2 flash_memory_write_fail1 ( MEMWR_ACTFLAB.fail ,MEM_MUX.release   )  
+	/* TODO: add in .smv file : flash_memory_ok_write2 > flash_memory_ok_write1 */
+	connector RDV3 flash_memory_ok_write2 ( MEMWR_ACTFLAB.ok_write ,MEM_MUX.release ,MEMWR_MODMNG.done   )  
+	connector RDV2 flash_memory_ok_write1 ( MEMWR_ACTFLAB.ok_write ,MEM_MUX.release   )  
+	connector SINGLE MEMRD_ACTFLAB_finish ( MEMRD_ACTFLAB.finish   )  
+	connector SINGLE MEMWR_ACTFLAB_wait ( MEMWR_ACTFLAB.wait   )  
+	connector SINGLE MEMWR_ACTFLAB_contin ( MEMWR_ACTFLAB.contin   )  
+	connector SINGLE MEMWR_ACTFLAB_finish ( MEMWR_ACTFLAB.finish   ) 
+
+	
+ 
+	priority flash_memory_setRead1_after_flash_memory_setRead2 		flash_memory_setRead1:* < flash_memory_setRead2:* 
+	priority flash_memory_read_fail1_after_flash_memory_read_fail2 		flash_memory_read_fail1:* < flash_memory_read_fail2:* 
+	priority flash_memory_ok_read1_after_flash_memory_ok_read2 		flash_memory_ok_read1:* < flash_memory_ok_read2:* 
+	priority flash_memory_setWrite1_after_flash_memory_setWrite2 		flash_memory_setWrite1:* < flash_memory_setWrite2:* 
+	priority flash_memory_write_fail1_after_flash_memory_write_fail2 		flash_memory_write_fail1:* < flash_memory_write_fail2:* 
+	priority flash_memory_ok_write1_after_flash_memory_ok_write2 		flash_memory_ok_write1:* < flash_memory_ok_write2:*
+
+end
+
+
+end

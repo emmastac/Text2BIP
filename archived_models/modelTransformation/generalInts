@@ -1,0 +1,23 @@
++ for ternary connectors
+
+Payload
+PL_to_I2C + MES_LIB → I2C_sat (I2C_sat) (OK)
+PL_to_MEM → write (Flash memory)  + setwrite (MEM_LIB) (OK)
+PL_to_MEM → return (Flash memory) (OK, δεν υπάρχει περίπτωση να κάνει fail το FlashMem? )
+
+CDMS_status
+I2C_res → I2C_sat (I2C_sat) + decodeMessage (MSG_LIB) (OK για return και fail)
+I2C_ask → I2C_sat (I2C_sat) + composeMessage (MSG_LIB) (OK)
+
+I2C_sat
+error1, error2, error3 → log (logger) (OK)
+
+Housekeeping
+HK_to_I2C + MES_LIB → I2C_sat (I2C_sat) (OK)
+HK_to_I2C_NOFAIL → I2C_sat (I2C_sat) (OK)
+mem_write_req → write + setwrite (MEM_LIB) (OK)
+mem_res → return, fail (Flash memory) (2 binary connectors) (OK)
+fail → log (logger) (ektos)
+
+Memory
+fail, bad_crc → log (logger) (OK)

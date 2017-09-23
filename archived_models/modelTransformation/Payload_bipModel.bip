@@ -1,0 +1,459 @@
+model Payload_bipModel
+
+	port type syncPort
+	//port type sync1Port(int msg1)
+	//port type sync2Port(int msg1, int msg2)
+	//port type sync3Port(int msg1, int msg2, int msg3)
+	//port type sync4Port(int msg1, int msg2, int msg3, int msg4)
+
+
+connector type SINGLE(syncPort p1)
+define p1
+end
+
+
+connector type RDV2(syncPort p1, syncPort p2)
+define p1 p2
+end	
+
+connector type RDV3(syncPort p1, syncPort p2, syncPort p3)
+define p1 p2 p3
+end	
+
+connector type RDV4(syncPort p1, syncPort p2, syncPort p3, syncPort p4)
+define p1 p2 p3 p4
+end	
+
+connector type RDV5(syncPort p1, syncPort p2, syncPort p3, syncPort p4, syncPort p5)
+define p1 p2 p3 p4 p5
+end	
+
+connector type RDV6(syncPort p1, syncPort p2, syncPort p3, syncPort p4, syncPort p5, syncPort p6)
+define p1 p2 p3 p4 p5 p6
+end	
+
+
+
+ 
+atomic type MessageLibrary
+
+   
+	export port  syncPort  composeMessage     
+	export port  syncPort  decodeMessage   
+ 
+	place S0 
+
+initial to  S0 do{  }
+
+ on decodeMessage from S0 to S0   
+ on composeMessage from S0 to S0   
+
+
+end
+
+ 
+atomic type sMutex
+
+   
+	export port  syncPort  take     
+	export port  syncPort  release   
+ 
+	place IDLE ,BUSY 
+
+initial to  IDLE do{  }
+
+ on take from IDLE to BUSY   
+ on release from BUSY to IDLE   
+
+
+end
+
+ /* Part of the s128_4 */ 
+ 
+atomic type s128_4ActionFlowWithAbort
+
+   
+	export port  syncPort  tc128_4     
+	export port  syncPort  fail     
+	export port  syncPort  I2C_ask     
+	export port  syncPort  wrong_state     
+	export port  syncPort  start     
+	export port  syncPort  executed     
+	export port  syncPort  I2C_res     
+	export port  syncPort  exec     
+	export port  syncPort  I2C_fail   
+ 
+	place IDLE ,BUSY ,VALIDATE ,START ,END ,I2C 
+
+initial to  IDLE do{  }
+
+ on start from IDLE to BUSY   
+ on tc128_4 from BUSY to VALIDATE   
+ on exec from VALIDATE to START   
+ on wrong_state from VALIDATE to IDLE   
+ on I2C_ask from START to I2C   
+ on I2C_fail from I2C to IDLE   
+ on I2C_res from I2C to END   
+ on executed from END to IDLE   
+ on fail from END to IDLE   
+
+
+end
+
+ /* Part of the s128_1 */ 
+ 
+atomic type s128_1ActionFlowWithAbort
+
+   
+	export port  syncPort  loaded     
+	export port  syncPort  fail     
+	export port  syncPort  I2C_ask     
+	export port  syncPort  load     
+	export port  syncPort  tc128_1     
+	export port  syncPort  wrong_state     
+	export port  syncPort  start     
+	export port  syncPort  I2C_res     
+	export port  syncPort  I2C_fail   
+ 
+	place IDLE ,BUSY ,VALIDATE ,START ,END ,I2C 
+
+initial to  IDLE do{  }
+
+ on start from IDLE to BUSY   
+ on tc128_1 from BUSY to VALIDATE   
+ on load from VALIDATE to START   
+ on wrong_state from VALIDATE to IDLE   
+ on I2C_ask from START to I2C   
+ on I2C_fail from I2C to IDLE   
+ on I2C_res from I2C to END   
+ on loaded from END to IDLE   
+ on fail from END to IDLE   
+
+
+end
+
+ /* Part of the s128_5 */ 
+ 
+atomic type s128_5ActionFlowWithAbort
+
+   
+	export port  syncPort  fail     
+	export port  syncPort  tc128_5     
+	export port  syncPort  I2C_ask     
+	export port  syncPort  aborted     
+	export port  syncPort  I2C_res     
+	export port  syncPort  I2C_fail   
+ 
+	place IDLE ,START ,END ,I2C 
+
+initial to  IDLE do{  }
+
+ on tc128_5 from IDLE to START   
+ on I2C_ask from START to I2C   
+ on I2C_fail from I2C to IDLE   
+ on I2C_res from I2C to END   
+ on aborted from END to IDLE   
+ on fail from END to IDLE   
+
+
+end
+
+ /* Part of the status_verification */ 
+ 
+atomic type statusVerificationActionFlowWithAbort
+
+   
+	export port  syncPort  I2C_ask     
+	export port  syncPort  started     
+	export port  syncPort  complete     
+	export port  syncPort  I2C_res     
+	export port  syncPort  I2C_fail     
+	export port  syncPort  full   
+ 
+	place CHECK_STATUS ,IDLE ,END ,I2C 
+
+initial to  IDLE do{  }
+
+ on started from IDLE to CHECK_STATUS   
+ on I2C_ask from CHECK_STATUS to I2C   
+ on I2C_fail from I2C to IDLE   
+ on I2C_res from I2C to END   
+ on complete from END to IDLE   
+ on full from END to IDLE   
+
+
+end
+
+ 
+atomic type plModeManager
+
+   
+	export port  syncPort  to_idle     
+	export port  syncPort  to_result_ready     
+	export port  syncPort  to_scenario_ready     
+	export port  syncPort  to_started     
+	export port  syncPort  load     
+	export port  syncPort  ready     
+	export port  syncPort  started     
+	export port  syncPort  exec   
+ 
+	place SCENARIO_READY ,IDLE ,STARTED ,RESULT_READY 
+
+initial to  IDLE do{  }
+
+ on load from IDLE to IDLE   
+ on to_scenario_ready from IDLE to SCENARIO_READY   
+ on exec from SCENARIO_READY to SCENARIO_READY   
+ on to_idle from SCENARIO_READY to IDLE   
+ on to_started from SCENARIO_READY to STARTED   
+ on started from STARTED to STARTED   
+ on to_idle from STARTED to IDLE   
+ on to_result_ready from STARTED to RESULT_READY   
+ on to_started from RESULT_READY to STARTED   
+ on ready from RESULT_READY to RESULT_READY   
+ on to_idle from RESULT_READY to IDLE   
+
+
+end
+
+ 
+atomic type data_transferActionFlowWithAbort
+
+ 
+data int  finish  
+   
+	export port  syncPort  I2C_ask     
+	export port  syncPort  ask_mem     
+	export port  syncPort  start     
+	export port  syncPort  mem_res     
+	export port  syncPort  I2C_res     
+	export port  syncPort  done     
+	export port  syncPort  not_done     
+	export port  syncPort  I2C_fail   
+ 
+	place ACQUIRE ,MEM ,IDLE ,END ,I2C ,SAVE 
+
+initial to  IDLE do{  
+	finish=0;  }
+
+ on start from IDLE to ACQUIRE   
+ on I2C_ask from ACQUIRE to I2C   
+ on I2C_fail from I2C to IDLE   
+ on I2C_res from I2C to SAVE   
+ on ask_mem from SAVE to MEM   
+ on mem_res from MEM to END   do{
+  finish=-1; /* finished=-1, as long as it is non-deterministically assigned */  }  
+ on done from END to IDLE  provided( (finish==-1 || finish==1) )   
+ on not_done from END to IDLE  provided( (finish==-1 || finish==0) )   
+
+
+end
+
+ 
+atomic type data_transferModeManager
+
+   
+	export port  syncPort  to_idle     
+	export port  syncPort  to_busy     
+	export port  syncPort  contin   
+ 
+	place IDLE ,BUSY 
+
+initial to  IDLE do{  }
+
+ on to_busy from IDLE to BUSY   
+ on to_idle from BUSY to IDLE   
+ on contin from BUSY to BUSY   
+
+
+end
+
+ 
+atomic type flash_memory_readActionFlowWithAbort
+
+   
+	export port  syncPort  fail     
+	export port  syncPort  read     
+	export port  syncPort  ok_CRC     
+	export port  syncPort  check_CRC     
+	export port  syncPort  bad_CRC     
+	export port  syncPort  return   
+ 
+	place READ ,CRC ,STATUS_READ ,IDLE 
+
+initial to  IDLE do{  }
+
+ on read from IDLE to CRC   
+ on check_CRC from CRC to STATUS_READ   
+ on bad_CRC from STATUS_READ to IDLE   
+ on ok_CRC from STATUS_READ to READ   
+ on fail from READ to IDLE   
+ on return from READ to IDLE   
+
+
+end
+
+ 
+atomic type flash_memory_writeActionFlowWithAbort
+
+   
+	export port  syncPort  fail     
+	export port  syncPort  wait     
+	export port  syncPort  contin     
+	export port  syncPort  write     
+	export port  syncPort  done     
+	export port  syncPort  return   
+ 
+	place STATUS_WRITE ,IDLE ,WAIT ,WRITE 
+
+initial to  IDLE do{  }
+
+ on write from IDLE to WAIT   
+ on wait from WAIT to STATUS_WRITE   
+ on contin from STATUS_WRITE to IDLE   
+ on done from STATUS_WRITE to WRITE   
+ on fail from WRITE to IDLE   
+ on return from WRITE to IDLE   
+
+
+end
+
+ 
+atomic type memory_library
+
+   
+	export port  syncPort  setWrite     
+	export port  syncPort  checkCRC     
+	export port  syncPort  setRead   
+ 
+	place S0 
+
+initial to  S0 do{  }
+
+ on setWrite from S0 to S0   
+ on setRead from S0 to S0   
+ on checkCRC from S0 to S0   
+
+
+end
+
+ 
+atomic type TC_128_4
+
+   
+	export port  syncPort  send_128_4     
+	export port  syncPort  response   
+ 
+	place S0 ,S1 
+
+initial to  S0 do{  }
+
+ on send_128_4 from S0 to S1   
+ on response from S1 to S0   
+
+
+end
+
+
+
+compound type CubETH_payload
+
+
+	component MessageLibrary MSGLIB 
+	component sMutex s128_4_MUX 
+	component s128_4ActionFlowWithAbort s128_4_ACTFLAB 
+	component sMutex s128_1_MUX 
+	component s128_1ActionFlowWithAbort s128_1_ACTFLAB 
+	component sMutex s128_5_MUX 
+	component s128_5ActionFlowWithAbort s128_5_ACTFLAB 
+	component sMutex STAT_VER_MUX 
+	component statusVerificationActionFlowWithAbort STAT_VER_ACTFLAB 
+	component plModeManager PLMODMNG 
+	component data_transferActionFlowWithAbort DATRANS_ACTFLAB 
+	component data_transferModeManager DATRANS_MODMNG 
+	component memory_library MEMLIB 
+
+ 
+	/******** s_128_4 ***********/
+	connector RDV2 s128_4_fail ( s128_4_MUX.release ,s128_4_ACTFLAB.fail   )  
+	connector RDV2 s128_4_wrong_state ( s128_4_MUX.release ,s128_4_ACTFLAB.wrong_state   )  
+	connector RDV2 s128_4_takeTC ( s128_4_MUX.take ,s128_4_ACTFLAB.tc128_4   )  
+	connector RDV2 s128_4_exec ( s128_4_ACTFLAB.exec ,PLMODMNG.exec   )  
+	/* TODO: add in .smv file : s128_4_executed2 > s128_4_executed1 */
+	connector RDV2 s128_4_success1 ( s128_4_MUX.release ,s128_4_ACTFLAB.executed   )  
+	connector RDV3 s128_4_success2 ( s128_4_MUX.release ,s128_4_ACTFLAB.executed ,PLMODMNG.to_started   )  
+	connector RDV2 s128_4_I2C_ask ( s128_4_ACTFLAB.I2C_ask ,MSGLIB.composeMessage   )  
+	connector RDV2 s128_4_I2C_res ( s128_4_ACTFLAB.I2C_res ,MSGLIB.decodeMessage   )  
+	connector RDV3 s128_4_I2C_fail ( s128_4_MUX.release ,s128_4_ACTFLAB.I2C_fail ,MSGLIB.decodeMessage   )  
+	/******** s_128_1 ***********/
+	connector RDV2 s128_1_fail ( s128_1_MUX.release ,s128_1_ACTFLAB.fail   )  
+	connector RDV2 s128_1_wrong_state ( s128_1_MUX.release ,s128_1_ACTFLAB.wrong_state   )  
+	connector RDV2 s128_1_takeTC ( s128_1_MUX.take ,s128_1_ACTFLAB.tc128_1   )  
+	connector RDV2 s128_1_load ( s128_1_ACTFLAB.load ,PLMODMNG.load   )  
+	/* TODO: add in .smv file : s128_1_success2 > s128_1_success1 */
+	connector RDV2 s128_1_success1 ( s128_1_MUX.release ,s128_1_ACTFLAB.loaded   )  
+	connector RDV3 s128_1_success2 ( s128_1_MUX.release ,s128_1_ACTFLAB.loaded ,PLMODMNG.to_scenario_ready   )  
+	connector RDV2 s128_1_I2C_ask ( s128_1_ACTFLAB.I2C_ask ,MSGLIB.composeMessage   )  
+	connector RDV2 s128_1_I2C_res ( s128_1_ACTFLAB.I2C_res ,MSGLIB.decodeMessage   )  
+	connector RDV3 s128_1_I2C_fail ( s128_1_MUX.release ,s128_1_ACTFLAB.I2C_fail ,MSGLIB.decodeMessage   )  
+	/******** s_128_5 ***********/
+	connector RDV2 s128_5_fail ( s128_5_MUX.release ,s128_5_ACTFLAB.fail   )  
+	/* TODO: add in .smv file : s128_5_aborted2 > s128_5_aborted1 */
+	connector RDV2 s128_5_aborted1 ( s128_1_MUX.release ,s128_5_ACTFLAB.aborted   )  
+	connector RDV3 s128_5_aborted2 ( s128_1_MUX.release ,s128_5_ACTFLAB.aborted ,PLMODMNG.to_idle   )  
+	connector RDV2 s128_5_takeTC ( s128_5_MUX.take ,s128_5_ACTFLAB.tc128_5   )  
+	connector RDV2 s128_5_I2C_ask ( s128_5_ACTFLAB.I2C_ask ,MSGLIB.composeMessage   )  
+	connector RDV2 s128_5_I2C_res ( s128_5_ACTFLAB.I2C_res ,MSGLIB.decodeMessage   )  
+	connector RDV3 s128_5_I2C_fail ( s128_5_MUX.release ,s128_5_ACTFLAB.I2C_fail ,MSGLIB.decodeMessage   )  
+	/******** status verification ***********/
+	connector RDV3 status_verif_started ( STAT_VER_MUX.take ,STAT_VER_ACTFLAB.started ,PLMODMNG.started   )  
+	/* TODO: add in .smv file : status_verif_result2 > status_verif_result1 */
+	connector RDV2 status_verif_result1 ( STAT_VER_MUX.release ,STAT_VER_ACTFLAB.full   )  
+	connector RDV3 status_verif_result2 ( STAT_VER_MUX.release ,STAT_VER_ACTFLAB.full ,PLMODMNG.to_result_ready   )  
+	/* TODO: add in .smv file : status_verif_to_idle2 > status_verif_to_idle1 */
+	connector RDV2 status_verif_to_idle1 ( STAT_VER_MUX.release ,STAT_VER_ACTFLAB.complete   )  
+	connector RDV3 status_verif_to_idle2 ( STAT_VER_MUX.release ,STAT_VER_ACTFLAB.complete ,PLMODMNG.to_idle   )  
+	connector RDV2 status_verif_I2C_ask ( STAT_VER_ACTFLAB.I2C_ask ,MSGLIB.composeMessage   )  
+	connector RDV2 status_verif_I2C_res ( STAT_VER_ACTFLAB.I2C_res ,MSGLIB.decodeMessage   )  
+	connector RDV2 status_verif_I2C_fail ( STAT_VER_ACTFLAB.I2C_fail ,MSGLIB.decodeMessage   )  
+	/* TODO: add in .smv file : payload_ready2 > 1 */
+	connector SINGLE payload_ready1 ( PLMODMNG.ready   )  
+	connector RDV2 payload_ready2 ( PLMODMNG.ready ,DATRANS_MODMNG.to_busy   )  
+	connector RDV2 data_transfer_start ( DATRANS_ACTFLAB.start ,DATRANS_MODMNG.contin   )  
+	/* TODO: add in .smv file : data_transfer_done4 > ..3, 2, 1 & 2 > 1, 3 > 1 */
+	connector SINGLE data_transfer_done1 ( DATRANS_ACTFLAB.done   )  
+	connector RDV2 data_transfer_done2 ( DATRANS_ACTFLAB.done ,DATRANS_MODMNG.to_idle   )  
+	connector RDV2 data_transfer_done3 ( DATRANS_ACTFLAB.done ,PLMODMNG.to_started   )  
+	connector RDV3 data_transfer_done4 ( DATRANS_ACTFLAB.done ,DATRANS_MODMNG.to_idle ,PLMODMNG.to_started   )  
+	connector RDV2 data_transfer_I2C_ask ( DATRANS_ACTFLAB.I2C_ask ,MSGLIB.composeMessage   )  
+	connector RDV2 data_transfer_I2C_res ( DATRANS_ACTFLAB.I2C_res ,MSGLIB.decodeMessage   )  
+	connector RDV2 data_transfer_I2C_fail ( DATRANS_ACTFLAB.I2C_fail ,MSGLIB.decodeMessage   )  
+	/* PL_to_MEM → write (Flash memory)  + setwrite (MEM_LIB) */
+	connector RDV2 data_transfer_ask_mem ( DATRANS_ACTFLAB.ask_mem ,MEMLIB.setWrite   )  
+	/* PL_to_MEM → return (Flash memory)  */
+	connector SINGLE data_transfer_mem_res ( DATRANS_ACTFLAB.mem_res   )  
+	connector SINGLE s128_4_ACTFLAB_start ( s128_4_ACTFLAB.start   )  
+	connector SINGLE s128_1_ACTFLAB_start ( s128_1_ACTFLAB.start   )  
+	connector SINGLE DATRANS_ACTFLAB_not_done ( DATRANS_ACTFLAB.not_done   )  
+	connector SINGLE MEMLIB_checkCRC ( MEMLIB.checkCRC   )  
+	connector SINGLE MEMLIB_setRead ( MEMLIB.setRead   ) 
+
+	
+ 
+	priority s128_4_success1_after_s128_4_success2 		s128_4_success1 < s128_4_success2 
+	priority s128_1_success1_after_s128_1_success2 		s128_1_success1 < s128_1_success2 
+	priority s128_5_aborted1_after_s128_5_aborted2 		s128_5_aborted1 < s128_5_aborted2 
+	priority status_verif_result1_after_status_verif_result2 		status_verif_result1 < status_verif_result2 
+	priority payload_ready1_after_payload_ready2 		payload_ready1 < payload_ready2 
+	priority status_verif_to_idle1_after_status_verif_to_idle2 		status_verif_to_idle1 < status_verif_to_idle2 
+	priority data_transfer_done1_after_data_transfer_done2 		data_transfer_done1 < data_transfer_done2 
+	priority data_transfer_done1_after_data_transfer_done3 		data_transfer_done1 < data_transfer_done3 
+	priority data_transfer_done1_after_data_transfer_done4 		data_transfer_done1 < data_transfer_done4 
+	priority data_transfer_done2_after_data_transfer_done4 		data_transfer_done2 < data_transfer_done4 
+	priority data_transfer_done3_after_data_transfer_done4 		data_transfer_done3 < data_transfer_done4
+
+end
+
+component CubETH_payload Root
+
+end
